@@ -620,17 +620,36 @@ function renderPokeCard(cardId, p) {
   window['_'+prefix+'Poke'] = p;
 }
 
-// 技セレクト生成
+// 技セレクト生成 — まず技名だけ一覧表示、選択後に詳細取得
 async function populateMoveSelect(p) {
   const sel = document.getElementById('atk-move-select');
   sel.innerHTML = '<option value="">— 読み込み中... —</option>';
-  // 最大50技のみ取得（全部だと重い）
-  const moves = p.moves.slice(0,50);
-  const results = await Promise.allSettled(moves.map(m=>fetchMove(m.url)));
-  const validMoves = results.filter(r=>r.status==='fulfilled'&&r.value.power).map(r=>r.value);
-  validMoves.sort((a,b)=>(b.power||0)-(a.power||0));
-  sel.innerHTML = '<option value="">— 技を選択 —</option>' +
-    validMoves.map(m=>`<option value="${m.nameEn}" data-pow="${m.power}" data-type="${m.type}" data-class="${m.damageClass}">${m.name}（${TYPE_JP[m.type]||m.type} / 威力${m.power}）</option>`).join('');
+
+  // p.moves の正しい構造: [{move:{name,url}, version_group_details:[...]}]
+  const moves = p.moves.map(m=>({name:m.move.name, url:m.move.url}));
+
+  // まず技名だけ表示（軽量）
+  sel.innerHTML = '<option value="">— 技を選択してください —</option>' +
+    moves.map(m=>`<option value="${m.name}" data-url="${m.url}" data-pow="" data-type="" data-class="">${m.name}</option>`).join('');
+
+  // 選択時に詳細を取得してoption属性を更新
+  sel.onchange = async function(){
+    const opt = sel.selectedOptions[0];
+    if(!opt||!opt.value) return;
+    if(opt.dataset.type) return; // 既に取得済み
+    const infoEl = document.getElementById('atk-move-info');
+    infoEl.innerHTML='技データ取得中...'; infoEl.classList.add('show');
+    try{
+      const m = await fetchMove(opt.dataset.url);
+      opt.dataset.pow = m.power||0;
+      opt.dataset.type = m.type;
+      opt.dataset.class = m.damageClass;
+      opt.textContent = `${m.name}（${TYPE_JP[m.type]||m.type} / 威力${m.power||'—'}）`;
+      infoEl.innerHTML=`<strong>${m.name}</strong> &nbsp;<span class="type-pill t-${m.type}" style="font-size:9px;">${TYPE_JP[m.type]||m.type}</span><br>
+        威力: ${m.power||'—'} &nbsp; 命中: ${m.accuracy||'—'} &nbsp; PP: ${m.pp||'—'} &nbsp; 分類: ${m.damageClass}`;
+      infoEl.classList.add('show');
+    }catch(e){ infoEl.innerHTML='取得できませんでした。'; }
+  };
 }
 
 // 技情報表示
@@ -694,11 +713,19 @@ function calcDamage() {
 let myMovesData = [];
 async function populateMyMoves(p) {
   const el = document.getElementById('my-moves-list');
-  el.innerHTML = '<div style="font-size:11px;color:var(--text2);">技データ読み込み中...</div>';
-  const moves = p.moves.slice(0,40);
+  el.innerHTML = '<div style="font-size:11px;color:var(--text2);">技データ取得中（最大8件）...</div>';
+  // 正しい構造: m.move.url
+  const moves = p.moves.slice(0,30).map(m=>({name:m.move.name, url:m.move.url}));
   const results = await Promise.allSettled(moves.map(m=>fetchMove(m.url)));
-  myMovesData = results.filter(r=>r.status==='fulfilled'&&r.value.power).map(r=>r.value).slice(0,4);
-  el.innerHTML = '<div style="font-size:10px;color:var(--text2);letter-spacing:2px;margin-bottom:8px;">代表的な技（最大4つ）</div>' +
+  myMovesData = results
+    .filter(r=>r.status==='fulfilled' && r.value.power && r.value.power > 0)
+    .map(r=>r.value)
+    .slice(0,8);
+  if(!myMovesData.length){
+    el.innerHTML='<div style="font-size:11px;color:var(--text2);">ダメージ技が見つかりませんでした</div>';
+    return;
+  }
+  el.innerHTML = '<div style="font-size:10px;color:var(--text2);letter-spacing:2px;margin-bottom:8px;">使用可能な技</div>' +
     myMovesData.map((m,i)=>`
       <div style="padding:7px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;">
         <span class="type-pill t-${m.type}" style="font-size:9px;">${TYPE_JP[m.type]||m.type}</span>
