@@ -138,7 +138,22 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;margin:4p
 .tp-ひこう,.tp-飛行{background:#0277bd;color:#fff;}.tp-エスパー{background:#ad1457;color:#fff;}.tp-むし,.tp-虫{background:#558b2f;color:#fff;}
 .tp-いわ,.tp-岩{background:#4e342e;color:#fff;}.tp-ゴースト{background:#4a148c;color:#fff;}.tp-ドラゴン{background:#4527a0;color:#fff;}
 .tp-あく,.tp-悪{background:#212121;color:#fff;}.tp-はがね,.tp-鋼{background:#455a64;color:#fff;}.tp-フェアリー{background:#880e4f;color:#fff;}
-footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18px 20px;margin-top:36px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.add-section{margin-top:16px;border:1px solid var(--border2);background:var(--bg2);padding:16px;}
+.add-section-title{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--accent3);margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+.add-section-title::after{content:'';flex:1;height:1px;background:var(--border2);}
+.add-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.add-card{background:var(--panel);border:1px solid var(--border);padding:12px;}
+.add-card-label{font-size:9px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;margin-bottom:8px;}
+.add-total-box{background:var(--bg);border:1px solid var(--border2);padding:14px;margin-top:12px;}
+.add-total-num{font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--accent3);line-height:1;}
+.add-total-pct{font-family:'JetBrains Mono',monospace;font-size:24px;color:var(--accent3);margin-top:4px;}
+.add-bar-wrap{height:8px;background:var(--bg);overflow:hidden;margin:8px 0;display:flex;gap:2px;}
+.add-bar-1{height:100%;background:var(--accent);transition:width 0.5s;}
+.add-bar-2{height:100%;background:var(--accent2);transition:width 0.5s;}
+.add-breakdown{font-size:11px;color:var(--text3);margin-top:8px;line-height:2;}
+.add-ko-tag{display:inline-block;padding:2px 9px;font-size:10px;font-weight:700;letter-spacing:2px;margin-top:6px;}
+.add-ko1{background:var(--accent2);color:#fff;}.add-ko2{background:var(--accent3);color:#000;}.add-ko3{background:var(--text2);color:#fff;}
+footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18px 20px;margin-top:36px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
 .footer-logo{font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--text2);letter-spacing:4px;}
 .footer-text{font-size:10px;color:var(--text2);line-height:1.6;}
 </style>
@@ -350,6 +365,10 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
     </div>
 
     <button class="main-btn" onclick="calcDamage()">CALCULATE DAMAGE</button>
+    <div style="display:flex;align-items:center;gap:10px;margin:-4px 0 8px;">
+      <button id="add-toggle-btn" onclick="toggleAddMode()" style="background:transparent;border:1px solid var(--border2);color:var(--text2);padding:6px 16px;cursor:pointer;font-size:11px;font-family:'Noto Sans JP',sans-serif;letter-spacing:1px;transition:all 0.18s;">＋ 加算計算を使う</button>
+      <span style="font-size:10px;color:var(--text2);">2体・2技の合計ダメージで倒せるか判定</span>
+    </div>
 
     <div class="result-box" id="result-box">
       <div class="sec">計算結果</div>
@@ -369,6 +388,137 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
       <div style="margin-top:12px;">
         <div style="font-size:10px;color:var(--text2);margin-bottom:4px;letter-spacing:2px;">乱数16段階（最小〜最大）</div>
         <div class="rolls-wrap" id="dmg-rolls"></div>
+      </div>
+    </div>
+
+    <!-- 加算計算セクション -->
+    <div class="add-section" id="add-section" style="display:none;">
+      <div class="add-section-title">加算ダメージ計算（2体 × 2技）</div>
+      <div class="add-grid">
+
+        <!-- 攻撃側2 -->
+        <div class="add-card">
+          <div class="add-card-label">攻撃側 2体目</div>
+          <label>ポケモン検索</label>
+          <div class="search-wrap">
+            <input class="search-input" id="atk2-search" type="text" placeholder="名前を入力..." autocomplete="off">
+            <div class="dropdown" id="atk2-drop"></div>
+          </div>
+          <div class="poke-card" id="atk2-card">
+            <div class="poke-no" id="atk2-no"></div>
+            <div class="poke-name" id="atk2-name"></div>
+            <div class="poke-types" id="atk2-types"></div>
+            <div id="atk2-basestats"></div>
+          </div>
+          <label>レベル</label>
+          <input type="number" id="atk2-lv" value="50" min="1" max="100">
+          <label>性格</label>
+          <select id="atk2-nature">
+            <option>おっとり</option><option>いじっぱり</option><option>やんちゃ</option>
+            <option>ゆうかん</option><option>さみしがり</option><option>ずぶとい</option>
+            <option>わんぱく</option><option>のうてんき</option><option>のんき</option>
+            <option>ひかえめ</option><option>うっかりや</option><option>おだやか</option>
+            <option>おとなしい</option><option>しんちょう</option><option>なまいき</option>
+            <option>おくびょう</option><option>せっかち</option><option>ようき</option>
+            <option>むじゃき</option><option>おとぼけ</option>
+          </select>
+          <label>個体値（0〜31）</label>
+          <div class="slider-row">
+            <div class="slider-header"><span class="slider-label">個体値</span><span class="slider-val" id="atk2-iv-disp">31</span></div>
+            <div class="slider-inputs">
+              <input type="range" id="atk2-iv-range" min="0" max="31" value="31">
+              <input type="number" id="atk2-iv" min="0" max="31" value="31">
+            </div>
+          </div>
+          <label>努力値（こうげき）</label>
+          <div class="slider-row">
+            <div class="slider-header"><span class="slider-label">努力値</span><span class="slider-val" id="atk2-ev-atk-disp">0</span></div>
+            <div class="slider-inputs">
+              <input type="range" id="atk2-ev-atk-range" min="0" max="252" step="4" value="0">
+              <input type="number" id="atk2-ev-atk" min="0" max="252" value="0">
+            </div>
+          </div>
+          <label>努力値（とくこう）</label>
+          <div class="slider-row">
+            <div class="slider-header"><span class="slider-label">努力値</span><span class="slider-val" id="atk2-ev-spa-disp">0</span></div>
+            <div class="slider-inputs">
+              <input type="range" id="atk2-ev-spa-range" min="0" max="252" step="4" value="0">
+              <input type="number" id="atk2-ev-spa" min="0" max="252" value="0">
+            </div>
+          </div>
+          <div class="real-stat-box">
+            <div class="real-stat-row">
+              <span class="real-stat-label">こうげき</span>
+              <span class="real-stat-val" id="atk2-stat-atk">—</span>
+              <span class="real-stat-note">物理技で参照</span>
+            </div>
+            <div class="real-stat-row">
+              <span class="real-stat-label">とくこう</span>
+              <span class="real-stat-val" id="atk2-stat-spa">—</span>
+              <span class="real-stat-note">特殊技で参照</span>
+            </div>
+          </div>
+          <label style="margin-top:10px;">技検索（2体目）</label>
+          <div class="search-wrap">
+            <input class="search-input" id="atk2-move-search" type="text" placeholder="技名を入力..." autocomplete="off">
+            <div class="dropdown" id="atk2-move-drop"></div>
+          </div>
+          <input type="hidden" id="atk2-move-pow" value="">
+          <input type="hidden" id="atk2-move-type" value="">
+          <input type="hidden" id="atk2-move-cat" value="">
+          <input type="hidden" id="atk2-move-hits" value="">
+          <div id="atk2-move-info" style="display:none;background:var(--bg2);border:1px solid var(--border2);padding:8px 10px;margin-top:4px;font-size:11px;color:var(--text3);line-height:1.7;"></div>
+          <label>持ち物</label>
+          <select id="atk2-item">
+            <option value="hachimaki">こだわりハチマキ ×1.5（物理）</option>
+            <option value="megane">こだわりメガネ ×1.5（特殊）</option>
+            <option value="inochi">いのちのたま ×1.3</option>
+            <option value="tatsujin">たつじんのおび ×1.2（抜群時）</option>
+            <option value="none" selected>なし</option>
+          </select>
+        </div>
+
+        <!-- 1体目の技2 -->
+        <div class="add-card">
+          <div class="add-card-label">攻撃側 1体目 / 技2</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:8px;">1体目（上の攻撃側）が打つ2発目の技を選択</div>
+          <label>技検索（1体目・2発目）</label>
+          <div class="search-wrap">
+            <input class="search-input" id="atk1b-move-search" type="text" placeholder="技名を入力..." autocomplete="off">
+            <div class="dropdown" id="atk1b-move-drop"></div>
+          </div>
+          <input type="hidden" id="atk1b-move-pow" value="">
+          <input type="hidden" id="atk1b-move-type" value="">
+          <input type="hidden" id="atk1b-move-cat" value="">
+          <input type="hidden" id="atk1b-move-hits" value="">
+          <div id="atk1b-move-info" style="display:none;background:var(--bg2);border:1px solid var(--border2);padding:8px 10px;margin-top:4px;font-size:11px;color:var(--text3);line-height:1.7;"></div>
+          <label>持ち物（1体目・2発目用）</label>
+          <select id="atk1b-item">
+            <option value="hachimaki">こだわりハチマキ ×1.5（物理）</option>
+            <option value="megane">こだわりメガネ ×1.5（特殊）</option>
+            <option value="inochi">いのちのたま ×1.3</option>
+            <option value="tatsujin">たつじんのおび ×1.2（抜群時）</option>
+            <option value="none" selected>なし</option>
+          </select>
+          <div style="font-size:10px;color:var(--text2);margin-top:10px;line-height:1.8;border-top:1px solid var(--border);padding-top:10px;">
+            ※ 1体目のポケモン・個体値・努力値・レベル・性格は<br>上の攻撃側の設定をそのまま使います。
+          </div>
+        </div>
+      </div>
+
+      <button class="main-btn" style="background:linear-gradient(135deg,var(--accent3),#997a00);margin-top:12px;" onclick="calcAddDamage()">⚡ 合計ダメージを計算</button>
+
+      <div class="add-total-box" id="add-result" style="display:none;">
+        <div class="add-result-title" style="font-size:10px;letter-spacing:2px;color:var(--text2);margin-bottom:8px;">合計ダメージ結果</div>
+        <div class="add-total-num" id="add-total-num">—</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:4px;" id="add-total-range"></div>
+        <div class="add-bar-wrap" id="add-bar-wrap">
+          <div class="add-bar-1" id="add-bar-1" style="width:0%"></div>
+          <div class="add-bar-2" id="add-bar-2" style="width:0%"></div>
+        </div>
+        <div class="add-total-pct" id="add-total-pct">0%</div>
+        <div id="add-ko-tag"></div>
+        <div class="add-breakdown" id="add-breakdown"></div>
       </div>
     </div>
   </div>
@@ -760,6 +910,219 @@ function calcDamage() {
   if(pmx>=100)     { kt.innerHTML='<span class="ko-tag ko1">確定1発</span>'; document.getElementById('dmg-desc').textContent='確実に倒せます'; }
   else if(pmn>=50) { kt.innerHTML='<span class="ko-tag ko2">確定2発</span>'; document.getElementById('dmg-desc').textContent='2回で確実に倒せます'; }
   else             { kt.innerHTML='<span class="ko-tag ko3">3発以上</span>'; document.getElementById('dmg-desc').textContent='3回以上必要です'; }
+}
+
+// ===== 加算モード =====
+function toggleAddMode() {
+  const sec = document.getElementById('add-section');
+  const btn = document.getElementById('add-toggle-btn');
+  const isOn = sec.style.display === 'block';
+  sec.style.display = isOn ? 'none' : 'block';
+  btn.textContent = isOn ? '＋ 加算計算を使う' : '✕ 加算計算を閉じる';
+  btn.style.borderColor = isOn ? 'var(--border2)' : 'var(--accent3)';
+  btn.style.color = isOn ? 'var(--text2)' : 'var(--accent3)';
+  if(!isOn) {
+    setupMoveSearch2('atk2-move-search','atk2-move-drop','atk2');
+    setupMoveSearch2('atk1b-move-search','atk1b-move-drop','atk1b');
+    setupSearch('atk2-search','atk2-drop');
+    syncSlider('atk2-iv-range','atk2-iv','atk2-iv-disp');
+    syncSlider('atk2-ev-atk-range','atk2-ev-atk','atk2-ev-atk-disp');
+    syncSlider('atk2-ev-spa-range','atk2-ev-spa','atk2-ev-spa-disp');
+    document.getElementById('atk2-lv').addEventListener('input', recalcAtk2);
+    document.getElementById('atk2-nature').addEventListener('change', recalcAtk2);
+  }
+}
+
+// 2体目初期化
+function initAtk2(p) {
+  window._atk2Base = p;
+  document.getElementById('atk2-no').textContent = '#' + String(p.no).padStart(3,'0');
+  document.getElementById('atk2-name').textContent = p.name;
+  const t1=p.type1?`<span class="type-pill tp-${p.type1}">${p.type1}</span>`:'';
+  const t2=p.type2?`<span class="type-pill tp-${p.type2}">${p.type2}</span>`:'';
+  document.getElementById('atk2-types').innerHTML=t1+t2;
+  document.getElementById('atk2-card').classList.add('show');
+  renderBaseStats('atk2', p);
+  recalcAtk2();
+}
+
+function recalcAtk2() {
+  const p = window._atk2Base;
+  if(!p) return;
+  const lv  = parseInt(document.getElementById('atk2-lv').value)||50;
+  const iv  = parseInt(document.getElementById('atk2-iv').value)||31;
+  const evA = parseInt(document.getElementById('atk2-ev-atk').value)||0;
+  const evS = parseInt(document.getElementById('atk2-ev-spa').value)||0;
+  const nat = PERSONALITIES[document.getElementById('atk2-nature').value]||{atk:1,spa:1};
+  const atkVal = calcStat(p.atk, iv, evA, lv, nat.atk);
+  const spaVal = calcStat(p.spa, iv, evS, lv, nat.spa);
+  document.getElementById('atk2-stat-atk').textContent = atkVal;
+  document.getElementById('atk2-stat-spa').textContent = spaVal;
+  document.getElementById('atk2-ev-atk-disp').textContent = evA;
+  document.getElementById('atk2-ev-spa-disp').textContent = evS;
+  document.getElementById('atk2-iv-disp').textContent = iv;
+  window._atk2Stats = {atk: atkVal, spa: spaVal};
+}
+
+// 技検索（加算用）
+function setupMoveSearch2(inputId, dropId, prefix) {
+  const inp  = document.getElementById(inputId);
+  const drop = document.getElementById(dropId);
+  if(!inp) return;
+  let timer;
+  inp.addEventListener('input', () => {
+    clearTimeout(timer);
+    const q = inp.value.trim();
+    if(!q) { drop.classList.remove('show'); return; }
+    timer = setTimeout(() => {
+      const results = moveIndex.filter(m => m.name.includes(q) && m.power > 0).slice(0,14);
+      if(!results.length) { drop.classList.remove('show'); return; }
+      drop.innerHTML = results.map(m => {
+        const cat = m.category==='物理'?'物理':m.category==='特殊'?'特殊':'変化';
+        return `<div class="drop-item" onclick="selectMove2(${m._i},'${prefix}')">
+          <span class="type-pill tp-${m.type}" style="font-size:9px;">${m.type}</span>
+          <span class="drop-name">${m.name}</span>
+          <span style="font-size:10px;color:var(--text2);">${cat} / 威力${m.power}${m.hits>1?' ×'+m.hits+'hit':''}</span>
+        </div>`;
+      }).join('');
+      drop.classList.add('show');
+    }, 150);
+  });
+  document.addEventListener('click', e => {
+    if(!inp.contains(e.target)&&!drop.contains(e.target)) drop.classList.remove('show');
+  });
+}
+
+function selectMove2(idx, prefix) {
+  const m = MOVES_DATA[idx];
+  document.getElementById(prefix+'-move-search').value = m.name;
+  document.getElementById(prefix+'-move-drop').classList.remove('show');
+  document.getElementById(prefix+'-move-pow').value  = m.power;
+  document.getElementById(prefix+'-move-type').value = m.type;
+  document.getElementById(prefix+'-move-cat').value  = m.category;
+  document.getElementById(prefix+'-move-hits').value = m.hits;
+  const cat = m.category==='物理'?'物理（こうげき参照）':m.category==='特殊'?'特殊（とくこう参照）':'変化技';
+  const info = document.getElementById(prefix+'-move-info');
+  info.style.display='block';
+  info.innerHTML=`<strong>${m.name}</strong> &nbsp;<span class="type-pill tp-${m.type}" style="font-size:9px;">${m.type}</span><br>${cat} / 威力 ${m.power}${m.hits>1?' ×'+m.hits+'hit':''} / PP ${m.pp||'—'}`;
+}
+
+// ===== 共通ダメージ計算関数 =====
+const MOVE_TYPE_TO_POKE2 = {
+  '炎':'ほのお','水':'みず','電気':'でんき','草':'くさ','氷':'こおり',
+  '格闘':'かくとう','毒':'どく','地面':'じめん','飛行':'ひこう','虫':'むし',
+  '岩':'いわ','悪':'あく','鋼':'はがね',
+  'ノーマル':'ノーマル','エスパー':'エスパー','ゴースト':'ゴースト',
+  'ドラゴン':'ドラゴン','フェアリー':'フェアリー'
+};
+
+function calcOneDamage(atkStats, atkBase, defStats, defBase, lv, mtype, mcat, mhits, mpower, itemKey) {
+  const atkStat = mcat==='物理' ? atkStats.atk : atkStats.spa;
+  const defStat = mcat==='物理' ? defStats.def  : defStats.spd;
+  const hp      = defStats.hp;
+  const defTypes = defBase ? [defBase.type1, defBase.type2].filter(Boolean) : [];
+  const eff      = getTypeEff(mtype, defTypes);
+  const atkTypes = atkBase ? [atkBase.type1, atkBase.type2].filter(Boolean) : [];
+  const stab     = atkTypes.includes(MOVE_TYPE_TO_POKE2[mtype]||mtype) ? 1.5 : 1;
+  let itemMult = 1;
+  if(itemKey==='hachimaki' && mcat==='物理') itemMult=1.5;
+  else if(itemKey==='megane' && mcat==='特殊') itemMult=1.5;
+  else if(itemKey==='inochi') itemMult=1.3;
+  else if(itemKey==='tatsujin' && eff>1) itemMult=1.2;
+  const step1 = Math.floor(lv*2/5+2);
+  const step2 = Math.floor(Math.floor(step1*mpower*atkStat/defStat)/50)+2;
+  const step3 = Math.floor(step2*itemMult);
+  const step4 = Math.floor(step3*stab);
+  const rolls  = Array.from({length:16},(_,i)=>Math.floor(step4*(85+i)/100));
+  const damages = rolls.map(d=>Math.floor(d*eff)*mhits);
+  return {damages, eff, stab, mn:damages[0], mx:damages[15]};
+}
+
+// ===== 加算ダメージ計算 =====
+function calcAddDamage() {
+  if(!window._atkStats || !window._defStats) { alert('メインの攻撃側・防御側ポケモンを選択してください'); return; }
+
+  // 1体目・技1（メインの計算結果を流用）
+  const pow1  = parseInt(document.getElementById('atk-move-pow').value)||0;
+  const type1 = document.getElementById('atk-move-type').value;
+  const cat1  = document.getElementById('atk-move-cat').value;
+  const hits1 = parseInt(document.getElementById('atk-move-hits').value)||1;
+  const item1 = document.getElementById('atk-item').value;
+  const lv1   = parseInt(document.getElementById('atk-lv').value)||50;
+  if(!pow1||!type1) { alert('1体目の技を選択してください'); return; }
+
+  // 1体目・技2
+  const pow1b  = parseInt(document.getElementById('atk1b-move-pow').value)||0;
+  const type1b = document.getElementById('atk1b-move-type').value;
+  const cat1b  = document.getElementById('atk1b-move-cat').value;
+  const hits1b = parseInt(document.getElementById('atk1b-move-hits').value)||1;
+  const item1b = document.getElementById('atk1b-item').value;
+
+  // 2体目・技
+  const pow2  = parseInt(document.getElementById('atk2-move-pow').value)||0;
+  const type2 = document.getElementById('atk2-move-type').value;
+  const cat2  = document.getElementById('atk2-move-cat').value;
+  const hits2 = parseInt(document.getElementById('atk2-move-hits').value)||1;
+  const item2 = document.getElementById('atk2-item').value;
+  const lv2   = parseInt(document.getElementById('atk2-lv').value)||50;
+
+  if(!pow2||!type2) { alert('2体目のポケモンと技を選択してください'); return; }
+  if(!window._atk2Stats) { alert('2体目のポケモンを選択してください'); return; }
+
+  const hp = window._defStats.hp;
+
+  // 各ダメージ計算
+  const r1  = calcOneDamage(window._atkStats,  window._atkBase,  window._defStats, window._defBase, lv1, type1,  cat1,  hits1,  pow1,  item1);
+  const r1b = pow1b ? calcOneDamage(window._atkStats, window._atkBase, window._defStats, window._defBase, lv1, type1b, cat1b, hits1b, pow1b, item1b) : null;
+  const r2  = calcOneDamage(window._atk2Stats, window._atk2Base, window._defStats, window._defBase, lv2, type2,  cat2,  hits2,  pow2,  item2);
+
+  // 合計（最小同士・最大同士）
+  const totalMn = r1.mn + (r1b ? r1b.mn : 0) + r2.mn;
+  const totalMx = r1.mx + (r1b ? r1b.mx : 0) + r2.mx;
+  const pctMn   = Math.round(totalMn/hp*100);
+  const pctMx   = Math.round(totalMx/hp*100);
+
+  // バーの幅（1体目 / 2体目の割合）
+  const bar1w = Math.min(Math.round((r1.mx+(r1b?r1b.mx:0))/hp*100), 100);
+  const bar2w = Math.min(Math.round(r2.mx/hp*100), 100);
+  const totalBarW = Math.min(pctMx, 100);
+  document.getElementById('add-bar-1').style.width = Math.min(bar1w, totalBarW)+'%';
+  document.getElementById('add-bar-2').style.width = Math.min(bar2w, totalBarW - Math.min(bar1w,totalBarW))+'%';
+
+  document.getElementById('add-result').style.display='block';
+  document.getElementById('add-total-num').textContent = `${totalMn} 〜 ${totalMx}`;
+  document.getElementById('add-total-range').textContent = `合計ダメージ幅: ${totalMn}〜${totalMx}`;
+  document.getElementById('add-total-pct').textContent  = `${pctMn}〜${pctMx}%`;
+
+  const atkName1 = window._atkBase  ? window._atkBase.name  : '1体目';
+  const atkName2 = window._atk2Base ? window._atk2Base.name : '2体目';
+  const move1name  = document.getElementById('atk-move-search').value  || '技1';
+  const move1bname = document.getElementById('atk1b-move-search').value || '';
+  const move2name  = document.getElementById('atk2-move-search').value  || '技(2体目)';
+
+  let breakdown = `<span style="color:var(--accent);">■ ${atkName1} / ${move1name}</span>　${r1.mn}〜${r1.mx}ダメージ（${Math.round(r1.mn/hp*100)}〜${Math.round(r1.mx/hp*100)}%）`;
+  if(r1b) breakdown += `<br><span style="color:var(--accent);">■ ${atkName1} / ${move1bname}</span>　${r1b.mn}〜${r1b.mx}ダメージ（${Math.round(r1b.mn/hp*100)}〜${Math.round(r1b.mx/hp*100)}%）`;
+  breakdown += `<br><span style="color:var(--accent2);">■ ${atkName2} / ${move2name}</span>　${r2.mn}〜${r2.mx}ダメージ（${Math.round(r2.mn/hp*100)}〜${Math.round(r2.mx/hp*100)}%）`;
+  document.getElementById('add-breakdown').innerHTML = breakdown;
+
+  const kt = document.getElementById('add-ko-tag');
+  if(pctMx>=100)     kt.innerHTML='<span class="add-ko-tag add-ko1">合計で確定突破</span>';
+  else if(pctMn>=100) kt.innerHTML='<span class="add-ko-tag add-ko1">確定突破</span>';
+  else if(pctMx>=75) kt.innerHTML='<span class="add-ko-tag add-ko2">乱数次第で突破可能</span>';
+  else               kt.innerHTML='<span class="add-ko-tag add-ko3">突破できない</span>';
+}
+
+// onSelectPokeを拡張（atk2対応）
+const _origOnSelectPoke = onSelectPoke;
+function onSelectPoke(inputId, dropId, name) {
+  if(inputId==='atk2-search') {
+    document.getElementById(inputId).value = name;
+    document.getElementById(dropId).classList.remove('show');
+    const p = pokeIndex.find(x=>x.name===name);
+    if(p) initAtk2(p);
+    return;
+  }
+  _origOnSelectPoke(inputId, dropId, name);
 }
 
 // ===== 技判定 =====
