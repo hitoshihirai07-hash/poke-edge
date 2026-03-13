@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PokeEdge | ポケモン対戦支援ツール</title>
+<meta name="description" content="全世代対応のポケモン対戦支援ツール。ダメージ計算・技選択判定・パーティ管理。SV・Championsに対応。">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07090f;--bg2:#0b0e1a;--panel:#0f1423;
+  --border:#1a2540;--border2:#243356;
+  --accent:#00c8f0;--accent2:#ff3060;--accent3:#ffc800;--green:#00e676;
+  --text:#d8e8ff;--text2:#4a6080;--text3:#7a90b0;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 50% 35% at 10% 5%,rgba(0,200,240,0.06) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 25% at 90% 90%,rgba(255,48,96,0.04) 0%,transparent 60%),
+    linear-gradient(rgba(0,200,240,0.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,200,240,0.018) 1px,transparent 1px);
+  background-size:auto,auto,52px 52px,52px 52px;
+}
+header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(7,9,15,0.96);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  height:52px;padding:0 20px;
+  display:flex;align-items:center;gap:14px;
+}
+.logo{
+  font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:6px;
+  color:var(--accent);text-shadow:0 0 20px rgba(0,200,240,0.4);flex-shrink:0;
+}
+.logo em{color:var(--accent2);font-style:normal;}
+.header-sep{width:1px;height:16px;background:var(--border);flex-shrink:0;}
+.header-sub{font-size:10px;color:var(--text2);letter-spacing:2px;flex-shrink:0;}
+.gen-selector{display:flex;gap:3px;margin-left:auto;}
+.gen-btn{
+  background:transparent;border:1px solid var(--border);color:var(--text2);
+  padding:4px 11px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;
+  font-size:11px;letter-spacing:1px;transition:all 0.18s;white-space:nowrap;position:relative;
+}
+.gen-btn:hover{border-color:var(--accent);color:var(--accent);}
+.gen-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(0,200,240,0.07);}
+.gen-btn.isnew::after{content:'NEW';position:absolute;top:-7px;right:-3px;background:var(--accent2);color:#fff;font-size:7px;font-weight:700;padding:1px 4px;}
+
+.layout{
+  position:relative;z-index:1;
+  display:grid;grid-template-columns:1fr 172px;
+  max-width:1100px;margin:0 auto;padding:18px 14px;gap:16px;align-items:start;
+}
+@media(max-width:820px){.layout{grid-template-columns:1fr;}}
+
+/* SIDEBAR */
+.sidebar{display:flex;flex-direction:column;gap:10px;position:sticky;top:66px;}
+.affili-card{display:block;background:var(--panel);border:1px solid var(--border);padding:12px;text-decoration:none;transition:border-color 0.18s;}
+.affili-card:hover{border-color:var(--accent3);}
+.affili-badge{font-size:8px;color:var(--accent3);letter-spacing:2px;font-weight:700;margin-bottom:5px;}
+.affili-name{font-size:11px;color:var(--text);font-weight:700;line-height:1.5;}
+.affili-price{font-size:12px;color:var(--accent3);margin-top:3px;font-family:'JetBrains Mono',monospace;}
+.affili-cta{display:block;margin-top:8px;background:var(--accent3);color:#000;font-size:9px;font-weight:700;padding:5px;text-align:center;letter-spacing:1px;}
+.premium-box{background:linear-gradient(160deg,rgba(255,48,96,0.1),rgba(255,48,96,0.03));border:1px solid rgba(255,48,96,0.2);padding:13px;}
+.prem-title{font-size:11px;color:var(--accent2);font-weight:700;letter-spacing:1px;margin-bottom:6px;}
+.prem-list{font-size:10px;color:var(--text3);line-height:1.9;}
+.prem-btn{display:block;width:100%;margin-top:10px;background:var(--accent2);color:#fff;border:none;font-size:10px;font-weight:700;padding:7px;text-align:center;letter-spacing:1px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;}
+.prem-btn:hover{opacity:0.85;}
+
+/* MAIN */
+.main-content{min-width:0;}
+.gen-bar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.gen-tag{display:inline-block;padding:3px 9px;font-size:9px;font-weight:700;letter-spacing:1px;}
+.gen-sv{background:rgba(0,200,240,0.1);color:var(--accent);border:1px solid rgba(0,200,240,0.2);}
+.gen-champ{background:rgba(255,48,96,0.1);color:var(--accent2);border:1px solid rgba(255,48,96,0.2);}
+.gen-note{font-size:10px;color:var(--text2);margin-left:auto;}
+
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:18px;overflow-x:auto;}
+.tab{padding:10px 16px;background:transparent;border:none;color:var(--text2);cursor:pointer;font-family:'Noto Sans JP',sans-serif;font-size:12px;letter-spacing:1px;position:relative;transition:color 0.2s;white-space:nowrap;flex-shrink:0;}
+.tab::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:var(--accent);transform:scaleX(0);transition:transform 0.2s;}
+.tab.active{color:var(--accent);}
+.tab.active::after{transform:scaleX(1);}
+.panel{display:none;}.panel.active{display:block;}
+
+.sec{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--text2);margin-bottom:10px;display:flex;align-items:center;gap:10px;}
+.sec::after{content:'';flex:1;height:1px;background:var(--border);}
+.card{background:var(--panel);border:1px solid var(--border);padding:16px;}
+.card-title{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--text2);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.card-title::before{content:'';width:3px;height:11px;background:var(--accent);}
+
+label{display:block;font-size:10px;color:var(--text2);margin-bottom:4px;letter-spacing:1px;}
+input,select{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:7px 10px;font-family:'Noto Sans JP',sans-serif;font-size:12px;outline:none;transition:border-color 0.2s;margin-bottom:10px;}
+input:focus,select:focus{border-color:var(--accent);}
+select option{background:var(--bg2);}
+input[type=number]{margin-bottom:0;}
+
+/* ポケモン検索 */
+.search-wrap{position:relative;margin-bottom:10px;}
+.search-input{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:8px 12px;font-family:'Noto Sans JP',sans-serif;font-size:13px;outline:none;transition:border-color 0.2s;margin-bottom:0;}
+.search-input:focus{border-color:var(--accent);}
+.search-dropdown{
+  display:none;position:absolute;top:100%;left:0;right:0;z-index:50;
+  background:var(--panel);border:1px solid var(--border);max-height:200px;overflow-y:auto;
+}
+.search-dropdown.show{display:block;}
+.search-item{padding:8px 12px;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:8px;transition:background 0.15s;}
+.search-item:hover{background:var(--bg2);}
+.search-item img{width:32px;height:32px;}
+
+/* ポケモンカード */
+.poke-card{background:var(--bg2);border:1px solid var(--border);padding:14px;margin-bottom:10px;display:none;}
+.poke-card.show{display:block;}
+.poke-card-header{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.poke-card-img{width:64px;height:64px;image-rendering:pixelated;}
+.poke-card-name{font-size:18px;font-weight:700;}
+.poke-card-no{font-size:11px;color:var(--text2);font-family:'JetBrains Mono',monospace;}
+.poke-types{display:flex;gap:4px;margin-top:4px;}
+.type-pill{display:inline-block;padding:2px 8px;font-size:10px;font-weight:700;letter-spacing:1px;}
+
+/* 種族値バー */
+.stat-row{display:grid;grid-template-columns:60px 1fr 36px;align-items:center;gap:8px;margin-bottom:6px;}
+.stat-label{font-size:10px;color:var(--text2);}
+.stat-bar-bg{height:5px;background:var(--bg);overflow:hidden;}
+.stat-bar-fg{height:100%;transition:width 0.6s cubic-bezier(.4,0,.2,1);}
+.stat-val{font-size:11px;font-family:'JetBrains Mono',monospace;text-align:right;}
+
+/* 技選択 */
+.move-select-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin-bottom:8px;}
+.move-load-btn{background:transparent;border:1px solid var(--border);color:var(--text2);padding:6px 10px;cursor:pointer;font-size:11px;white-space:nowrap;transition:all 0.15s;font-family:'Noto Sans JP',sans-serif;}
+.move-load-btn:hover{border-color:var(--accent);color:var(--accent);}
+.move-info{background:var(--bg2);border:1px solid var(--border);padding:10px;margin-bottom:8px;display:none;font-size:11px;color:var(--text3);}
+.move-info.show{display:block;}
+
+/* 計算ボタン */
+.main-btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),#007a99);border:none;color:#000;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:4px;cursor:pointer;transition:all 0.15s;margin:12px 0;}
+.main-btn:hover{opacity:0.85;transform:translateY(-1px);}
+.main-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+
+/* 結果 */
+.result-box{background:var(--bg2);border:1px solid var(--border);padding:16px;display:none;}
+.result-box.show{display:block;}
+.dmg-num{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--accent);line-height:1;text-shadow:0 0 20px rgba(0,200,240,0.3);}
+.dmg-pct{font-family:'JetBrains Mono',monospace;font-size:26px;color:var(--accent);margin-top:4px;}
+.dmg-bar-wrap{height:8px;background:var(--bg);overflow:hidden;margin:8px 0;}
+.dmg-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width 0.7s cubic-bezier(.4,0,.2,1);}
+.ko-tag{display:inline-block;padding:2px 9px;font-size:10px;font-weight:700;letter-spacing:2px;margin-top:5px;}
+.ko1{background:var(--accent2);color:#fff;}.ko2{background:var(--accent3);color:#000;}.ko3{background:var(--text2);color:#fff;}
+.hp-wrap{margin-top:8px;}
+.hp-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--text2);margin-bottom:3px;}
+.hp-bg{height:5px;background:var(--bg);overflow:hidden;}
+.hp-fg{height:100%;background:linear-gradient(90deg,var(--green),var(--accent3));transition:width 0.4s;}
+
+/* 技判定タブ */
+.calc-2col{display:grid;grid-template-columns:1fr 44px 1fr;gap:10px;align-items:start;}
+.vs-mid{display:flex;align-items:center;justify-content:center;padding-top:50px;font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--accent2);}
+
+/* パーティ */
+.party-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.pm-slot{background:var(--panel);border:1px solid var(--border);padding:12px 8px;text-align:center;cursor:pointer;min-height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;transition:border-color 0.2s;position:relative;}
+.pm-slot.empty{border-style:dashed;}
+.pm-slot:hover{border-color:var(--accent);}
+.pm-slot .pm-img{width:48px;height:48px;image-rendering:pixelated;}
+.pm-slot .pm-name{font-size:11px;font-weight:700;}
+.pm-slot .pm-types{display:flex;gap:3px;flex-wrap:wrap;justify-content:center;margin-top:2px;}
+.pm-remove{position:absolute;top:4px;right:4px;background:var(--accent2);color:#fff;border:none;font-size:10px;width:16px;height:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.add-icon{font-size:20px;color:var(--border2);}
+.cov-wrap{background:var(--panel);border:1px solid var(--border);padding:14px;}
+.cov-row{display:flex;align-items:center;gap:7px;margin-bottom:6px;}
+.cov-label{width:64px;font-size:10px;color:var(--text3);}
+.cov-bar-bg{flex:1;height:5px;background:var(--bg);overflow:hidden;}
+.cov-bar-fg{height:100%;transition:width 0.6s;}
+.cov-pct{width:26px;font-size:10px;color:var(--accent);text-align:right;font-family:'JetBrains Mono',monospace;}
+.save-btn{width:100%;padding:9px;background:transparent;border:1px solid var(--accent);color:var(--accent);font-family:'Noto Sans JP',sans-serif;font-size:12px;cursor:pointer;letter-spacing:2px;transition:all 0.2s;}
+.save-btn:hover{background:rgba(0,200,240,0.07);}
+.party-wrap{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:600px){.party-wrap{grid-template-columns:1fr;}}
+
+/* ローディング */
+.loading{display:none;align-items:center;gap:8px;font-size:11px;color:var(--text2);padding:8px 0;}
+.loading.show{display:flex;}
+.spin{width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.error-msg{font-size:11px;color:var(--accent2);padding:6px 0;display:none;}
+.error-msg.show{display:block;}
+
+/* type colors */
+.t-fire{background:#c62828;color:#fff;}.t-water{background:#1565c0;color:#fff;}.t-grass{background:#2e7d32;color:#fff;}
+.t-electric{background:#f9a825;color:#000;}.t-psychic{background:#ad1457;color:#fff;}.t-dragon{background:#4527a0;color:#fff;}
+.t-normal{background:#546e7a;color:#fff;}.t-ice{background:#00838f;color:#fff;}.t-fighting{background:#b71c1c;color:#fff;}
+.t-dark{background:#212121;color:#fff;}.t-steel{background:#455a64;color:#fff;}.t-ghost{background:#4a148c;color:#fff;}
+.t-ground{background:#6d4c41;color:#fff;}.t-rock{background:#4e342e;color:#fff;}.t-poison{background:#6a1b9a;color:#fff;}
+.t-fairy{background:#880e4f;color:#fff;}.t-bug{background:#558b2f;color:#fff;}.t-flying{background:#0277bd;color:#fff;}
+
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18px 20px;margin-top:36px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--text2);letter-spacing:4px;}
+.footer-text{font-size:10px;color:var(--text2);letter-spacing:1px;line-height:1.6;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Poke<em>Edge</em></div>
+  <div class="header-sep"></div>
+  <div class="header-sub">対戦支援ツール</div>
+  <div class="gen-selector">
+    <button class="gen-btn active" data-gen="sv" onclick="switchGen('sv')">SV</button>
+    <button class="gen-btn isnew" data-gen="champ" onclick="switchGen('champ')">Champions</button>
+    <button class="gen-btn" data-gen="swsh" onclick="switchGen('swsh')">剣盾</button>
+  </div>
+</header>
+
+<div class="layout">
+<div class="main-content">
+
+  <div class="gen-bar">
+    <span style="font-size:10px;color:var(--text2);letter-spacing:2px;">対応世代:</span>
+    <span id="gen-display" class="gen-tag gen-sv">SV / スカーレット・バイオレット</span>
+    <span class="gen-note">PokeAPI からリアルタイムでデータ取得</span>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('damage')">⚡ ダメージ計算</button>
+    <button class="tab" onclick="switchTab('move')">🎯 技選択判定</button>
+    <button class="tab" onclick="switchTab('party')">📋 パーティ管理</button>
+  </div>
+
+  <!-- ===== DAMAGE ===== -->
+  <div class="panel active" id="tab-damage">
+    <div class="calc-2col">
+
+      <!-- 攻撃側 -->
+      <div class="card">
+        <div class="card-title">攻撃側</div>
+
+        <label>ポケモン名で検索</label>
+        <div class="search-wrap">
+          <input type="text" class="search-input" id="atk-search" placeholder="例: ウーラオス、ガブリアス..." autocomplete="off">
+          <div class="search-dropdown" id="atk-dropdown"></div>
+        </div>
+        <div class="loading" id="atk-loading"><div class="spin"></div>データ取得中...</div>
+        <div class="error-msg" id="atk-error">ポケモンが見つかりませんでした</div>
+
+        <div class="poke-card" id="atk-card">
+          <div class="poke-card-header">
+            <img class="poke-card-img" id="atk-img" src="" alt="">
+            <div>
+              <div class="poke-card-no" id="atk-no">#000</div>
+              <div class="poke-card-name" id="atk-name">—</div>
+              <div class="poke-types" id="atk-types"></div>
+            </div>
+          </div>
+          <div id="atk-stats"></div>
+        </div>
+
+        <label>使用する技</label>
+        <div class="move-select-row">
+          <select id="atk-move-select" style="margin-bottom:0;">
+            <option value="">— ポケモンを選択してください —</option>
+          </select>
+          <button class="move-load-btn" onclick="loadMoveInfo('atk')">技情報</button>
+        </div>
+        <div class="move-info" id="atk-move-info"></div>
+
+        <label style="margin-top:8px;">持ち物</label>
+        <select id="atk-item">
+          <option value="1.5">こだわりハチマキ ×1.5</option>
+          <option value="1.3">いのちのたま ×1.3</option>
+          <option value="1.5c">こだわりメガネ ×1.5</option>
+          <option value="1.2">たつじんのおび ×1.2</option>
+          <option value="1">なし</option>
+        </select>
+
+        <label>攻撃/特攻 実数値</label>
+        <input type="number" id="atk-stat" value="176" min="1" max="999">
+      </div>
+
+      <div class="vs-mid">VS</div>
+
+      <!-- 防御側 -->
+      <div class="card">
+        <div class="card-title">防御側</div>
+
+        <label>ポケモン名で検索</label>
+        <div class="search-wrap">
+          <input type="text" class="search-input" id="def-search" placeholder="例: ガブリアス、トゲキッス..." autocomplete="off">
+          <div class="search-dropdown" id="def-dropdown"></div>
+        </div>
+        <div class="loading" id="def-loading"><div class="spin"></div>データ取得中...</div>
+        <div class="error-msg" id="def-error">ポケモンが見つかりませんでした</div>
+
+        <div class="poke-card" id="def-card">
+          <div class="poke-card-header">
+            <img class="poke-card-img" id="def-img" src="" alt="">
+            <div>
+              <div class="poke-card-no" id="def-no">#000</div>
+              <div class="poke-card-name" id="def-name">—</div>
+              <div class="poke-types" id="def-types"></div>
+            </div>
+          </div>
+          <div id="def-stats"></div>
+          <div class="hp-wrap">
+            <div class="hp-labels"><span>HP</span><span id="hp-disp">— / —</span></div>
+            <div class="hp-bg"><div class="hp-fg" id="hp-fg" style="width:100%"></div></div>
+          </div>
+        </div>
+
+        <label style="margin-top:8px;">HP 実数値</label>
+        <input type="number" id="def-hp" value="183" min="1" max="999">
+        <label>防御/特防 実数値</label>
+        <input type="number" id="def-def" value="115" min="1" max="999">
+      </div>
+    </div>
+
+    <button class="main-btn" id="calc-btn" onclick="calcDamage()">CALCULATE DAMAGE</button>
+
+    <div class="result-box" id="result-box">
+      <div class="sec">計算結果</div>
+      <div style="display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap;">
+        <div>
+          <div class="dmg-num" id="dmg-num">—</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:4px;" id="dmg-range">—</div>
+          <div id="ko-tag"></div>
+        </div>
+        <div style="flex:1;min-width:140px;">
+          <div style="font-size:10px;color:var(--text2);margin-bottom:5px;">ダメージ割合</div>
+          <div class="dmg-bar-wrap"><div class="dmg-bar-fill" id="dmg-bar" style="width:0%"></div></div>
+          <div class="dmg-pct" id="dmg-pct">0%</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:4px;" id="dmg-desc"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MOVE JUDGE ===== -->
+  <div class="panel" id="tab-move">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+
+      <div class="card">
+        <div class="card-title">自分のポケモン</div>
+        <label>ポケモン名で検索</label>
+        <div class="search-wrap">
+          <input type="text" class="search-input" id="my-search" placeholder="例: ウーラオス..." autocomplete="off">
+          <div class="search-dropdown" id="my-dropdown"></div>
+        </div>
+        <div class="loading" id="my-loading"><div class="spin"></div>データ取得中...</div>
+        <div class="poke-card" id="my-card">
+          <div class="poke-card-header">
+            <img class="poke-card-img" id="my-img" src="" alt="">
+            <div>
+              <div class="poke-card-name" id="my-name">—</div>
+              <div class="poke-types" id="my-types"></div>
+            </div>
+          </div>
+        </div>
+        <div id="my-moves-list" style="margin-top:10px;"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">相手のポケモン</div>
+        <label>ポケモン名で検索</label>
+        <div class="search-wrap">
+          <input type="text" class="search-input" id="opp-search" placeholder="例: ガブリアス..." autocomplete="off">
+          <div class="search-dropdown" id="opp-dropdown"></div>
+        </div>
+        <div class="loading" id="opp-loading"><div class="spin"></div>データ取得中...</div>
+        <div class="poke-card" id="opp-card">
+          <div class="poke-card-header">
+            <img class="poke-card-img" id="opp-img" src="" alt="">
+            <div>
+              <div class="poke-card-name" id="opp-name">—</div>
+              <div class="poke-types" id="opp-types"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="main-btn" onclick="judgeMove()">🎯 最適技を判定</button>
+
+    <div class="result-box" id="judge-result">
+      <div class="sec">判定結果</div>
+      <div id="judge-text" style="font-size:13px;line-height:2;"></div>
+    </div>
+  </div>
+
+  <!-- ===== PARTY ===== -->
+  <div class="panel" id="tab-party">
+    <div class="party-wrap">
+      <div>
+        <div class="sec">パーティ構成（最大6匹）</div>
+        <div class="party-grid" id="party-grid"></div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <div class="search-wrap" style="flex:1;margin:0;">
+            <input type="text" class="search-input" id="party-search" placeholder="追加するポケモンを検索..." autocomplete="off">
+            <div class="search-dropdown" id="party-dropdown"></div>
+          </div>
+        </div>
+        <div class="loading" id="party-loading"><div class="spin"></div>データ取得中...</div>
+        <button class="save-btn" onclick="saveParty()">💾 パーティを保存（URLシェア）</button>
+      </div>
+      <div>
+        <div class="cov-wrap">
+          <div class="sec">タイプカバレッジ</div>
+          <div id="cov-chart"></div>
+          <div style="font-size:10px;color:var(--text2);margin-top:8px;">パーティのタイプ相性から算出</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main-content -->
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <a class="affili-card" href="https://www.amazon.co.jp/dp/B09VTRNC3T?tag=YOUR_TAG" id="affili-1" target="_blank" rel="noopener">
+    <div class="affili-badge">🛒 AMAZON</div>
+    <div class="affili-name" id="affili-name-1">Nintendo Switch 本体</div>
+    <div class="affili-price">¥32,978</div>
+    <span class="affili-cta">Amazonで見る →</span>
+  </a>
+  <a class="affili-card" href="https://www.amazon.co.jp/dp/B0BHR4FV1Z?tag=YOUR_TAG" id="affili-2" target="_blank" rel="noopener">
+    <div class="affili-badge">🛒 AMAZON</div>
+    <div class="affili-name" id="affili-name-2">ポケモン スカーレット</div>
+    <div class="affili-price" id="affili-price-2">¥5,480</div>
+    <span class="affili-cta">Amazonで見る →</span>
+  </a>
+  <div class="premium-box">
+    <div class="prem-title">⚡ PREMIUM</div>
+    <div class="prem-list">
+      ・パーティ無制限保存<br>
+      ・詳細乱数計算<br>
+      ・メタ分析レポート<br>
+      ・広告非表示
+    </div>
+    <button class="prem-btn" onclick="alert('近日公開予定！')">事前登録 →</button>
+  </div>
+</div>
+</div><!-- /layout -->
+
+<footer>
+  <div class="footer-logo">PokeEdge</div>
+  <div class="footer-text">非公式ファンサイト / Unofficial Fan Tool<br>データ提供: PokéAPI (pokeapi.co)</div>
+</footer>
+
+<script>
+// ===== 型相性テーブル =====
+const typeChart = {
+  normal:   {rock:.5,ghost:0,steel:.5},
+  fire:     {fire:.5,water:.5,grass:2,ice:2,bug:2,rock:.5,dragon:.5,steel:2},
+  water:    {fire:2,water:.5,grass:.5,ground:2,rock:2,dragon:.5},
+  electric: {water:2,electric:.5,grass:.5,ground:0,flying:2,dragon:.5},
+  grass:    {fire:.5,water:2,grass:.5,poison:.5,ground:2,flying:.5,bug:.5,rock:2,dragon:.5,steel:.5},
+  ice:      {fire:.5,water:.5,grass:2,ice:.5,ground:2,flying:2,dragon:2,steel:.5},
+  fighting: {normal:2,ice:2,poison:.5,flying:.5,psychic:.5,bug:.5,rock:2,ghost:0,dark:2,steel:2,fairy:.5},
+  poison:   {grass:2,poison:.5,ground:.5,rock:.5,ghost:.5,steel:0,fairy:2},
+  ground:   {fire:2,electric:2,grass:.5,poison:2,flying:0,bug:.5,rock:2,steel:2},
+  flying:   {electric:.5,grass:2,fighting:2,bug:2,rock:.5,steel:.5},
+  psychic:  {fighting:2,poison:2,psychic:.5,dark:0,steel:.5},
+  bug:      {fire:.5,grass:2,fighting:.5,poison:.5,flying:.5,psychic:2,ghost:.5,dark:2,steel:.5,fairy:.5},
+  rock:     {fire:2,ice:2,fighting:.5,ground:.5,flying:2,bug:2,steel:.5},
+  ghost:    {normal:0,psychic:2,ghost:2,dark:.5},
+  dragon:   {dragon:2,steel:.5,fairy:0},
+  dark:     {fighting:.5,psychic:2,ghost:2,dark:.5,fairy:.5},
+  steel:    {fire:.5,water:.5,electric:.5,ice:2,rock:2,steel:.5,fairy:2},
+  fairy:    {fire:.5,fighting:2,poison:.5,dragon:2,dark:2,steel:.5},
+};
+
+const TYPE_JP = {fire:'ほのお',water:'みず',grass:'くさ',electric:'でんき',psychic:'エスパー',dragon:'ドラゴン',normal:'ノーマル',ice:'こおり',fighting:'かくとう',dark:'あく',steel:'はがね',ghost:'ゴースト',ground:'じめん',rock:'いわ',poison:'どく',fairy:'フェアリー',bug:'むし',flying:'ひこう'};
+const STAT_LABELS = {hp:'HP',attack:'こうげき',defense:'ぼうぎょ','special-attack':'とくこう','special-defense':'とくぼう',speed:'すばやさ'};
+const STAT_COLORS = {hp:'#e53935',attack:'#fb8c00',defense:'#fdd835','special-attack':'#1e88e5','special-defense':'#00acc1',speed:'#43a047'};
+
+// ポケモン名翻訳キャッシュ
+const cache = {};
+const moveCache = {};
+const nameCache = {}; // en->ja
+
+// ===== PokeAPI: ポケモン取得 =====
+async function fetchPokemon(query) {
+  const key = query.toLowerCase().trim();
+  if(cache[key]) return cache[key];
+  // 日本語 → 英語変換が必要な場合はspeciesから
+  const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${encodeURIComponent(key)}`);
+  if(!res.ok) throw new Error('not found');
+  const data = await res.json();
+  // 日本語名を species から取得
+  const specRes = await fetch(data.species.url);
+  const specData = await specRes.json();
+  const jaName = specData.names.find(n=>n.language.name==='ja')?.name || data.name;
+  const result = {
+    id: data.id,
+    name: jaName,
+    nameEn: data.name,
+    types: data.types.map(t=>t.type.name),
+    stats: data.stats,
+    moves: data.moves.map(m=>m.move),
+    sprite: data.sprites.front_default,
+    spriteAnim: data.sprites.other?.['official-artwork']?.front_default || data.sprites.front_default,
+  };
+  cache[key] = result;
+  return result;
+}
+
+// ===== PokeAPI: 技取得 =====
+async function fetchMove(url) {
+  if(moveCache[url]) return moveCache[url];
+  const res = await fetch(url);
+  if(!res.ok) throw new Error('move not found');
+  const data = await res.json();
+  const jaName = data.names.find(n=>n.language.name==='ja')?.name || data.name;
+  const result = {
+    name: jaName,
+    nameEn: data.name,
+    type: data.type.name,
+    power: data.power,
+    accuracy: data.accuracy,
+    pp: data.pp,
+    damageClass: data.damage_class.name, // physical/special/status
+    effect: data.effect_entries.find(e=>e.language.name==='en')?.short_effect || '',
+  };
+  moveCache[url] = result;
+  return result;
+}
+
+// ===== 日本語検索 (species一覧) =====
+let speciesList = null;
+async function getSpeciesList() {
+  if(speciesList) return speciesList;
+  const res = await fetch('https://pokeapi.co/api/v2/pokemon-species?limit=1300');
+  const data = await res.json();
+  speciesList = data.results;
+  return speciesList;
+}
+
+// ===== 検索サジェスト =====
+function setupSearch(inputId, dropdownId, loadingId, errorId, cardId, onSelect) {
+  const input = document.getElementById(inputId);
+  const dropdown = document.getElementById(dropdownId);
+  let timer;
+  input.addEventListener('input', ()=>{
+    clearTimeout(timer);
+    const q = input.value.trim();
+    if(q.length < 1){ dropdown.classList.remove('show'); return; }
+    timer = setTimeout(async()=>{
+      // 英語名での直接検索を試みる
+      try {
+        const res = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=20&offset=0`);
+        // 簡易: 英語名でフィルタリング
+        const listRes = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=1302`);
+        const listData = await listRes.json();
+        const filtered = listData.results.filter(p=>p.name.includes(q.toLowerCase())).slice(0,8);
+        if(filtered.length===0){ dropdown.classList.remove('show'); return; }
+        dropdown.innerHTML = filtered.map(p=>`
+          <div class="search-item" onclick="selectPokemon('${p.name}','${inputId}','${dropdownId}','${loadingId}','${errorId}','${cardId}')">
+            <span>${p.name}</span>
+          </div>`).join('');
+        dropdown.classList.add('show');
+      } catch(e){}
+    }, 300);
+  });
+  document.addEventListener('click', e=>{if(!input.contains(e.target)&&!dropdown.contains(e.target))dropdown.classList.remove('show');});
+}
+
+// ポケモン選択・カード表示
+async function selectPokemon(nameEn, inputId, dropdownId, loadingId, errorId, cardId) {
+  document.getElementById(dropdownId).classList.remove('show');
+  document.getElementById(loadingId).classList.add('show');
+  document.getElementById(errorId).classList.remove('show');
+  try {
+    const p = await fetchPokemon(nameEn);
+    document.getElementById(inputId).value = p.name;
+    document.getElementById(loadingId).classList.remove('show');
+    renderPokeCard(cardId, p);
+    // 技選択を更新
+    if(cardId==='atk-card') populateMoveSelect(p);
+    if(cardId==='my-card') populateMyMoves(p);
+    if(cardId==='opp-card') window._oppPoke = p;
+  } catch(e) {
+    document.getElementById(loadingId).classList.remove('show');
+    document.getElementById(errorId).classList.add('show');
+  }
+}
+
+function renderPokeCard(cardId, p) {
+  const card = document.getElementById(cardId);
+  const prefix = cardId.split('-')[0];
+  document.getElementById(prefix+'-img').src = p.sprite || '';
+  document.getElementById(prefix+'-name').textContent = p.name;
+  if(document.getElementById(prefix+'-no')) document.getElementById(prefix+'-no').textContent = `#${String(p.id).padStart(3,'0')}`;
+  document.getElementById(prefix+'-types').innerHTML = p.types.map(t=>`<span class="type-pill t-${t}">${TYPE_JP[t]||t}</span>`).join('');
+  // 種族値
+  const statsEl = document.getElementById(prefix+'-stats');
+  if(statsEl){
+    statsEl.innerHTML = p.stats.map(s=>{
+      const lbl = STAT_LABELS[s.stat.name]||s.stat.name;
+      const col = STAT_COLORS[s.stat.name]||'var(--accent)';
+      const w = Math.round(s.base_stat/255*100);
+      return `<div class="stat-row">
+        <div class="stat-label">${lbl}</div>
+        <div class="stat-bar-bg"><div class="stat-bar-fg" style="width:${w}%;background:${col};"></div></div>
+        <div class="stat-val">${s.base_stat}</div>
+      </div>`;
+    }).join('');
+  }
+  // HP初期値セット
+  if(cardId==='def-card'){
+    const hpBase = p.stats.find(s=>s.stat.name==='hp')?.base_stat||100;
+    const hpEst = Math.floor(hpBase*2*50/100+50+10); // Lv50 個体値31 努力値0
+    document.getElementById('def-hp').value = hpEst;
+    document.getElementById('hp-disp').textContent = `${hpEst} / ${hpEst}`;
+    const defBase = p.stats.find(s=>s.stat.name==='defense')?.base_stat||100;
+    document.getElementById('def-def').value = Math.floor(defBase*2*50/100+5);
+  }
+  if(cardId==='atk-card'){
+    const atkBase = p.stats.find(s=>s.stat.name==='attack')?.base_stat||100;
+    document.getElementById('atk-stat').value = Math.floor(atkBase*2*50/100+5);
+  }
+  card.classList.add('show');
+  window['_'+prefix+'Poke'] = p;
+}
+
+// 技セレクト生成
+async function populateMoveSelect(p) {
+  const sel = document.getElementById('atk-move-select');
+  sel.innerHTML = '<option value="">— 読み込み中... —</option>';
+  // 最大50技のみ取得（全部だと重い）
+  const moves = p.moves.slice(0,50);
+  const results = await Promise.allSettled(moves.map(m=>fetchMove(m.url)));
+  const validMoves = results.filter(r=>r.status==='fulfilled'&&r.value.power).map(r=>r.value);
+  validMoves.sort((a,b)=>(b.power||0)-(a.power||0));
+  sel.innerHTML = '<option value="">— 技を選択 —</option>' +
+    validMoves.map(m=>`<option value="${m.nameEn}" data-pow="${m.power}" data-type="${m.type}" data-class="${m.damageClass}">${m.name}（${TYPE_JP[m.type]||m.type} / 威力${m.power}）</option>`).join('');
+}
+
+// 技情報表示
+async function loadMoveInfo(side) {
+  const sel = document.getElementById(side+'-move-select');
+  const info = document.getElementById(side+'-move-info');
+  const opt = sel.selectedOptions[0];
+  if(!opt||!opt.value){info.classList.remove('show');return;}
+  const nameEn = opt.value;
+  const url = `https://pokeapi.co/api/v2/move/${nameEn}`;
+  info.innerHTML='読み込み中...';info.classList.add('show');
+  try{
+    const m = await fetchMove(url);
+    info.innerHTML=`<strong>${m.name}</strong> &nbsp; <span class="type-pill t-${m.type}" style="font-size:9px;">${TYPE_JP[m.type]||m.type}</span><br>
+    威力: ${m.power||'—'} &nbsp; 命中: ${m.accuracy||'—'} &nbsp; PP: ${m.pp||'—'} &nbsp; 分類: ${m.damageClass}<br>
+    <span style="color:var(--text2);">${m.effect}</span>`;
+  }catch(e){info.innerHTML='取得できませんでした。';}
+}
+
+// ===== ダメージ計算 =====
+function calcDamage() {
+  const sel = document.getElementById('atk-move-select').selectedOptions[0];
+  if(!sel||!sel.value){alert('技を選択してください');return;}
+  const power = parseInt(sel.dataset.pow)||0;
+  const moveType = sel.dataset.type;
+  const moveClass = sel.dataset.class;
+  if(!power){alert('この技はダメージ技ではありません');return;}
+
+  const atkStat = parseInt(document.getElementById('atk-stat').value)||100;
+  const defStat = parseInt(document.getElementById('def-def').value)||100;
+  const hp = parseInt(document.getElementById('def-hp').value)||100;
+  const itemVal = parseFloat(document.getElementById('atk-item').value)||1;
+
+  // 相性計算
+  const defPoke = window._defPoke;
+  let effMult = 1;
+  if(defPoke && typeChart[moveType]){
+    defPoke.types.forEach(t=>{
+      if(typeChart[moveType][t]!==undefined) effMult *= typeChart[moveType][t];
+    });
+  }
+
+  const base = Math.floor((Math.floor(power * atkStat / defStat / 50) + 2) * itemVal * effMult);
+  const mn = Math.floor(base * 0.85), mx = base;
+  const pmx = Math.round((mx/hp)*100), pmn = Math.round((mn/hp)*100);
+
+  document.getElementById('result-box').classList.add('show');
+  document.getElementById('dmg-num').textContent = `${mn} 〜 ${mx}`;
+  document.getElementById('dmg-range').textContent = `乱数幅 ${mn}〜${mx} ダメージ　相性: ×${effMult}`;
+  document.getElementById('dmg-bar').style.width = Math.min(pmx,100)+'%';
+  document.getElementById('dmg-pct').textContent = `${pmn}〜${pmx}%`;
+  document.getElementById('hp-disp').textContent = `${hp} / ${hp}`;
+
+  const kt = document.getElementById('ko-tag');
+  if(pmx>=100){kt.innerHTML='<span class="ko-tag ko1">確定1発</span>';document.getElementById('dmg-desc').textContent='確実に倒せます';}
+  else if(pmn>=50){kt.innerHTML='<span class="ko-tag ko2">確定2発</span>';document.getElementById('dmg-desc').textContent='2回で確実に倒せます';}
+  else{kt.innerHTML='<span class="ko-tag ko3">3発以上</span>';document.getElementById('dmg-desc').textContent='3回以上必要です';}
+}
+
+// ===== 技判定 =====
+let myMovesData = [];
+async function populateMyMoves(p) {
+  const el = document.getElementById('my-moves-list');
+  el.innerHTML = '<div style="font-size:11px;color:var(--text2);">技データ読み込み中...</div>';
+  const moves = p.moves.slice(0,40);
+  const results = await Promise.allSettled(moves.map(m=>fetchMove(m.url)));
+  myMovesData = results.filter(r=>r.status==='fulfilled'&&r.value.power).map(r=>r.value).slice(0,4);
+  el.innerHTML = '<div style="font-size:10px;color:var(--text2);letter-spacing:2px;margin-bottom:8px;">代表的な技（最大4つ）</div>' +
+    myMovesData.map((m,i)=>`
+      <div style="padding:7px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;">
+        <span class="type-pill t-${m.type}" style="font-size:9px;">${TYPE_JP[m.type]||m.type}</span>
+        <span style="font-size:12px;font-weight:700;">${m.name}</span>
+        <span style="font-size:10px;color:var(--text2);margin-left:auto;">威力 ${m.power}</span>
+      </div>`).join('');
+}
+
+function judgeMove() {
+  const oppPoke = window._oppPoke;
+  if(!oppPoke){alert('相手のポケモンを選択してください');return;}
+  if(!myMovesData.length){alert('自分のポケモンを選択してください');return;}
+
+  const results = myMovesData.map(m=>{
+    let eff=1;
+    oppPoke.types.forEach(t=>{if(typeChart[m.type]&&typeChart[m.type][t]!==undefined)eff*=typeChart[m.type][t];});
+    return{...m,eff,score:(m.power||0)*eff};
+  }).sort((a,b)=>b.score-a.score);
+
+  const best = results[0];
+  const el = document.getElementById('judge-result');
+  el.classList.add('show');
+  document.getElementById('judge-text').innerHTML = results.map((r,i)=>`
+    <div style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:${i===0?'var(--accent)':'var(--text2)'};">${i+1}</span>
+      <span class="type-pill t-${r.type}" style="font-size:9px;">${TYPE_JP[r.type]||r.type}</span>
+      <span style="font-size:13px;font-weight:700;${i===0?'color:var(--accent);':''}">${r.name}</span>
+      <span style="font-size:10px;color:var(--text2);">相性 ×${r.eff}</span>
+      <span style="font-size:10px;color:var(--text2);margin-left:auto;">スコア ${r.score}</span>
+    </div>`).join('') +
+    `<div style="margin-top:12px;font-size:13px;color:var(--accent);">✓ 推奨: <strong>${best.name}</strong>（${oppPoke.name} に対して ×${best.eff}）</div>`;
+}
+
+// ===== パーティ管理 =====
+let party = [];
+function renderPartyGrid() {
+  const el = document.getElementById('party-grid');
+  const slots = Array(6).fill(null).map((_,i)=>party[i]||null);
+  el.innerHTML = slots.map((p,i)=>p ? `
+    <div class="pm-slot">
+      <button class="pm-remove" onclick="removeFromParty(${i})">×</button>
+      <img class="pm-img" src="${p.sprite||''}" alt="">
+      <div class="pm-name">${p.name}</div>
+      <div class="pm-types">${p.types.map(t=>`<span class="type-pill t-${t}" style="font-size:8px;">${TYPE_JP[t]||t}</span>`).join('')}</div>
+    </div>` : `
+    <div class="pm-slot empty"><div class="add-icon">＋</div><div style="font-size:9px;color:var(--text2);">空き</div></div>`
+  ).join('');
+  updateCoverage();
+}
+function removeFromParty(i){ party.splice(i,1); renderPartyGrid(); }
+async function addToParty(nameEn) {
+  if(party.length>=6){alert('パーティは6匹までです');return;}
+  document.getElementById('party-loading').classList.add('show');
+  try{
+    const p = await fetchPokemon(nameEn);
+    party.push(p);
+    renderPartyGrid();
+  }catch(e){alert('ポケモンが見つかりませんでした');}
+  document.getElementById('party-loading').classList.remove('show');
+}
+function updateCoverage(){
+  const allTypes = Object.keys(TYPE_JP);
+  const covScores = {};
+  allTypes.forEach(t=>{
+    let best=0;
+    party.forEach(p=>{
+      p.types.forEach(pt=>{
+        if(typeChart[pt]&&typeChart[pt][t]){if(typeChart[pt][t]>best)best=typeChart[pt][t];}
+      });
+    });
+    covScores[t]=best;
+  });
+  const top8 = allTypes.sort((a,b)=>covScores[b]-covScores[a]).slice(0,8);
+  const maxScore = Math.max(...top8.map(t=>covScores[t]))||1;
+  document.getElementById('cov-chart').innerHTML = top8.map(t=>{
+    const pct = Math.round((covScores[t]/maxScore)*100);
+    return `<div class="cov-row">
+      <div class="cov-label">${TYPE_JP[t]||t}</div>
+      <div class="cov-bar-bg"><div class="cov-bar-fg" style="width:${pct}%;background:var(--accent);"></div></div>
+      <div class="cov-pct">${pct}%</div>
+    </div>`;
+  }).join('');
+}
+function saveParty(){
+  const names = party.map(p=>p.nameEn).join(',');
+  const url = location.href.split('?')[0]+'?party='+encodeURIComponent(names);
+  navigator.clipboard?.writeText(url).then(()=>alert('URLをコピーしました！')).catch(()=>alert('URL: '+url));
+}
+
+// パーティ検索セットアップ
+function setupPartySearch(){
+  const input = document.getElementById('party-search');
+  const dropdown = document.getElementById('party-dropdown');
+  let timer;
+  input.addEventListener('input',()=>{
+    clearTimeout(timer);
+    const q = input.value.trim();
+    if(q.length<1){dropdown.classList.remove('show');return;}
+    timer = setTimeout(async()=>{
+      try{
+        const res = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=1302`);
+        const data = await res.json();
+        const filtered = data.results.filter(p=>p.name.includes(q.toLowerCase())).slice(0,8);
+        dropdown.innerHTML = filtered.map(p=>`
+          <div class="search-item" onclick="addToParty('${p.name}');document.getElementById('party-search').value='';document.getElementById('party-dropdown').classList.remove('show');">
+            <span>${p.name}</span>
+          </div>`).join('');
+        dropdown.classList.add('show');
+      }catch(e){}
+    },300);
+  });
+  document.addEventListener('click',e=>{if(!input.contains(e.target)&&!dropdown.contains(e.target))dropdown.classList.remove('show');});
+}
+
+// ===== タブ・世代切替 =====
+function switchTab(id){
+  const ids=['damage','move','party'];
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',ids[i]===id));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+}
+const GEN_LABELS = {
+  sv:{label:'SV / スカーレット・バイオレット',cls:'gen-sv',affili:'ポケモン スカーレット'},
+  champ:{label:'Pokémon Champions（2026.4〜）',cls:'gen-champ',affili:'Pokémon Champions'},
+  swsh:{label:'剣盾 / ソード・シールド',cls:'gen-sv',affili:'ポケモン ソード'}
+};
+function switchGen(gen){
+  document.querySelectorAll('.gen-btn').forEach(b=>b.classList.toggle('active',b.dataset.gen===gen));
+  const d=GEN_LABELS[gen];
+  const disp=document.getElementById('gen-display');
+  disp.textContent=d.label; disp.className='gen-tag '+d.cls;
+  document.getElementById('affili-name-2').textContent=d.affili;
+}
+
+// ===== 検索セットアップ =====
+setupSearch('atk-search','atk-dropdown','atk-loading','atk-error','atk-card',null);
+setupSearch('def-search','def-dropdown','def-loading','def-error','def-card',null);
+setupSearch('my-search','my-dropdown','my-loading','my-loading','my-card',null);
+setupSearch('opp-search','opp-dropdown','opp-loading','opp-loading','opp-card',null);
+setupPartySearch();
+renderPartyGrid();
+
+// URLパラメータからパーティ復元
+(async()=>{
+  const params = new URLSearchParams(location.search);
+  const partyParam = params.get('party');
+  if(partyParam){
+    const names = partyParam.split(',');
+    for(const n of names){ try{ const p=await fetchPokemon(n); party.push(p); }catch(e){} }
+    renderPartyGrid();
+  }
+})();
+</script>
+</body>
+</html>
