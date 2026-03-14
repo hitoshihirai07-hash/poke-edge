@@ -630,8 +630,12 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
           <div id="party-ev-summary" style="font-size:10px;color:var(--text3);padding-top:4px;"></div>
         </div>
         <div class="cov-wrap" style="margin-top:10px;">
-          <div class="sec">タイプカバレッジ</div>
-          <div id="cov-chart"></div>
+          <div class="sec">攻撃カバレッジ（技ベース）</div>
+          <div style="font-size:10px;color:var(--text2);margin-bottom:8px;">登録した技で各タイプに抜群を取れるか</div>
+          <div id="cov-chart-atk"></div>
+          <div class="sec" style="margin-top:14px;">防御カバレッジ（被弾ベース）</div>
+          <div style="font-size:10px;color:var(--text2);margin-bottom:8px;">各タイプの技に対するパーティ全体の耐性（赤=弱点/青=耐性）</div>
+          <div id="cov-chart-def"></div>
         </div>
       </div>
 
@@ -1646,31 +1650,102 @@ function deleteParty(i) {
 // renderPartyGrid は後方互換のために残す
 function renderPartyGrid() { renderPartySlotList(); }
 function updateCoverage() {
-  const allTypes=['ノーマル','ほのお','みず','でんき','くさ','こおり','かくとう','どく','じめん','ひこう','エスパー','むし','いわ','ゴースト','ドラゴン','あく','はがね','フェアリー'];
-  const moveTypeMap={'炎':'ほのお','水':'みず','電気':'でんき','草':'くさ','氷':'こおり','格闘':'かくとう','毒':'どく','地面':'じめん','飛行':'ひこう','虫':'むし','岩':'いわ','悪':'あく','鋼':'はがね','ノーマル':'ノーマル','エスパー':'エスパー','ゴースト':'ゴースト','ドラゴン':'ドラゴン','フェアリー':'フェアリー'};
-  const covMap={};
-  allTypes.forEach(t=>covMap[t]=0);
-  party.forEach(p=>{
-    [p.type1,p.type2].filter(Boolean).forEach(pt=>{
-      Object.entries(TYPE_EFF).forEach(([mt,chart])=>{
-        if(moveTypeMap[mt]===pt){
-          Object.entries(chart).forEach(([defT,eff])=>{
-            if(eff===2) covMap[defT]=Math.max(covMap[defT]||0,2);
-          });
+  const allTypes = ['ノーマル','ほのお','みず','でんき','くさ','こおり','かくとう','どく','じめん','ひこう','エスパー','むし','いわ','ゴースト','ドラゴン','あく','はがね','フェアリー'];
+  const moveTypeMap = {
+    '炎':'ほのお','水':'みず','電気':'でんき','草':'くさ','氷':'こおり',
+    '格闘':'かくとう','毒':'どく','地面':'じめん','飛行':'ひこう','虫':'むし',
+    '岩':'いわ','悪':'あく','鋼':'はがね',
+    'ノーマル':'ノーマル','エスパー':'エスパー','ゴースト':'ゴースト',
+    'ドラゴン':'ドラゴン','フェアリー':'フェアリー'
+  };
+
+  // ===== 攻撃カバレッジ（技ベース） =====
+  // 各防御タイプに対して「抜群を取れるか」をスコア化
+  const atkMap = {};
+  allTypes.forEach(t => atkMap[t] = 0);
+
+  party.forEach(m => {
+    (m.moves||[]).forEach(mv => {
+      if(!mv||!mv.power) return;
+      const chart = TYPE_EFF[mv.type] || {};
+      const pokeTypes = [m.poke.type1, m.poke.type2].filter(Boolean);
+      const hasStab = pokeTypes.includes(moveTypeMap[mv.type]||mv.type);
+      Object.entries(chart).forEach(([defT, eff]) => {
+        if(eff >= 2) {
+          atkMap[defT] = Math.max(atkMap[defT]||0, hasStab ? 3 : 2);
+        } else if(eff === 1) {
+          atkMap[defT] = Math.max(atkMap[defT]||0, hasStab ? 1.5 : 1);
         }
       });
     });
   });
-  const sorted=allTypes.sort((a,b)=>(covMap[b]||0)-(covMap[a]||0)).slice(0,10);
-  const max=Math.max(...sorted.map(t=>covMap[t]||0),1);
-  document.getElementById('cov-chart').innerHTML=sorted.map(t=>{
-    const pct=Math.round(((covMap[t]||0)/max)*100);
+
+  const atkMax = Math.max(...allTypes.map(t => atkMap[t]||0), 1);
+  document.getElementById('cov-chart-atk').innerHTML = allTypes.map(t => {
+    const score = atkMap[t]||0;
+    const pct = Math.round((score/atkMax)*100);
+    const color = score>=3?'var(--accent)':score>=2?'var(--accent3)':score>0?'var(--text3)':'var(--border2)';
+    const label = score>=3?'抜群+STAB':score>=2?'抜群':score>1?'等倍STAB':score>0?'等倍':'未対応';
     return `<div class="cov-row">
       <div class="cov-label">${t}</div>
-      <div class="cov-bar-bg"><div class="cov-bar-fg" style="width:${pct}%;background:var(--accent);"></div></div>
-      <div class="cov-pct">${pct}%</div>
+      <div class="cov-bar-bg"><div class="cov-bar-fg" style="width:${Math.max(pct,score>0?3:0)}%;background:${color};"></div></div>
+      <div style="font-size:9px;color:${color};width:56px;text-align:right;">${label}</div>
     </div>`;
   }).join('');
+
+  // ===== 防御カバレッジ（被弾ベース） =====
+  // 各攻撃タイプに対してパーティ全体の耐性をスコア化
+  // スコア: 無効(0倍)=最高、半減(0.5倍)=良、等倍(1倍)=普通、抜群(2倍)=弱点
+  // 「弱点を突かれるポケモンが何匹いるか」をカウント
+  const defWeakCount  = {}; // 弱点を持つポケモン数
+  const defResCount   = {}; // 半減・無効を持つポケモン数
+  allTypes.forEach(t => { defWeakCount[t]=0; defResCount[t]=0; });
+
+  // 攻撃タイプ（ひらがな/カタカナ）→ TYPE_EFF キー（漢字）への逆引き
+  const pokeTypeToMoveType = {};
+  Object.entries(moveTypeMap).forEach(([mt, pt]) => pokeTypeToMoveType[pt]=mt);
+
+  party.forEach(m => {
+    const defTypes = [m.poke.type1, m.poke.type2].filter(Boolean);
+    // 各攻撃タイプ（ひらがな）でこのポケモンへの相性を計算
+    allTypes.forEach(atkType => {
+      const mt = pokeTypeToMoveType[atkType] || atkType;
+      const eff = getTypeEff(mt, defTypes);
+      if(eff >= 2)   defWeakCount[atkType]++;
+      else if(eff <= 0.5) defResCount[atkType]++;
+    });
+  });
+
+  const partySize = Math.max(party.length, 1);
+  document.getElementById('cov-chart-def').innerHTML = allTypes.map(t => {
+    const weak = defWeakCount[t]||0;
+    const res  = defResCount[t]||0;
+    // 弱点が多いほど危険（赤）、耐性が多いほど安全（青）
+    const danger = Math.round((weak/partySize)*100);
+    const safe   = Math.round((res/partySize)*100);
+    let color, label;
+    if(weak >= 3)      { color='var(--accent2)'; label=`弱点${weak}体`; }
+    else if(weak >= 2) { color='#ff8c00';        label=`弱点${weak}体`; }
+    else if(weak === 1){ color='var(--accent3)'; label=`弱点${weak}体`; }
+    else if(res >= 2)  { color='var(--accent)';  label=`耐性${res}体`; }
+    else if(res >= 1)  { color='var(--green)';   label=`耐性${res}体`; }
+    else               { color='var(--text3)';   label='等倍'; }
+    // バーは弱点数を赤、耐性数を青で表示
+    const weakPct = Math.round((weak/partySize)*100);
+    const resPct  = Math.round((res/partySize)*100);
+    return `<div class="cov-row" style="margin-bottom:5px;">
+      <div class="cov-label">${t}</div>
+      <div class="cov-bar-bg" style="position:relative;flex:1;height:8px;background:var(--bg);overflow:hidden;">
+        <div style="position:absolute;left:0;top:0;height:100%;width:${weakPct}%;background:var(--accent2);opacity:0.8;transition:width 0.5s;"></div>
+        <div style="position:absolute;right:0;top:0;height:100%;width:${resPct}%;background:var(--accent);opacity:0.8;transition:width 0.5s;"></div>
+      </div>
+      <div style="font-size:9px;color:${color};width:56px;text-align:right;">${label}</div>
+    </div>`;
+  }).join('') +
+  `<div style="display:flex;gap:12px;margin-top:8px;font-size:9px;color:var(--text2);">
+    <span><span style="display:inline-block;width:10px;height:10px;background:var(--accent2);opacity:0.8;vertical-align:middle;margin-right:3px;"></span>弱点</span>
+    <span><span style="display:inline-block;width:10px;height:10px;background:var(--accent);opacity:0.8;vertical-align:middle;margin-right:3px;"></span>耐性</span>
+  </div>`;
 }
 function saveParty() { savePartyLocal(); }
 
