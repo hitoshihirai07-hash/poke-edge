@@ -1670,12 +1670,15 @@ function updateCoverage() {
       const chart = TYPE_EFF[mv.type] || {};
       const pokeTypes = [m.poke.type1, m.poke.type2].filter(Boolean);
       const hasStab = pokeTypes.includes(moveTypeMap[mv.type]||mv.type);
-      Object.entries(chart).forEach(([defT, eff]) => {
+      // 全防御タイプに対して相性を計算（TYPE_EFFに載っていない=等倍として処理）
+      allTypes.forEach(defT => {
+        const eff = chart[defT] !== undefined ? chart[defT] : 1;
         if(eff >= 2) {
           atkMap[defT] = Math.max(atkMap[defT]||0, hasStab ? 3 : 2);
         } else if(eff === 1) {
           atkMap[defT] = Math.max(atkMap[defT]||0, hasStab ? 1.5 : 1);
         }
+        // 半減(0.5)・無効(0)は加算しない
       });
     });
   });
