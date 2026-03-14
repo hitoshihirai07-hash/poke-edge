@@ -846,9 +846,10 @@ function calcStat(base, iv, ev, lv, nature) {
 const pokeIndex = POKEMON_DATA.map((p,i) => ({...p, _i:i}));
 const moveIndex = MOVES_DATA.map((m,i) => ({...m, _i:i}));
 
-function setupSearch(inputId, dropId) {
+function setupSearch(inputId, dropId, onSelect) {
   const inp = document.getElementById(inputId);
   const drop = document.getElementById(dropId);
+  if(!inp) return;
   let timer;
   inp.addEventListener('input', () => {
     clearTimeout(timer);
@@ -860,7 +861,7 @@ function setupSearch(inputId, dropId) {
       drop.innerHTML = results.map(p => {
         const t1 = p.type1 ? `<span class="type-pill tp-${p.type1}">${p.type1}</span>` : '';
         const t2 = p.type2 ? `<span class="type-pill tp-${p.type2}">${p.type2}</span>` : '';
-        return `<div class="drop-item" onclick="onSelectPoke('${inputId}','${dropId}','${p.name}')">
+        return `<div class="drop-item" onclick="searchDropSelect('${inputId}','${dropId}','${p.name}')">
           <span class="drop-name">${p.name}</span><span class="drop-types">${t1}${t2}</span>
         </div>`;
       }).join('');
@@ -870,19 +871,29 @@ function setupSearch(inputId, dropId) {
   document.addEventListener('click', e => {
     if(!inp.contains(e.target) && !drop.contains(e.target)) drop.classList.remove('show');
   });
+  if(onSelect) inp._onSelect = onSelect;
 }
 
-function onSelectPoke(inputId, dropId, name) {
-  document.getElementById(inputId).value = name;
-  document.getElementById(dropId).classList.remove('show');
+// 検索ドロップダウン選択（グローバルから呼ばれる）
+function searchDropSelect(inputId, dropId, name) {
+  const inp = document.getElementById(inputId);
+  const drop = document.getElementById(dropId);
+  inp.value = name;
+  drop.classList.remove('show');
   const p = pokeIndex.find(x => x.name === name);
   if(!p) return;
-  if(inputId==='atk-search') initAtkPoke(p);
-  if(inputId==='def-search') initDefPoke(p);
-  if(inputId==='my-search')  renderMyPoke(p);
-  if(inputId==='opp-search') renderOppPoke(p);
-  if(inputId==='party-search') addToParty(p);
+  // コールバックがあればそちら優先
+  if(inp._onSelect) { inp._onSelect(p); return; }
+  // デフォルトルーティング
+  if(inputId==='atk-search')    initAtkPoke(p);
+  else if(inputId==='def-search')    initDefPoke(p);
+  else if(inputId==='my-search')     renderMyPoke(p);
+  else if(inputId==='opp-search')    renderOppPoke(p);
+  else if(inputId==='atk2-search')   initAtk2(p);
+  else if(inputId==='party-search')  addToParty(p);
 }
+
+// onSelectPokeはsearchDropSelectに統合
 
 // ===== 攻撃側初期化 =====
 function initAtkPoke(p) {
@@ -1284,18 +1295,7 @@ function calcAddDamage() {
   else               kt.innerHTML='<span class="add-ko-tag add-ko3">突破できない</span>';
 }
 
-// onSelectPokeを拡張（atk2対応）
-const _origOnSelectPoke = onSelectPoke;
-function onSelectPoke(inputId, dropId, name) {
-  if(inputId==='atk2-search') {
-    document.getElementById(inputId).value = name;
-    document.getElementById(dropId).classList.remove('show');
-    const p = pokeIndex.find(x=>x.name===name);
-    if(p) initAtk2(p);
-    return;
-  }
-  _origOnSelectPoke(inputId, dropId, name);
-}
+// atk2はsetupSearchのコールバック経由で処理（searchDropSelectで対応済み）
 
 // ===== 技判定 =====
 function renderMyPoke(p) {
