@@ -1545,6 +1545,7 @@ function clearPartyMove(i) {
   if(selectedSlot<0||!party[selectedSlot]) return;
   party[selectedSlot].moves.splice(i,1);
   renderPeMoves(party[selectedSlot].moves);
+  updateCoverage();
 }
 
 function setupPeMoveSearch() {
@@ -1580,6 +1581,7 @@ function addPartyMove(idx) {
   renderPeMoves(moves);
   document.getElementById('pe-move-search').value='';
   document.getElementById('pe-move-drop').classList.remove('show');
+  updateCoverage();
 }
 
 // ローカル保存
