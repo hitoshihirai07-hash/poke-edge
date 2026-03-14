@@ -138,6 +138,57 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;margin:4p
 .tp-ひこう,.tp-飛行{background:#0277bd;color:#fff;}.tp-エスパー{background:#ad1457;color:#fff;}.tp-むし,.tp-虫{background:#558b2f;color:#fff;}
 .tp-いわ,.tp-岩{background:#4e342e;color:#fff;}.tp-ゴースト{background:#4a148c;color:#fff;}.tp-ドラゴン{background:#4527a0;color:#fff;}
 .tp-あく,.tp-悪{background:#212121;color:#fff;}.tp-はがね,.tp-鋼{background:#455a64;color:#fff;}.tp-フェアリー{background:#880e4f;color:#fff;}
+/* パーティ管理 新CSS */
+.party-layout{display:grid;grid-template-columns:200px 1fr;gap:16px;align-items:start;}
+@media(max-width:700px){.party-layout{grid-template-columns:1fr;}}
+.party-slot-list{display:flex;flex-direction:column;gap:6px;}
+.party-slot-btn{
+  background:var(--panel);border:1px solid var(--border);
+  padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;
+  transition:all 0.18s;position:relative;
+}
+.party-slot-btn:hover,.party-slot-btn.active{border-color:var(--accent);}
+.party-slot-btn.active{background:rgba(0,200,240,0.06);}
+.party-slot-btn.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);}
+.party-slot-num{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--text2);width:16px;flex-shrink:0;}
+.party-slot-info{flex:1;min-width:0;}
+.party-slot-name{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.party-slot-types{display:flex;gap:3px;margin-top:2px;flex-wrap:wrap;}
+.party-slot-empty{font-size:11px;color:var(--text2);}
+.party-slot-remove{background:none;border:none;color:var(--text2);cursor:pointer;font-size:14px;padding:0 2px;flex-shrink:0;}
+.party-slot-remove:hover{color:var(--accent2);}
+.party-editor{background:var(--panel);border:1px solid var(--border);padding:18px;}
+.party-editor-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.party-editor-title{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--text2);}
+.party-editor-pokename{font-size:18px;font-weight:700;color:var(--accent);}
+.ev-total-disp{font-size:10px;color:var(--text2);margin-top:4px;}
+.ev-over{color:var(--accent2)!important;}
+.real-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0;}
+.rs-item{background:var(--bg2);border:1px solid var(--border);padding:7px 8px;text-align:center;}
+.rs-label{font-size:9px;color:var(--text2);}
+.rs-val{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--accent);line-height:1.1;}
+.moves-input-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;}
+.move-input-item{background:var(--bg2);border:1px solid var(--border);padding:8px;position:relative;}
+.move-input-label{font-size:9px;color:var(--text2);margin-bottom:4px;}
+.move-filled{font-size:11px;font-weight:700;color:var(--text);}
+.move-filled-type{display:inline-block;padding:1px 5px;font-size:8px;font-weight:700;margin-left:4px;}
+.move-clear-btn{background:none;border:none;color:var(--text2);cursor:pointer;font-size:10px;position:absolute;top:6px;right:6px;}
+.party-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.party-action-btn{padding:8px 16px;background:transparent;border:1px solid var(--border2);color:var(--text2);font-family:'Noto Sans JP',sans-serif;font-size:11px;cursor:pointer;letter-spacing:1px;transition:all 0.18s;}
+.party-action-btn:hover{border-color:var(--accent);color:var(--accent);}
+.party-action-btn.primary{border-color:var(--accent);color:var(--accent);}
+.party-action-btn.danger{border-color:var(--accent2);color:var(--accent2);}
+.party-save-btn{padding:9px 20px;background:linear-gradient(135deg,var(--green),#007a40);border:none;color:#000;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;cursor:pointer;transition:all 0.18s;}
+.party-save-btn:hover{opacity:0.85;}
+.saved-parties-section{margin-top:14px;border-top:1px solid var(--border);padding-top:14px;}
+.saved-parties-title{font-size:10px;letter-spacing:3px;color:var(--text2);margin-bottom:8px;}
+.saved-party-list{display:flex;flex-direction:column;gap:4px;}
+.saved-party-item{background:var(--bg2);border:1px solid var(--border);padding:8px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:border-color 0.18s;}
+.saved-party-item:hover{border-color:var(--accent);}
+.saved-party-name{font-size:12px;font-weight:700;flex:1;}
+.saved-party-pokes{font-size:10px;color:var(--text2);}
+.saved-party-del{background:none;border:none;color:var(--text2);cursor:pointer;font-size:12px;}
+.saved-party-del:hover{color:var(--accent2);}
 .add-section{margin-top:16px;border:1px solid var(--border2);background:var(--bg2);padding:16px;}
 .add-section-title{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--accent3);margin-bottom:12px;display:flex;align-items:center;gap:10px;}
 .add-section-title::after{content:'';flex:1;height:1px;background:var(--border2);}
@@ -560,20 +611,141 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
 
   <!-- PARTY -->
   <div class="panel" id="tab-party">
-    <div class="party-wrap">
+    <!-- ポケモン追加バー -->
+    <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;">
+      <div class="search-wrap" style="flex:1;margin:0;">
+        <input class="search-input" id="party-search" type="text" placeholder="ポケモンを検索して追加..." autocomplete="off">
+        <div class="dropdown" id="party-drop"></div>
+      </div>
+      <button class="party-save-btn" onclick="savePartyLocal()">💾 保存</button>
+      <button class="party-action-btn" onclick="showSavedParties()" style="white-space:nowrap;">📂 読込</button>
+    </div>
+
+    <div class="party-layout">
+      <!-- 左: 6匹リスト -->
       <div>
-        <div class="sec">パーティ構成</div>
-        <div class="party-grid" id="party-grid"></div>
-        <div class="search-wrap">
-          <input class="search-input" id="party-search" type="text" placeholder="追加するポケモンを検索..." autocomplete="off">
-          <div class="dropdown" id="party-drop"></div>
+        <div class="party-slot-list" id="party-slot-list"></div>
+        <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+          <div style="font-size:10px;color:var(--text2);padding-top:4px;">合計努力値:</div>
+          <div id="party-ev-summary" style="font-size:10px;color:var(--text3);padding-top:4px;"></div>
         </div>
-        <button class="save-btn" onclick="saveParty()">💾 URLシェア</button>
+        <div class="cov-wrap" style="margin-top:10px;">
+          <div class="sec">タイプカバレッジ</div>
+          <div id="cov-chart"></div>
+        </div>
       </div>
-      <div class="cov-wrap">
-        <div class="sec">タイプカバレッジ</div>
-        <div id="cov-chart"></div>
+
+      <!-- 右: 編集パネル -->
+      <div class="party-editor" id="party-editor">
+        <div id="party-editor-empty" style="color:var(--text2);font-size:12px;padding:20px 0;">
+          左のポケモンを選択すると編集できます
+        </div>
+        <div id="party-editor-content" style="display:none;">
+          <div class="party-editor-header">
+            <div>
+              <div class="party-editor-title">編集中</div>
+              <div class="party-editor-pokename" id="pe-pokename">—</div>
+              <div class="poke-types" id="pe-types" style="margin-top:4px;"></div>
+            </div>
+          </div>
+
+          <label>レベル</label>
+          <input type="number" id="pe-lv" value="50" min="1" max="100" oninput="updatePartyMember()">
+
+          <label>性格</label>
+          <select id="pe-nature" onchange="updatePartyMember()">
+            <option>おっとり</option><option>いじっぱり</option><option>やんちゃ</option>
+            <option>ゆうかん</option><option>さみしがり</option><option>ずぶとい</option>
+            <option>わんぱく</option><option>のうてんき</option><option>のんき</option>
+            <option>ひかえめ</option><option>うっかりや</option><option>おだやか</option>
+            <option>おとなしい</option><option>しんちょう</option><option>なまいき</option>
+            <option>おくびょう</option><option>せっかち</option><option>ようき</option>
+            <option>むじゃき</option><option>おとぼけ</option>
+          </select>
+
+          <label>個体値（0〜31）</label>
+          <div class="slider-row">
+            <div class="slider-header"><span class="slider-label">個体値</span><span class="slider-val" id="pe-iv-disp">31</span></div>
+            <div class="slider-inputs">
+              <input type="range" id="pe-iv-range" min="0" max="31" value="31" oninput="pe_syncIV(this.value)">
+              <input type="number" id="pe-iv" min="0" max="31" value="31" oninput="pe_syncIV(this.value)">
+            </div>
+          </div>
+
+          <label>努力値（残り: <span id="pe-ev-remain">510</span>）</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            <div>
+              <div style="font-size:9px;color:var(--text2);margin-bottom:2px;">HP</div>
+              <div class="slider-inputs">
+                <input type="range" id="pe-ev-hp-r" min="0" max="252" step="4" value="0" oninput="pe_syncEV('hp',this.value)">
+                <input type="number" id="pe-ev-hp" min="0" max="252" value="0" oninput="pe_syncEV('hp',this.value)">
+              </div>
+            </div>
+            <div>
+              <div style="font-size:9px;color:var(--text2);margin-bottom:2px;">こうげき</div>
+              <div class="slider-inputs">
+                <input type="range" id="pe-ev-atk-r" min="0" max="252" step="4" value="0" oninput="pe_syncEV('atk',this.value)">
+                <input type="number" id="pe-ev-atk" min="0" max="252" value="0" oninput="pe_syncEV('atk',this.value)">
+              </div>
+            </div>
+            <div>
+              <div style="font-size:9px;color:var(--text2);margin-bottom:2px;">ぼうぎょ</div>
+              <div class="slider-inputs">
+                <input type="range" id="pe-ev-def-r" min="0" max="252" step="4" value="0" oninput="pe_syncEV('def',this.value)">
+                <input type="number" id="pe-ev-def" min="0" max="252" value="0" oninput="pe_syncEV('def',this.value)">
+              </div>
+            </div>
+            <div>
+              <div style="font-size:9px;color:var(--text2);margin-bottom:2px;">とくこう</div>
+              <div class="slider-inputs">
+                <input type="range" id="pe-ev-spa-r" min="0" max="252" step="4" value="0" oninput="pe_syncEV('spa',this.value)">
+                <input type="number" id="pe-ev-spa" min="0" max="252" value="0" oninput="pe_syncEV('spa',this.value)">
+              </div>
+            </div>
+            <div>
+              <div style="font-size:9px;color:var(--text2);margin-bottom:2px;">とくぼう</div>
+              <div class="slider-inputs">
+                <input type="range" id="pe-ev-spd-r" min="0" max="252" step="4" value="0" oninput="pe_syncEV('spd',this.value)">
+                <input type="number" id="pe-ev-spd" min="0" max="252" value="0" oninput="pe_syncEV('spd',this.value)">
+              </div>
+            </div>
+            <div>
+              <div style="font-size:9px;color:var(--text2);margin-bottom:2px;">すばやさ</div>
+              <div class="slider-inputs">
+                <input type="range" id="pe-ev-spe-r" min="0" max="252" step="4" value="0" oninput="pe_syncEV('spe',this.value)">
+                <input type="number" id="pe-ev-spe" min="0" max="252" value="0" oninput="pe_syncEV('spe',this.value)">
+              </div>
+            </div>
+          </div>
+
+          <!-- 実数値表示 -->
+          <div class="real-stats-grid" id="pe-real-stats"></div>
+
+          <!-- 技入力 -->
+          <label style="margin-top:10px;">技（最大4つ）</label>
+          <div class="moves-input-grid" id="pe-moves-grid">
+            <!-- JS生成 -->
+          </div>
+          <div style="margin-top:6px;position:relative;">
+            <input class="search-input" id="pe-move-search" type="text" placeholder="技名を入力して選択..." autocomplete="off" style="font-size:11px;">
+            <div class="dropdown" id="pe-move-drop"></div>
+          </div>
+
+          <!-- 持ち物 -->
+          <label>持ち物</label>
+          <input type="text" id="pe-item" placeholder="例: こだわりハチマキ" oninput="updatePartyMember()">
+
+          <!-- メモ -->
+          <label>メモ</label>
+          <input type="text" id="pe-memo" placeholder="自由記述" oninput="updatePartyMember()">
+        </div>
       </div>
+    </div>
+
+    <!-- 保存済みパーティ -->
+    <div class="saved-parties-section" id="saved-parties-section" style="display:none;">
+      <div class="saved-parties-title">保存済みパーティ</div>
+      <div class="saved-party-list" id="saved-party-list"></div>
     </div>
   </div>
 
@@ -1183,28 +1355,296 @@ function judgeMove() {
 
 // ===== パーティ =====
 let party = [];
-function renderPartyGrid() {
-  document.getElementById('party-grid').innerHTML = Array(6).fill(null).map((_,i) => {
-    const p = party[i];
-    if(p) return `<div class="pm-slot">
-      <button class="pm-remove" onclick="party.splice(${i},1);renderPartyGrid()">×</button>
-      <div class="pm-name">${p.name}</div>
-      <div class="pm-types">
-        ${p.type1?`<span class="type-pill tp-${p.type1}" style="font-size:8px;">${p.type1}</span>`:''}
-        ${p.type2?`<span class="type-pill tp-${p.type2}" style="font-size:8px;">${p.type2}</span>`:''}
-      </div>
-    </div>`;
-    return `<div class="pm-slot empty"><div class="add-icon">＋</div><div style="font-size:9px;color:var(--text2);">空き</div></div>`;
-  }).join('');
-  updateCoverage();
-}
+// ===== パーティ管理（新版） =====
+// party配列: {poke, lv, nature, iv, ev:{hp,atk,def,spa,spd,spe}, moves:[], item, memo}
+let selectedSlot = -1;
+
 function addToParty(p) {
   if(party.length>=6) { alert('パーティは6匹までです'); return; }
-  party.push(p);
+  party.push({
+    poke: p, lv:50, nature:'おっとり', iv:31,
+    ev:{hp:0,atk:0,def:0,spa:0,spd:0,spe:0},
+    moves:[], item:'', memo:''
+  });
   document.getElementById('party-search').value='';
   document.getElementById('party-drop').classList.remove('show');
-  renderPartyGrid();
+  renderPartySlotList();
+  selectSlot(party.length-1);
 }
+
+function renderPartySlotList() {
+  const el = document.getElementById('party-slot-list');
+  el.innerHTML = Array(6).fill(null).map((_,i) => {
+    const m = party[i];
+    if(m) {
+      const p = m.poke;
+      const t1 = p.type1?`<span class="type-pill tp-${p.type1}" style="font-size:7px;">${p.type1}</span>`:'';
+      const t2 = p.type2?`<span class="type-pill tp-${p.type2}" style="font-size:7px;">${p.type2}</span>`:'';
+      return `<div class="party-slot-btn ${selectedSlot===i?'active':''}" onclick="selectSlot(${i})">
+        <span class="party-slot-num">${i+1}</span>
+        <div class="party-slot-info">
+          <div class="party-slot-name">${p.name}</div>
+          <div class="party-slot-types">${t1}${t2}</div>
+        </div>
+        <button class="party-slot-remove" onclick="event.stopPropagation();removeFromParty(${i})">×</button>
+      </div>`;
+    }
+    return `<div class="party-slot-btn" style="opacity:0.4;cursor:default;">
+      <span class="party-slot-num">${i+1}</span>
+      <div class="party-slot-info"><div class="party-slot-empty">空き</div></div>
+    </div>`;
+  }).join('');
+  updateCoverage();
+  updateEvSummary();
+}
+
+function removeFromParty(i) {
+  party.splice(i,1);
+  if(selectedSlot>=party.length) selectedSlot=party.length-1;
+  renderPartySlotList();
+  if(selectedSlot>=0 && party[selectedSlot]) selectSlot(selectedSlot);
+  else { document.getElementById('party-editor-empty').style.display='block'; document.getElementById('party-editor-content').style.display='none'; }
+}
+
+function selectSlot(i) {
+  selectedSlot = i;
+  const m = party[i];
+  if(!m) return;
+  renderPartySlotList();
+  const p = m.poke;
+  document.getElementById('party-editor-empty').style.display='none';
+  document.getElementById('party-editor-content').style.display='block';
+  document.getElementById('pe-pokename').textContent = p.name;
+  const t1=p.type1?`<span class="type-pill tp-${p.type1}">${p.type1}</span>`:'';
+  const t2=p.type2?`<span class="type-pill tp-${p.type2}">${p.type2}</span>`:'';
+  document.getElementById('pe-types').innerHTML = t1+t2;
+  document.getElementById('pe-lv').value = m.lv;
+  document.getElementById('pe-nature').value = m.nature;
+  document.getElementById('pe-iv').value = m.iv;
+  document.getElementById('pe-iv-range').value = m.iv;
+  document.getElementById('pe-iv-disp').textContent = m.iv;
+  ['hp','atk','def','spa','spd','spe'].forEach(k=>{
+    document.getElementById('pe-ev-'+k).value = m.ev[k]||0;
+    document.getElementById('pe-ev-'+k+'-r').value = m.ev[k]||0;
+  });
+  document.getElementById('pe-item').value = m.item||'';
+  document.getElementById('pe-memo').value = m.memo||'';
+  renderPeMoves(m.moves);
+  updateRealStats();
+  updateEvRemain();
+}
+
+function pe_syncIV(val) {
+  const v = Math.min(31,Math.max(0,parseInt(val)||0));
+  document.getElementById('pe-iv').value = v;
+  document.getElementById('pe-iv-range').value = v;
+  document.getElementById('pe-iv-disp').textContent = v;
+  updatePartyMember();
+}
+
+function pe_syncEV(stat, val) {
+  const v = Math.min(252,Math.max(0,parseInt(val)||0));
+  document.getElementById('pe-ev-'+stat).value = v;
+  document.getElementById('pe-ev-'+stat+'-r').value = v;
+  updateEvRemain();
+  updatePartyMember();
+}
+
+function updateEvRemain() {
+  const total = ['hp','atk','def','spa','spd','spe'].reduce((s,k)=>s+(parseInt(document.getElementById('pe-ev-'+k).value)||0),0);
+  const remain = 510-total;
+  const el = document.getElementById('pe-ev-remain');
+  el.textContent = remain;
+  el.className = remain<0 ? 'ev-over' : '';
+}
+
+function updateEvSummary() {
+  const summary = party.map((m,i)=>{
+    const total=['hp','atk','def','spa','spd','spe'].reduce((s,k)=>s+(m.ev[k]||0),0);
+    return `${m.poke.name}:${total}`;
+  }).join(' / ');
+  document.getElementById('party-ev-summary').textContent = summary || '—';
+}
+
+function updateRealStats() {
+  if(selectedSlot<0||!party[selectedSlot]) return;
+  const m = party[selectedSlot];
+  const p = m.poke;
+  const lv = parseInt(document.getElementById('pe-lv').value)||50;
+  const iv = parseInt(document.getElementById('pe-iv').value)||31;
+  const nat = PERSONALITIES[document.getElementById('pe-nature').value]||{atk:1,def:1,spa:1,spd:1,spe:1};
+  const ev = {
+    hp: parseInt(document.getElementById('pe-ev-hp').value)||0,
+    atk:parseInt(document.getElementById('pe-ev-atk').value)||0,
+    def:parseInt(document.getElementById('pe-ev-def').value)||0,
+    spa:parseInt(document.getElementById('pe-ev-spa').value)||0,
+    spd:parseInt(document.getElementById('pe-ev-spd').value)||0,
+    spe:parseInt(document.getElementById('pe-ev-spe').value)||0,
+  };
+  const stats = [
+    {k:'hp', label:'HP',   val:calcHP(p.hp,   iv, ev.hp,  lv),        c:'#e53935'},
+    {k:'atk',label:'攻撃', val:calcStat(p.atk, iv, ev.atk, lv, nat.atk), c:'#fb8c00'},
+    {k:'def',label:'防御', val:calcStat(p.def, iv, ev.def, lv, nat.def||1), c:'#fdd835'},
+    {k:'spa',label:'特攻', val:calcStat(p.spa, iv, ev.spa, lv, nat.spa), c:'#1e88e5'},
+    {k:'spd',label:'特防', val:calcStat(p.spd, iv, ev.spd, lv, nat.spd||1), c:'#00acc1'},
+    {k:'spe',label:'素早', val:calcStat(p.spe, iv, ev.spe, lv, nat.spe||1), c:'#43a047'},
+  ];
+  document.getElementById('pe-real-stats').innerHTML = stats.map(s=>
+    `<div class="rs-item">
+      <div class="rs-label">${s.label}</div>
+      <div class="rs-val" style="color:${s.c};">${s.val}</div>
+    </div>`).join('');
+}
+
+function updatePartyMember() {
+  if(selectedSlot<0||!party[selectedSlot]) return;
+  const m = party[selectedSlot];
+  m.lv     = parseInt(document.getElementById('pe-lv').value)||50;
+  m.nature = document.getElementById('pe-nature').value;
+  m.iv     = parseInt(document.getElementById('pe-iv').value)||31;
+  m.ev     = {
+    hp: parseInt(document.getElementById('pe-ev-hp').value)||0,
+    atk:parseInt(document.getElementById('pe-ev-atk').value)||0,
+    def:parseInt(document.getElementById('pe-ev-def').value)||0,
+    spa:parseInt(document.getElementById('pe-ev-spa').value)||0,
+    spd:parseInt(document.getElementById('pe-ev-spd').value)||0,
+    spe:parseInt(document.getElementById('pe-ev-spe').value)||0,
+  };
+  m.item = document.getElementById('pe-item').value;
+  m.memo = document.getElementById('pe-memo').value;
+  updateRealStats();
+  updateEvRemain();
+  updateEvSummary();
+}
+
+// 技管理
+function renderPeMoves(moves) {
+  const grid = document.getElementById('pe-moves-grid');
+  grid.innerHTML = [0,1,2,3].map(i => {
+    const mv = moves[i];
+    if(mv) return `<div class="move-input-item">
+      <div class="move-input-label">技${i+1}</div>
+      <div class="move-filled">
+        ${mv.name}<span class="move-filled-type tp-${mv.type}">${mv.type}</span>
+        <span style="font-size:9px;color:var(--text2);margin-left:4px;">威力${mv.power||'—'}</span>
+      </div>
+      <button class="move-clear-btn" onclick="clearPartyMove(${i})">×</button>
+    </div>`;
+    return `<div class="move-input-item" style="opacity:0.4;">
+      <div class="move-input-label">技${i+1}</div>
+      <div style="font-size:11px;color:var(--text2);">未選択</div>
+    </div>`;
+  }).join('');
+}
+
+function clearPartyMove(i) {
+  if(selectedSlot<0||!party[selectedSlot]) return;
+  party[selectedSlot].moves.splice(i,1);
+  renderPeMoves(party[selectedSlot].moves);
+}
+
+function setupPeMoveSearch() {
+  const inp  = document.getElementById('pe-move-search');
+  const drop = document.getElementById('pe-move-drop');
+  let timer;
+  inp.addEventListener('input',()=>{
+    clearTimeout(timer);
+    const q=inp.value.trim();
+    if(!q){drop.classList.remove('show');return;}
+    timer=setTimeout(()=>{
+      const results=moveIndex.filter(m=>m.name.includes(q)).slice(0,12);
+      if(!results.length){drop.classList.remove('show');return;}
+      drop.innerHTML=results.map(m=>`
+        <div class="drop-item" onclick="addPartyMove(${m._i})">
+          <span class="type-pill tp-${m.type}" style="font-size:9px;">${m.type}</span>
+          <span class="drop-name">${m.name}</span>
+          <span style="font-size:10px;color:var(--text2);">${m.category} / 威力${m.power||'—'}</span>
+        </div>`).join('');
+      drop.classList.add('show');
+    },150);
+  });
+  document.addEventListener('click',e=>{if(!inp.contains(e.target)&&!drop.contains(e.target))drop.classList.remove('show');});
+}
+
+function addPartyMove(idx) {
+  if(selectedSlot<0||!party[selectedSlot]) return;
+  const m=MOVES_DATA[idx];
+  const moves=party[selectedSlot].moves;
+  if(moves.length>=4){alert('技は4つまでです');return;}
+  if(moves.find(x=>x.name===m.name)){alert('同じ技は登録できません');return;}
+  moves.push({name:m.name,type:m.type,power:m.power,category:m.category});
+  renderPeMoves(moves);
+  document.getElementById('pe-move-search').value='';
+  document.getElementById('pe-move-drop').classList.remove('show');
+}
+
+// ローカル保存
+function savePartyLocal() {
+  const name = prompt('パーティ名を入力してください', 'マイパーティ');
+  if(!name) return;
+  if(party.length===0){alert('ポケモンを追加してください');return;}
+  const data = {
+    name,
+    date: new Date().toLocaleDateString('ja-JP'),
+    members: party.map(m=>({
+      pokeName: m.poke.name, pokeNo: m.poke.no,
+      type1: m.poke.type1, type2: m.poke.type2,
+      lv:m.lv, nature:m.nature, iv:m.iv, ev:m.ev,
+      moves:m.moves, item:m.item, memo:m.memo
+    }))
+  };
+  const saved = JSON.parse(localStorage.getItem('pokeedge_parties')||'[]');
+  saved.unshift(data);
+  if(saved.length>20) saved.pop();
+  localStorage.setItem('pokeedge_parties', JSON.stringify(saved));
+  alert(`「${name}」を保存しました！`);
+}
+
+function showSavedParties() {
+  const sec = document.getElementById('saved-parties-section');
+  const isShown = sec.style.display==='block';
+  sec.style.display = isShown ? 'none' : 'block';
+  if(!isShown) renderSavedPartyList();
+}
+
+function renderSavedPartyList() {
+  const saved = JSON.parse(localStorage.getItem('pokeedge_parties')||'[]');
+  const el = document.getElementById('saved-party-list');
+  if(!saved.length){el.innerHTML='<div style="font-size:11px;color:var(--text2);padding:8px;">保存済みパーティはありません</div>';return;}
+  el.innerHTML = saved.map((s,i)=>`
+    <div class="saved-party-item" onclick="loadParty(${i})">
+      <div class="saved-party-name">${s.name}</div>
+      <div class="saved-party-pokes">${s.members.map(m=>m.pokeName).join(' / ')}</div>
+      <div style="font-size:9px;color:var(--text2);margin-left:auto;">${s.date||''}</div>
+      <button class="saved-party-del" onclick="event.stopPropagation();deleteParty(${i})">🗑</button>
+    </div>`).join('');
+}
+
+function loadParty(i) {
+  const saved = JSON.parse(localStorage.getItem('pokeedge_parties')||'[]');
+  const s = saved[i];
+  if(!s) return;
+  party = s.members.map(m=>{
+    const poke = pokeIndex.find(x=>x.name===m.pokeName) || {name:m.pokeName,no:m.pokeNo,type1:m.type1,type2:m.type2,hp:0,atk:0,def:0,spa:0,spd:0,spe:0};
+    return {poke, lv:m.lv||50, nature:m.nature||'おっとり', iv:m.iv||31, ev:m.ev||{hp:0,atk:0,def:0,spa:0,spd:0,spe:0}, moves:m.moves||[], item:m.item||'', memo:m.memo||''};
+  });
+  selectedSlot = -1;
+  renderPartySlotList();
+  document.getElementById('saved-parties-section').style.display='none';
+  if(party.length) selectSlot(0);
+  alert(`「${s.name}」を読み込みました`);
+}
+
+function deleteParty(i) {
+  if(!confirm('このパーティを削除しますか？')) return;
+  const saved = JSON.parse(localStorage.getItem('pokeedge_parties')||'[]');
+  saved.splice(i,1);
+  localStorage.setItem('pokeedge_parties', JSON.stringify(saved));
+  renderSavedPartyList();
+}
+
+// renderPartyGrid は後方互換のために残す
+function renderPartyGrid() { renderPartySlotList(); }
 function updateCoverage() {
   const allTypes=['ノーマル','ほのお','みず','でんき','くさ','こおり','かくとう','どく','じめん','ひこう','エスパー','むし','いわ','ゴースト','ドラゴン','あく','はがね','フェアリー'];
   const moveTypeMap={'炎':'ほのお','水':'みず','電気':'でんき','草':'くさ','氷':'こおり','格闘':'かくとう','毒':'どく','地面':'じめん','飛行':'ひこう','虫':'むし','岩':'いわ','悪':'あく','鋼':'はがね','ノーマル':'ノーマル','エスパー':'エスパー','ゴースト':'ゴースト','ドラゴン':'ドラゴン','フェアリー':'フェアリー'};
@@ -1232,11 +1672,7 @@ function updateCoverage() {
     </div>`;
   }).join('');
 }
-function saveParty() {
-  const names=party.map(p=>encodeURIComponent(p.name)).join(',');
-  const url=location.href.split('?')[0]+'?party='+names;
-  navigator.clipboard?.writeText(url).then(()=>alert('URLをコピーしました！')).catch(()=>prompt('URLをコピーしてください:',url));
-}
+function saveParty() { savePartyLocal(); }
 
 // ===== タブ・世代 =====
 function switchTab(id) {
@@ -1270,11 +1706,12 @@ function onStatChange(){ recalcAtk(); recalcDef(); }
 
 // ===== 初期化 =====
 setupSearch('atk-search','atk-drop');
+setupPeMoveSearch();
+renderPartySlotList();
 setupSearch('def-search','def-drop');
 setupSearch('my-search','my-drop');
 setupSearch('opp-search','opp-drop');
 setupSearch('party-search','party-drop');
-renderPartyGrid();
 
 // スライダー連動設定
 ['atk-lv','def-lv'].forEach(id=>{
