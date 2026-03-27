@@ -15,6 +15,16 @@
   document.documentElement.setAttribute('data-theme',t);
 })();
 </script>
+<script>
+(function(){
+  var dark={'--bg':'#07090f','--bg2':'#0b0e1a','--panel':'#0f1423','--border':'#1a2540','--border2':'#243356','--accent':'#00c8f0','--accent2':'#ff3060','--accent3':'#ffc800','--green':'#00e676','--text':'#d8e8ff','--text2':'#4a6080','--text3':'#7a90b0'};
+  var light={'--bg':'#e8f4f8','--bg2':'#d0e8f0','--panel':'#f4fbff','--border':'#90c8e0','--border2':'#60a8cc','--accent':'#0066aa','--accent2':'#cc1040','--accent3':'#cc7700','--green':'#007744','--text':'#051828','--text2':'#2a5070','--text3':'#0a3050'};
+  var t=localStorage.getItem('pokeedge_theme')||'dark';
+  var vars=t==='light'?light:dark;
+  var root=document.documentElement.style;
+  for(var k in vars)root.setProperty(k,vars[k]);
+})();
+</script>
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
@@ -265,20 +275,6 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 }
 
 /* ===== ライトモード ===== */
-html[data-theme="light"] {
-  --bg:#e8f4f8;--bg2:#d0e8f0;--panel:#f4fbff;
-  --border:#90c8e0;--border2:#60a8cc;
-  --accent:#0066aa;--accent2:#cc1040;--accent3:#cc7700;--green:#007744;
-  --text:#051828;--text2:#2a5070;--text3:#0a3050;
-}
-html[data-theme="light"] body::before {
-  background:
-    radial-gradient(ellipse 50% 35% at 10% 5%,rgba(0,136,170,0.06) 0%,transparent 60%),
-    linear-gradient(rgba(0,136,170,0.03) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(0,136,170,0.03) 1px,transparent 1px);
-  background-size:auto,52px 52px,52px 52px;
-}
-
 </style>
 </head>
 <body>
@@ -855,22 +851,31 @@ window.onload = async ()=>{
 </script>
 <script>
 
+
 // ===== テーマ切替 =====
+var THEMES = {dark:{"--bg":"#07090f","--bg2":"#0b0e1a","--panel":"#0f1423","--border":"#1a2540","--border2":"#243356","--accent":"#00c8f0","--accent2":"#ff3060","--accent3":"#ffc800","--green":"#00e676","--text":"#d8e8ff","--text2":"#4a6080","--text3":"#7a90b0"},light:{"--bg":"#e8f4f8","--bg2":"#d0e8f0","--panel":"#f4fbff","--border":"#90c8e0","--border2":"#60a8cc","--accent":"#0066aa","--accent2":"#cc1040","--accent3":"#cc7700","--green":"#007744","--text":"#051828","--text2":"#2a5070","--text3":"#0a3050"}};
 function applyTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
+  var vars = THEMES[theme] || THEMES.dark;
+  var root = document.documentElement.style;
+  for(var k in vars) root.setProperty(k, vars[k]);
   localStorage.setItem('pokeedge_theme', theme);
-  const btn = document.getElementById('theme-btn');
+  var btn = document.getElementById('theme-btn');
   if(btn) btn.textContent = theme === 'light' ? '🌙' : '☀️';
+  document.documentElement.setAttribute('data-theme', theme);
 }
 function toggleTheme() {
-  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  var current = localStorage.getItem('pokeedge_theme') || 'dark';
   applyTheme(current === 'dark' ? 'light' : 'dark');
 }
-// ページ読み込み時に保存済みテーマを適用
-(function() {
-  const saved = localStorage.getItem('pokeedge_theme') || 'dark';
-  applyTheme(saved);
+// 即時適用
+(function(){
+  var t = localStorage.getItem('pokeedge_theme') || 'dark';
+  var vars = THEMES[t] || THEMES.dark;
+  var root = document.documentElement.style;
+  for(var k in vars) root.setProperty(k, vars[k]);
+  document.documentElement.setAttribute('data-theme', t);
 })();
+
 
 function toggleNav(){
   const nav = document.querySelector('.header-nav');
