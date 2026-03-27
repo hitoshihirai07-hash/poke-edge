@@ -303,6 +303,47 @@ input[type=file]{display:none;}
     <div class="log" id="log-ab">CSVを読み込んでください</div>
   </div>
 
+  <!-- season.csv → season.json -->
+  <div class="section">
+    <div class="sec-title">使用可能ポケモン更新（season.json）</div>
+    <div class="sec-file">season.csv → season.json</div>
+    <div class="sec-cols">
+      必須カラム：<span>No</span>・<span>名前</span>・<span>タイプ1</span>・<span>タイプ2</span>・<span>内定（またはシーズン名）</span><br>
+      <span style="font-size:10px;color:var(--text3);">内定列にTRUEで使用可能。列を追加すればシーズン管理も可能。</span>
+    </div>
+    <div class="steps">
+      <div class="step"><span class="step-n">1</span><span>season.csv をドロップ or クリックして選択</span></div>
+      <div class="step"><span class="step-n">2</span><span>プレビューを確認して「JSON生成」をクリック</span></div>
+      <div class="step"><span class="step-n">3</span><span>season.json をダウンロードしてCloudflareにアップロード</span></div>
+    </div>
+    <div class="drop-zone" id="dz-season"
+      onclick="document.getElementById('f-season').click()"
+      ondragover="onDragOver(event,'dz-season')"
+      ondragleave="onDragLeave('dz-season')"
+      ondrop="onDrop(event,'season')">
+      <div class="drop-icon">📅</div>
+      <div class="drop-text">season.csv をここにドロップ</div>
+      <div class="drop-sub">またはクリックしてファイルを選択</div>
+    </div>
+    <input type="file" id="f-season" accept=".csv" style="display:none" onchange="loadFile(event,'season')">
+    <div class="preview" id="prev-season" style="display:none;">
+      <div class="preview-head">
+        <div class="prev-stat"><div class="prev-val" id="prev-season-n">0</div><div class="prev-lbl">件数</div></div>
+        <div class="prev-stat"><div class="prev-val" id="prev-season-c">0</div><div class="prev-lbl">シーズン数</div></div>
+        <div class="prev-stat" style="flex:1;text-align:left;padding-left:16px;">
+          <div class="prev-lbl" style="margin-bottom:4px;">シーズン / 内定列</div>
+          <div id="prev-season-cols" style="font-size:10px;color:var(--text3);"></div>
+        </div>
+      </div>
+      <table class="preview-table" id="prev-season-table"><thead></thead><tbody></tbody></table>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gen" id="btn-season-gen" onclick="generateJSON('season')" disabled>⚡ JSON生成</button>
+      <button class="btn btn-dl"  id="btn-season-dl"  onclick="downloadJSON('season')"  disabled>💾 season.json ダウンロード</button>
+    </div>
+    <div class="log" id="log-season">CSVを読み込んでください</div>
+  </div>
+
 </div>
 
 <script>
@@ -487,7 +528,7 @@ function generateJSON(type) {
 function downloadJSON(type) {
   const json = state[type].json;
   if(!json) return;
-  const names = { poke:'pokemon', move:'moves', ab:'abilities' };
+  const names = { poke:'pokemon', move:'moves', ab:'abilities', season:'season' };
   const filename = names[type]+'.json';
   const blob = new Blob([JSON.stringify(json, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
