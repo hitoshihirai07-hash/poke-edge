@@ -182,13 +182,13 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 }
 
 /* ===== ライトモード ===== */
-[data-theme="light"] {
+html[data-theme="light"] {
   --bg:#e8f4f8;--bg2:#d0e8f0;--panel:#f4fbff;
   --border:#90c8e0;--border2:#60a8cc;
   --accent:#0066aa;--accent2:#cc1040;--accent3:#cc7700;--green:#007744;
   --text:#051828;--text2:#2a5070;--text3:#0a3050;
 }
-[data-theme="light"] body::before {
+html[data-theme="light"] body::before {
   background:
     radial-gradient(ellipse 50% 35% at 10% 5%,rgba(0,136,170,0.06) 0%,transparent 60%),
     linear-gradient(rgba(0,136,170,0.03) 1px,transparent 1px),
