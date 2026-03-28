@@ -333,6 +333,57 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
       <!-- ポケモン選択 -->
       <div class="section">
         <div class="sec-title">ポケモン</div>
+        <!-- タイプ絞り込み -->
+        <div style="display:flex;gap:6px;margin-bottom:6px;">
+          <div style="flex:1;">
+            <div style="font-size:9px;color:var(--text2);margin-bottom:2px;">タイプ1で絞り込み</div>
+            <select id="type-filter1" onchange="onTypeFilterChange()" style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:5px 8px;font-size:11px;font-family:'Noto Sans JP',sans-serif;outline:none;">
+              <option value="">すべて</option>
+<option value="ノーマル">ノーマル</option>
+<option value="ほのお">ほのお</option>
+<option value="みず">みず</option>
+<option value="でんき">でんき</option>
+<option value="くさ">くさ</option>
+<option value="こおり">こおり</option>
+<option value="かくとう">かくとう</option>
+<option value="どく">どく</option>
+<option value="じめん">じめん</option>
+<option value="ひこう">ひこう</option>
+<option value="エスパー">エスパー</option>
+<option value="むし">むし</option>
+<option value="いわ">いわ</option>
+<option value="ゴースト">ゴースト</option>
+<option value="ドラゴン">ドラゴン</option>
+<option value="あく">あく</option>
+<option value="はがね">はがね</option>
+<option value="フェアリー">フェアリー</option>
+            </select>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:9px;color:var(--text2);margin-bottom:2px;">タイプ2で絞り込み</div>
+            <select id="type-filter2" onchange="onTypeFilterChange()" style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:5px 8px;font-size:11px;font-family:'Noto Sans JP',sans-serif;outline:none;">
+              <option value="">すべて</option>
+<option value="ノーマル">ノーマル</option>
+<option value="ほのお">ほのお</option>
+<option value="みず">みず</option>
+<option value="でんき">でんき</option>
+<option value="くさ">くさ</option>
+<option value="こおり">こおり</option>
+<option value="かくとう">かくとう</option>
+<option value="どく">どく</option>
+<option value="じめん">じめん</option>
+<option value="ひこう">ひこう</option>
+<option value="エスパー">エスパー</option>
+<option value="むし">むし</option>
+<option value="いわ">いわ</option>
+<option value="ゴースト">ゴースト</option>
+<option value="ドラゴン">ドラゴン</option>
+<option value="あく">あく</option>
+<option value="はがね">はがね</option>
+<option value="フェアリー">フェアリー</option>
+            </select>
+          </div>
+        </div>
         <div id="season-filter-wrap" style="display:none;margin-bottom:6px;">
   <select id="global-season-filter" onchange="onSeasonFilterChange()" style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:4px 8px;font-size:10px;font-family:'Noto Sans JP',sans-serif;outline:none;">
     <option value="">すべてのポケモン表示</option>
@@ -660,6 +711,22 @@ function recalcReal() {
 }
 
 // ===== ポケモン検索 =====
+
+// ===== タイプ絞り込み =====
+function getTypeFilteredPokes() {
+  const t1 = document.getElementById('type-filter1')?.value || '';
+  const t2 = document.getElementById('type-filter2')?.value || '';
+  let pokes = getSeasonFilteredPokes();
+  if(t1) pokes = pokes.filter(p => p.type1===t1 || p.type2===t1);
+  if(t2) pokes = pokes.filter(p => p.type1===t2 || p.type2===t2);
+  return pokes;
+}
+function onTypeFilterChange() {
+  // 検索inputをリセットしてドロップを再表示
+  const inp = document.getElementById('poke-search');
+  if(inp) inp.dispatchEvent(new Event('input'));
+}
+
 function setupPokeSearch() {
   const inp=document.getElementById('poke-search');
   const drop=document.getElementById('poke-drop');
@@ -667,9 +734,9 @@ function setupPokeSearch() {
   inp.addEventListener('input',()=>{
     clearTimeout(timer);
     const q=inp.value.trim();
-    if(!q){drop.classList.remove('show');return;}
     timer=setTimeout(()=>{
-      const res=getSeasonFilteredPokes().filter(p => p.name.includes(q)).slice(0,12);
+      const filtered = getTypeFilteredPokes();
+      const res = q ? filtered.filter(p=>p.name.includes(q)).slice(0,12) : filtered.slice(0,12);
       if(!res.length){drop.classList.remove('show');return;}
       drop.innerHTML=res.map(p=>{
         const t1=p.type1?`<span class="type-pill tp-${p.type1}">${p.type1}</span>`:'';
