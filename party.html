@@ -403,6 +403,89 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
       <div>
         <div class="sec">パーティ（最大6体）</div>
         <div class="party-slot-list" id="party-slot-list"></div>
+        <!-- スロット編集エリア -->
+        <div id="party-editor-empty" style="display:none;background:var(--bg2);border:1px dashed var(--border2);padding:20px;text-align:center;font-size:11px;color:var(--text2);margin-top:10px;">
+          スロットを選択して技・努力値を編集
+        </div>
+        <div id="party-editor-content" style="display:none;margin-top:10px;background:var(--bg2);border:1px solid var(--border);padding:14px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+            <span id="pe-pokename" style="font-size:15px;font-weight:700;"></span>
+            <span id="pe-types"></span>
+          </div>
+
+          <!-- ゲームモード -->
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
+            <span style="font-size:9px;color:var(--text2);">ゲーム:</span>
+            <label style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:11px;">
+              <input type="radio" name="pe-mode" id="pe-mode-classic" value="classic" checked onchange="onPeModeChange()">
+              <span style="color:var(--text);">従来作（最大252）</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:11px;">
+              <input type="radio" name="pe-mode" id="pe-mode-champ" value="champions" onchange="onPeModeChange()">
+              <span style="color:var(--accent3);">Champions（最大32）</span>
+            </label>
+          </div>
+
+          <!-- レベル・個体値・性格 -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;">
+            <div>
+              <div style="font-size:9px;color:var(--text2);margin-bottom:2px;">レベル</div>
+              <input type="number" id="pe-lv" value="50" min="1" max="100" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:4px 6px;font-size:11px;outline:none;" oninput="updateRealStats()">
+            </div>
+            <div>
+              <div style="font-size:9px;color:var(--text2);margin-bottom:2px;">個体値</div>
+              <div style="display:flex;gap:4px;align-items:center;">
+                <input type="range" id="pe-iv-range" min="0" max="31" value="31" style="flex:1;accent-color:var(--accent);" oninput="pe_syncIV(this.value)">
+                <span id="pe-iv-disp" style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--accent3);width:20px;">31</span>
+                <input type="hidden" id="pe-iv" value="31">
+              </div>
+            </div>
+            <div>
+              <div style="font-size:9px;color:var(--text2);margin-bottom:2px;">性格</div>
+              <select id="pe-nature" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:4px 6px;font-size:10px;font-family:'Noto Sans JP',sans-serif;outline:none;" onchange="updateRealStats()">
+                <option>おっとり</option><option>いじっぱり</option><option>やんちゃ</option><option>ゆうかん</option><option>さみしがり</option>
+                <option>ずぶとい</option><option>わんぱく</option><option>のうてんき</option><option>のんき</option>
+                <option>ひかえめ</option><option>うっかりや</option><option>おだやか</option><option>おとなしい</option><option>しんちょう</option><option>なまいき</option>
+                <option>おくびょう</option><option>せっかち</option><option>ようき</option><option>むじゃき</option><option>おとぼけ</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 努力値 -->
+          <div style="font-size:9px;color:var(--text2);margin-bottom:4px;">努力値 <span id="pe-ev-remain" style="color:var(--accent3);">残り510</span></div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:8px;">
+            <div><div style="font-size:8px;color:var(--text2);">HP</div><input type="number" id="pe-ev-hp"  value="0" min="0" max="252" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:3px 5px;font-size:11px;font-family:'JetBrains Mono',monospace;text-align:right;outline:none;" oninput="pe_syncEV('hp',this.value)"><input type="range" id="pe-ev-hp-r"  min="0" max="252" step="4" value="0" style="width:100%;accent-color:#e53935;" oninput="pe_syncEV('hp',this.value)"></div>
+            <div><div style="font-size:8px;color:var(--text2);">攻撃</div><input type="number" id="pe-ev-atk" value="0" min="0" max="252" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:3px 5px;font-size:11px;font-family:'JetBrains Mono',monospace;text-align:right;outline:none;" oninput="pe_syncEV('atk',this.value)"><input type="range" id="pe-ev-atk-r" min="0" max="252" step="4" value="0" style="width:100%;accent-color:#fb8c00;" oninput="pe_syncEV('atk',this.value)"></div>
+            <div><div style="font-size:8px;color:var(--text2);">防御</div><input type="number" id="pe-ev-def" value="0" min="0" max="252" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:3px 5px;font-size:11px;font-family:'JetBrains Mono',monospace;text-align:right;outline:none;" oninput="pe_syncEV('def',this.value)"><input type="range" id="pe-ev-def-r" min="0" max="252" step="4" value="0" style="width:100%;accent-color:#fdd835;" oninput="pe_syncEV('def',this.value)"></div>
+            <div><div style="font-size:8px;color:var(--text2);">特攻</div><input type="number" id="pe-ev-spa" value="0" min="0" max="252" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:3px 5px;font-size:11px;font-family:'JetBrains Mono',monospace;text-align:right;outline:none;" oninput="pe_syncEV('spa',this.value)"><input type="range" id="pe-ev-spa-r" min="0" max="252" step="4" value="0" style="width:100%;accent-color:#1e88e5;" oninput="pe_syncEV('spa',this.value)"></div>
+            <div><div style="font-size:8px;color:var(--text2);">特防</div><input type="number" id="pe-ev-spd" value="0" min="0" max="252" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:3px 5px;font-size:11px;font-family:'JetBrains Mono',monospace;text-align:right;outline:none;" oninput="pe_syncEV('spd',this.value)"><input type="range" id="pe-ev-spd-r" min="0" max="252" step="4" value="0" style="width:100%;accent-color:#00acc1;" oninput="pe_syncEV('spd',this.value)"></div>
+            <div><div style="font-size:8px;color:var(--text2);">素早</div><input type="number" id="pe-ev-spe" value="0" min="0" max="252" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:3px 5px;font-size:11px;font-family:'JetBrains Mono',monospace;text-align:right;outline:none;" oninput="pe_syncEV('spe',this.value)"><input type="range" id="pe-ev-spe-r" min="0" max="252" step="4" value="0" style="width:100%;accent-color:#8e24aa;" oninput="pe_syncEV('spe',this.value)"></div>
+          </div>
+
+          <!-- 実数値表示 -->
+          <div id="pe-real-stats" style="font-size:10px;color:var(--text2);font-family:'JetBrains Mono',monospace;margin-bottom:8px;"></div>
+
+          <!-- 持ち物 -->
+          <div style="font-size:9px;color:var(--text2);margin-bottom:2px;">持ち物</div>
+          <select id="pe-item" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:5px 8px;font-size:11px;font-family:'Noto Sans JP',sans-serif;outline:none;margin-bottom:8px;" onchange="pe_save()">
+            <option value="">なし</option>
+            <option>こだわりハチマキ</option><option>こだわりメガネ</option><option>こだわりスカーフ</option>
+            <option>いのちのたま</option><option>たつじんのおび</option><option>きあいのタスキ</option>
+            <option>とつげきチョッキ</option><option>しんかのきせき</option><option>メガストーン</option><option>その他</option>
+          </select>
+
+          <!-- 技 -->
+          <div style="font-size:9px;color:var(--text2);margin-bottom:4px;">技（最大4つ）</div>
+          <div style="position:relative;margin-bottom:6px;">
+            <input type="text" id="pe-move-search" placeholder="技名を入力して追加..." style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;font-size:12px;outline:none;" autocomplete="off">
+            <div class="dropdown" id="pe-move-drop"></div>
+          </div>
+          <div id="pe-moves-grid" style="display:flex;flex-direction:column;gap:3px;margin-bottom:8px;"></div>
+
+          <!-- メモ -->
+          <div style="font-size:9px;color:var(--text2);margin-bottom:2px;">メモ</div>
+          <textarea id="pe-memo" rows="2" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 8px;font-family:'Noto Sans JP',sans-serif;font-size:11px;outline:none;resize:vertical;" oninput="pe_save()"></textarea>
+        </div>
         <div style="margin-top:6px;font-size:10px;color:var(--text2);">合計努力値: <span id="party-ev-summary" style="color:var(--text3);">—</span></div>
 
         <div class="cov-wrap" style="margin-top:12px;">
@@ -1281,6 +1364,11 @@ function selectSlot(i) {
   });
   document.getElementById('pe-item').value = m.item||'';
   document.getElementById('pe-memo').value = m.memo||'';
+  // ゲームモード復元
+  const champ = m.gameMode === 'champions';
+  if(document.getElementById('pe-mode-classic')) document.getElementById('pe-mode-classic').checked = !champ;
+  if(document.getElementById('pe-mode-champ'))   document.getElementById('pe-mode-champ').checked   =  champ;
+  onPeModeChange();
   renderPeMoves(m.moves);
   updateRealStats();
   updateEvRemain();
@@ -1370,6 +1458,43 @@ function updatePartyMember() {
 }
 
 // 技管理
+
+// ===== パーティエディタ保存 =====
+function pe_save() {
+  if(selectedSlot < 0 || !party[selectedSlot]) return;
+  const m = party[selectedSlot];
+  m.lv     = parseInt(document.getElementById('pe-lv').value)||50;
+  m.nature = document.getElementById('pe-nature').value;
+  m.iv     = parseInt(document.getElementById('pe-iv').value)||31;
+  m.ev = {
+    hp:  parseInt(document.getElementById('pe-ev-hp').value)||0,
+    atk: parseInt(document.getElementById('pe-ev-atk').value)||0,
+    def: parseInt(document.getElementById('pe-ev-def').value)||0,
+    spa: parseInt(document.getElementById('pe-ev-spa').value)||0,
+    spd: parseInt(document.getElementById('pe-ev-spd').value)||0,
+    spe: parseInt(document.getElementById('pe-ev-spe').value)||0,
+  };
+  m.item   = document.getElementById('pe-item').value;
+  m.memo   = document.getElementById('pe-memo').value;
+  m.gameMode = document.getElementById('pe-mode-champ')?.checked ? 'champions' : 'classic';
+  updateEvSummary();
+  updateCoverage();
+}
+
+function onPeModeChange() {
+  const champ = document.getElementById('pe-mode-champ')?.checked;
+  const max = champ ? 32 : 252;
+  const step = champ ? 1 : 4;
+  ['hp','atk','def','spa','spd','spe'].forEach(k => {
+    const r = document.getElementById('pe-ev-'+k+'-r');
+    const n = document.getElementById('pe-ev-'+k);
+    if(r){ r.max=max; r.step=step; if(parseInt(r.value)>max) r.value=0; }
+    if(n){ n.max=max; if(parseInt(n.value)>max) n.value=0; }
+  });
+  pe_save();
+  updateRealStats();
+}
+
 function renderPeMoves(moves) {
   const grid = document.getElementById('pe-moves-grid');
   grid.innerHTML = [0,1,2,3].map(i => {
