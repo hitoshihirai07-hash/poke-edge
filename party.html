@@ -417,9 +417,36 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
 
       <!-- 右: 登録済みポケモン選択 -->
       <div>
-        <div class="sec">登録済みポケモン一覧</div>
-        <input type="text" id="party-reg-search" placeholder="絞り込み..." style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:7px 10px;font-size:12px;outline:none;margin-bottom:8px;" oninput="renderRegPokeList(this.value)">
-        <div id="party-reg-list" style="max-height:420px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;"></div>
+        <!-- タブ切り替え -->
+        <div style="display:flex;gap:0;margin-bottom:10px;border-bottom:1px solid var(--border);">
+          <button id="tab-btn-reg" onclick="switchAddTab('reg')" style="flex:1;padding:8px;background:var(--accent);color:#000;border:none;font-family:'Noto Sans JP',sans-serif;font-size:11px;font-weight:700;cursor:pointer;">登録済みから選ぶ</button>
+          <button id="tab-btn-direct" onclick="switchAddTab('direct')" style="flex:1;padding:8px;background:var(--bg2);color:var(--text2);border:none;font-family:'Noto Sans JP',sans-serif;font-size:11px;cursor:pointer;">名前/タイプから選ぶ</button>
+        </div>
+
+        <!-- 登録済みタブ -->
+        <div id="tab-reg">
+          <input type="text" id="party-reg-search" placeholder="絞り込み..." style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:7px 10px;font-size:12px;outline:none;margin-bottom:8px;" oninput="renderRegPokeList(this.value)">
+          <div id="party-reg-list" style="max-height:380px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;"></div>
+        </div>
+
+        <!-- 直接検索タブ -->
+        <div id="tab-direct" style="display:none;">
+          <div style="display:flex;gap:6px;margin-bottom:6px;">
+            <div style="flex:1;">
+              <div style="font-size:9px;color:var(--text2);margin-bottom:2px;">タイプ1</div>
+              <select id="direct-type1" onchange="onDirectTypeChange()" style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:5px 8px;font-size:11px;font-family:'Noto Sans JP',sans-serif;outline:none;"><option value="">すべて</option><option value="ノーマル">ノーマル</option><option value="ほのお">ほのお</option><option value="みず">みず</option><option value="でんき">でんき</option><option value="くさ">くさ</option><option value="こおり">こおり</option><option value="かくとう">かくとう</option><option value="どく">どく</option><option value="じめん">じめん</option><option value="ひこう">ひこう</option><option value="エスパー">エスパー</option><option value="むし">むし</option><option value="いわ">いわ</option><option value="ゴースト">ゴースト</option><option value="ドラゴン">ドラゴン</option><option value="あく">あく</option><option value="はがね">はがね</option><option value="フェアリー">フェアリー</option></select>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:9px;color:var(--text2);margin-bottom:2px;">タイプ2</div>
+              <select id="direct-type2" onchange="onDirectTypeChange()" style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:5px 8px;font-size:11px;font-family:'Noto Sans JP',sans-serif;outline:none;"><option value="">すべて</option><option value="ノーマル">ノーマル</option><option value="ほのお">ほのお</option><option value="みず">みず</option><option value="でんき">でんき</option><option value="くさ">くさ</option><option value="こおり">こおり</option><option value="かくとう">かくとう</option><option value="どく">どく</option><option value="じめん">じめん</option><option value="ひこう">ひこう</option><option value="エスパー">エスパー</option><option value="むし">むし</option><option value="いわ">いわ</option><option value="ゴースト">ゴースト</option><option value="ドラゴン">ドラゴン</option><option value="あく">あく</option><option value="はがね">はがね</option><option value="フェアリー">フェアリー</option></select>
+            </div>
+          </div>
+          <div style="position:relative;margin-bottom:6px;">
+            <input type="text" id="direct-poke-search" placeholder="ポケモン名で絞り込み..." style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:7px 10px;font-size:12px;outline:none;" oninput="renderDirectPokeList()">
+          </div>
+          <div id="direct-poke-list" style="max-height:340px;overflow-y:auto;display:flex;flex-direction:column;gap:3px;"></div>
+        </div>
+
         <div style="font-size:10px;color:var(--text2);margin-top:8px;">クリックでパーティに追加。パーティが6体の場合は追加できません。</div>
       </div>
     </div>
@@ -1069,6 +1096,62 @@ function addToParty(p) {
 const LS_REG_KEY = 'pokeedge_pokemon_v1';
 function getRegisteredPokes() {
   try { return JSON.parse(localStorage.getItem(LS_REG_KEY)||'[]'); } catch(e) { return []; }
+}
+
+
+// ===== パーティ追加タブ切り替え =====
+function switchAddTab(tab) {
+  const isReg = tab === 'reg';
+  document.getElementById('tab-reg').style.display    = isReg ? '' : 'none';
+  document.getElementById('tab-direct').style.display = isReg ? 'none' : '';
+  document.getElementById('tab-btn-reg').style.background    = isReg ? 'var(--accent)' : 'var(--bg2)';
+  document.getElementById('tab-btn-reg').style.color         = isReg ? '#000' : 'var(--text2)';
+  document.getElementById('tab-btn-reg').style.fontWeight    = isReg ? '700' : 'normal';
+  document.getElementById('tab-btn-direct').style.background = isReg ? 'var(--bg2)' : 'var(--accent)';
+  document.getElementById('tab-btn-direct').style.color      = isReg ? 'var(--text2)' : '#000';
+  document.getElementById('tab-btn-direct').style.fontWeight = isReg ? 'normal' : '700';
+  if(!isReg) renderDirectPokeList();
+}
+
+function getDirectFilteredPokes() {
+  const t1 = document.getElementById('direct-type1')?.value || '';
+  const t2 = document.getElementById('direct-type2')?.value || '';
+  const q  = (document.getElementById('direct-poke-search')?.value || '').trim();
+  let pokes = pokeIndex;
+  if(t1) pokes = pokes.filter(p => p.type1===t1 || p.type2===t1);
+  if(t2) pokes = pokes.filter(p => p.type1===t2 || p.type2===t2);
+  if(q)  pokes = pokes.filter(p => p.name.includes(q));
+  return pokes;
+}
+
+function onDirectTypeChange() {
+  renderDirectPokeList();
+}
+
+function renderDirectPokeList() {
+  const el = document.getElementById('direct-poke-list');
+  if(!el) return;
+  const pokes = getDirectFilteredPokes().slice(0, 60);
+  if(!pokes.length) {
+    el.innerHTML = '<div style="font-size:11px;color:var(--text2);padding:12px 0;">該当するポケモンがいません</div>';
+    return;
+  }
+  el.innerHTML = pokes.map(p => {
+    const t1 = p.type1 ? `<span class="type-pill tp-${p.type1}" style="font-size:8px;">${p.type1}</span>` : '';
+    const t2 = p.type2 ? `<span class="type-pill tp-${p.type2}" style="font-size:8px;">${p.type2}</span>` : '';
+    return `<div style="background:var(--bg2);border:1px solid var(--border);padding:8px 10px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:border-color 0.15s;"
+      onmouseover="this.style.borderColor='var(--accent)'"
+      onmouseout="this.style.borderColor='var(--border)'"
+      onclick="addToPartyDirect('${p.name}')">
+      <span style="font-size:12px;font-weight:700;flex:1;">${p.name}</span>
+      ${t1}${t2}
+    </div>`;
+  }).join('');
+}
+
+function addToPartyDirect(name) {
+  const p = pokeIndex.find(x => x.name === name);
+  if(p) addToParty(p);
 }
 
 function renderRegPokeList(filter) {
