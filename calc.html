@@ -1587,7 +1587,7 @@ function calcOneDamage(atkStats, atkBase, defStats, defBase, lv, mtype, mcat, mh
   const defTypes = defBase ? [defBase.type1, defBase.type2].filter(Boolean) : [];
   const eff      = getTypeEff(mtype, defTypes);
   const atkTypes = atkBase ? [atkBase.type1, atkBase.type2].filter(Boolean) : [];
-  const stab     = atkTypes.includes(MOVE_TYPE_TO_POKE2[mtype]||mtype) ? 1.5 : 1;
+  const stab     = atkTypes.includes(mtype) ? 1.5 : 1;
   let itemMult = 1;
   if(itemKey==='hachimaki' && mcat==='物理') itemMult=1.5;
   else if(itemKey==='megane' && mcat==='特殊') itemMult=1.5;
