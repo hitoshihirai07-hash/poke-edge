@@ -444,6 +444,10 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
           <div style="position:relative;margin-bottom:6px;">
             <input type="text" id="direct-poke-search" placeholder="ポケモン名で絞り込み..." style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:7px 10px;font-size:12px;outline:none;" oninput="renderDirectPokeList()">
           </div>
+          <label style="display:flex;align-items:center;gap:6px;margin-bottom:8px;cursor:pointer;font-size:11px;color:var(--text3);">
+            <input type="checkbox" id="direct-season-only" onchange="renderDirectPokeList()" style="accent-color:var(--accent3);">
+            <span>使用可能ポケモンのみ表示</span>
+          </label>
           <div id="direct-poke-list" style="max-height:340px;overflow-y:auto;display:flex;flex-direction:column;gap:3px;"></div>
         </div>
 
@@ -1114,10 +1118,15 @@ function switchAddTab(tab) {
 }
 
 function getDirectFilteredPokes() {
-  const t1 = document.getElementById('direct-type1')?.value || '';
-  const t2 = document.getElementById('direct-type2')?.value || '';
-  const q  = (document.getElementById('direct-poke-search')?.value || '').trim();
+  const t1         = document.getElementById('direct-type1')?.value || '';
+  const t2         = document.getElementById('direct-type2')?.value || '';
+  const q          = (document.getElementById('direct-poke-search')?.value || '').trim();
+  const seasonOnly = document.getElementById('direct-season-only')?.checked || false;
   let pokes = pokeIndex;
+  if(seasonOnly && typeof SEASON_DATA !== 'undefined') {
+    const usable = SEASON_DATA.seasons.flatMap(s => SEASON_DATA[s]||[]);
+    pokes = pokes.filter(p => usable.includes(p.name));
+  }
   if(t1) pokes = pokes.filter(p => p.type1===t1 || p.type2===t1);
   if(t2) pokes = pokes.filter(p => p.type1===t2 || p.type2===t2);
   if(q)  pokes = pokes.filter(p => p.name.includes(q));
