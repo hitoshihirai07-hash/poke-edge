@@ -303,6 +303,35 @@ input[type=file]{display:none;}
     <div class="log" id="log-ab">CSVを読み込んでください</div>
   </div>
 
+  <!-- characteristic_table.csv → abilities_data.json -->
+  <div class="section">
+    <div class="sec-title">特性データ更新（abilities_data.json）</div>
+    <div class="sec-file">characteristic_table.csv → abilities_data.json</div>
+    <div class="sec-cols">
+      必須カラム：<span>特性</span>・<span>効果</span>・<span>倍判定</span>（TRUE/空）
+    </div>
+    <div class="steps">
+      <div class="step"><span class="step-n">1</span><span>characteristic_table.csv をドロップ or 選択</span></div>
+      <div class="step"><span class="step-n">2</span><span>「JSON生成」→「ダウンロード」</span></div>
+      <div class="step"><span class="step-n">3</span><span>abilities_data.json をCloudflareにアップロード</span></div>
+    </div>
+    <div class="drop-zone" id="dz-ab_data"
+      onclick="document.getElementById('f-ab_data').click()"
+      ondragover="onDragOver(event,'dz-ab_data')"
+      ondragleave="onDragLeave('dz-ab_data')"
+      ondrop="onDrop(event,'ab_data')">
+      <div class="drop-icon">⚡</div>
+      <div class="drop-text">characteristic_table.csv をここにドロップ</div>
+      <div class="drop-sub">またはクリックしてファイルを選択</div>
+    </div>
+    <input type="file" id="f-ab_data" accept=".csv" style="display:none" onchange="loadFile(event,'ab_data')">
+    <div class="btn-row">
+      <button class="btn btn-gen" id="btn-ab_data-gen" onclick="generateJSON('ab_data')" disabled>⚡ JSON生成</button>
+      <button class="btn btn-dl"  id="btn-ab_data-dl"  onclick="downloadJSON('ab_data')"  disabled>💾 abilities_data.json ダウンロード</button>
+    </div>
+    <div class="log" id="log-ab_data">CSVを読み込んでください</div>
+  </div>
+
   <!-- season.csv → season.json -->
   <div class="section">
     <div class="sec-title">使用可能ポケモン更新（season.json）</div>
@@ -352,7 +381,8 @@ const state = {
   poke:   { csv: null, json: null },
   move:   { csv: null, json: null },
   ab:     { csv: null, json: null },
-  season: { csv: null, json: null },
+  season:  { csv: null, json: null },
+  ab_data: { csv: null, json: null },
 };
 
 // ===== CSV パーサー =====
@@ -497,6 +527,15 @@ function generateJSON(type) {
       const info = seasonCols.map(s => s+':'+result[s].length+'件').join(' / ');
       log.innerHTML = `<span class="ok">✅ シーズンデータを生成しました（${info}）</span>`;
     }
+    else if(type==='ab_data') {
+      const result = data.rows.map(r => ({
+        name:     (r['特性']||'').trim(),
+        effect:   (r['効果']||'').trim(),
+        hasMult:  (r['倍判定']||'').trim().toUpperCase()==='TRUE',
+      }));
+      json = result;
+      log.innerHTML = `<span class="ok">✅ abilities_data.jsonを生成しました（${result.length}件）</span>`;
+    }
     else if(type==='ab') {
       // 特性CSV → abilities.json（{ポケモン名: [とくせい1, とくせい2, かくれとくせい]}）
       const nameKey = data.headers.includes('名前') ? '名前' : data.headers[1];
@@ -529,7 +568,7 @@ function generateJSON(type) {
 function downloadJSON(type) {
   const json = state[type].json;
   if(!json) return;
-  const names = { poke:'pokemon', move:'moves', ab:'abilities', season:'season' };
+  const names = { poke:'pokemon', move:'moves', ab:'abilities', season:'season', ab_data:'abilities_data' };
   const filename = names[type]+'.json';
   const blob = new Blob([JSON.stringify(json, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
