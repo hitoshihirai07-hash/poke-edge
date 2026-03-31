@@ -796,6 +796,18 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
               <input type="number" id="atk2-iv" min="0" max="31" value="31">
             </div>
           </div>
+          <!-- atk2 ゲームモード -->
+          <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
+            <span style="font-size:10px;color:var(--text2);">ゲーム:</span>
+            <label style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:11px;">
+              <input type="radio" name="atk2-mode" id="atk2-mode-classic" value="classic" checked onchange="onAtk2ModeChange()">
+              <span>従来作</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:11px;">
+              <input type="radio" name="atk2-mode" id="atk2-mode-champ" value="champions" onchange="onAtk2ModeChange()">
+              <span style="color:var(--accent3);">Champions</span>
+            </label>
+          </div>
           <label>努力値（こうげき）</label>
           <div class="slider-row">
             <div class="slider-header"><span class="slider-label">努力値</span><span class="slider-val" id="atk2-ev-atk-disp">0</span></div>
@@ -1509,6 +1521,20 @@ function initAtk2(p) {
   recalcAtk2();
 }
 
+
+function onAtk2ModeChange() {
+  const champ = document.getElementById('atk2-mode-champ')?.checked;
+  const max = champ ? 32 : 252;
+  const step = champ ? 1 : 4;
+  ['atk2-ev-atk-range','atk2-ev-atk','atk2-ev-spa-range','atk2-ev-spa'].forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.max = max; el.step = step;
+    if(parseInt(el.value) > max) el.value = 0;
+  });
+  recalcAtk2();
+}
+
 function recalcAtk2() {
   const p = window._atk2Base;
   if(!p) return;
@@ -1517,8 +1543,9 @@ function recalcAtk2() {
   const evA = parseInt(document.getElementById('atk2-ev-atk').value)||0;
   const evS = parseInt(document.getElementById('atk2-ev-spa').value)||0;
   const nat = PERSONALITIES[document.getElementById('atk2-nature').value]||{atk:1,spa:1};
-  const atkVal = calcStat(p.atk, iv, evA, lv, nat.atk);
-  const spaVal = calcStat(p.spa, iv, evS, lv, nat.spa);
+  const atk2Champ = document.getElementById('atk2-mode-champ')?.checked || false;
+  const atkVal = calcStat(p.atk, iv, evA, lv, nat.atk, atk2Champ);
+  const spaVal = calcStat(p.spa, iv, evS, lv, nat.spa, atk2Champ);
   document.getElementById('atk2-stat-atk').textContent = atkVal;
   document.getElementById('atk2-stat-spa').textContent = spaVal;
   document.getElementById('atk2-ev-atk-disp').textContent = evA;
