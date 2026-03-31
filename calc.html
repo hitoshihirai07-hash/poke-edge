@@ -1529,9 +1529,13 @@ function calcDamage() {
   document.getElementById('dmg-rolls').innerHTML = rollsHtml;
 
   const kt = document.getElementById('ko-tag');
-  if(pmx>=100)     { kt.innerHTML='<span class="ko-tag ko1">確定1発</span>'; document.getElementById('dmg-desc').textContent='確実に倒せます'; }
-  else if(pmn>=50) { kt.innerHTML='<span class="ko-tag ko2">確定2発</span>'; document.getElementById('dmg-desc').textContent='2回で確実に倒せます'; }
-  else             { kt.innerHTML='<span class="ko-tag ko3">3発以上</span>'; document.getElementById('dmg-desc').textContent='3回以上必要です'; }
+  if(pmn>=100)           { kt.innerHTML='<span class="ko-tag ko1">確定1発</span>';  document.getElementById('dmg-desc').textContent='確実に倒せます'; }
+  else if(pmx>=100)      { kt.innerHTML='<span class="ko-tag ko2">乱数1発</span>';  document.getElementById('dmg-desc').textContent='乱数次第で1発で倒せます（'+pmx+'%ダメージ）'; }
+  else if(pmn*2>=100)    { kt.innerHTML='<span class="ko-tag ko1">確定2発</span>';  document.getElementById('dmg-desc').textContent='2回で確実に倒せます'; }
+  else if(pmx*2>=100)    { kt.innerHTML='<span class="ko-tag ko2">乱数2発</span>';  document.getElementById('dmg-desc').textContent='乱数次第で2発で倒せます'; }
+  else if(pmn*3>=100)    { kt.innerHTML='<span class="ko-tag ko3">確定3発</span>';  document.getElementById('dmg-desc').textContent='3回で確実に倒せます'; }
+  else if(pmx*3>=100)    { kt.innerHTML='<span class="ko-tag ko3">乱数3発</span>';  document.getElementById('dmg-desc').textContent='乱数次第で3発で倒せます'; }
+  else                   { kt.innerHTML='<span class="ko-tag ko3">4発以上</span>';  document.getElementById('dmg-desc').textContent='4回以上必要です'; }
 }
 
 // ===== 加算モード =====
