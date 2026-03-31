@@ -2453,6 +2453,60 @@ function toggleTheme() {
 })();
 
 
+// ===== 特性データ =====
+let ABILITIES_DATA = [];
+async function loadAbilitiesData() {
+  try {
+    ABILITIES_DATA = await fetch('abilities_data.json?v='+Date.now()).then(r=>r.json());
+  } catch(e) {
+    console.warn('abilities_data.json読み込み失敗');
+  }
+}
+
+function getAbilityByName(name) {
+  return ABILITIES_DATA.find(a => a.name === name) || null;
+}
+
+function searchAbility(side, q) {
+  const drop = document.getElementById(side+'-ability-drop');
+  if(!drop) return;
+  if(!q.trim()) { drop.style.display='none'; return; }
+  const results = ABILITIES_DATA.filter(a => a.name.includes(q)).slice(0, 15);
+  if(!results.length) { drop.style.display='none'; return; }
+  drop.innerHTML = results.map(a => {
+    const tag = a.hasMult ? '<span style="font-size:8px;background:var(--accent3);color:#000;padding:1px 4px;margin-left:4px;">倍率あり</span>' : '';
+    return `<div style="padding:6px 10px;cursor:pointer;font-size:11px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:4px;"
+      onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background=''"
+      onclick="selectAbility('${side}','${a.name}')"
+    >${a.name}${tag}</div>`;
+  }).join('');
+  drop.style.display = 'block';
+}
+
+function selectAbility(side, name) {
+  const ab = getAbilityByName(name);
+  if(!ab) return;
+  const searchEl = document.getElementById(side+'-ability-search');
+  const hiddenEl = document.getElementById(side+'-ability');
+  const dropEl   = document.getElementById(side+'-ability-drop');
+  const infoEl   = document.getElementById(side+'-ability-info');
+  if(searchEl) searchEl.value = name;
+  if(hiddenEl) hiddenEl.value = name;
+  if(dropEl)   dropEl.style.display = 'none';
+  if(infoEl)   infoEl.textContent = ab.effect.slice(0,60) + (ab.effect.length>60?'…':'');
+}
+
+// 特性ドロップを閉じる
+document.addEventListener('click', function(e) {
+  ['atk','def'].forEach(function(side) {
+    const search = document.getElementById(side+'-ability-search');
+    const drop   = document.getElementById(side+'-ability-drop');
+    if(drop && search && !search.contains(e.target) && !drop.contains(e.target)) {
+      drop.style.display='none';
+    }
+  });
+});
+
 function toggleNav(){
   const nav = document.querySelector('.header-nav');
   const hb  = document.getElementById('hamburger');
