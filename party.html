@@ -443,11 +443,28 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
             <div>
               <div style="font-size:9px;color:var(--text2);margin-bottom:2px;">性格</div>
               <select id="pe-nature" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:4px 6px;font-size:10px;font-family:'Noto Sans JP',sans-serif;outline:none;" onchange="updateRealStats()">
-                <option>おっとり</option><option>いじっぱり</option><option>やんちゃ</option><option>ゆうかん</option><option>さみしがり</option>
-                <option>ずぶとい</option><option>わんぱく</option><option>のうてんき</option><option>のんき</option>
-                <option>ひかえめ</option><option>うっかりや</option><option>おだやか</option><option>おとなしい</option><option>しんちょう</option><option>なまいき</option>
-                <option>おくびょう</option><option>せっかち</option><option>ようき</option><option>むじゃき</option><option>おとぼけ</option>
-              </select>
+            <option value="がんばりや">がんばりや（補正なし）</option>
+            <option value="さみしがり">さみしがり（攻↑防↓）</option>
+            <option value="いじっぱり">いじっぱり（攻↑特攻↓）</option>
+            <option value="やんちゃ">やんちゃ（攻↑特防↓）</option>
+            <option value="ゆうかん">ゆうかん（攻↑素早↓）</option>
+            <option value="ずぶとい">ずぶとい（防↑攻↓）</option>
+            <option value="わんぱく">わんぱく（防↑特攻↓）</option>
+            <option value="のうてんき">のうてんき（防↑特防↓）</option>
+            <option value="のんき">のんき（防↑素早↓）</option>
+            <option value="ひかえめ">ひかえめ（特攻↑攻↓）</option>
+            <option value="おっとり">おっとり（特攻↑防↓）</option>
+            <option value="うっかりや">うっかりや（特攻↑特防↓）</option>
+            <option value="れいせい">れいせい（特攻↑素早↓）</option>
+            <option value="おだやか">おだやか（特防↑攻↓）</option>
+            <option value="おとなしい">おとなしい（特防↑特攻↓）</option>
+            <option value="しんちょう">しんちょう（特防↑特攻↓）</option>
+            <option value="なまいき">なまいき（特防↑素早↓）</option>
+            <option value="おくびょう">おくびょう（素早↑特防↓）</option>
+            <option value="せっかち">せっかち（素早↑防↓）</option>
+            <option value="ようき">ようき（素早↑特攻↓）</option>
+            <option value="むじゃき">むじゃき（素早↑特防↓）</option>
+          </select>
             </div>
           </div>
 
@@ -594,26 +611,31 @@ async function loadGameData() {
 // POKEMON_DATA: 外部JSONから読み込み (loadGameData)
 // MOVES_DATA: 外部JSONから読み込み (loadGameData)
 const PERSONALITIES = {
-  'おっとり': {atk:1,def:1,spa:1,spd:1,spe:1},
-  'いじっぱり': {atk:1.1,def:1,spa:0.9,spd:1,spe:1},
-  'やんちゃ': {atk:1.1,def:1,spa:1,spd:0.9,spe:1},
-  'ゆうかん': {atk:1.1,def:1,spa:1,spd:1,spe:0.9},
-  'さみしがり': {atk:1.1,def:0.9,spa:1,spd:1,spe:1},
-  'ずぶとい': {atk:0.9,def:1.1,spa:1,spd:1,spe:1},
-  'わんぱく': {atk:1,def:1.1,spa:0.9,spd:1,spe:1},
-  'のうてんき': {atk:1,def:1.1,spa:1,spd:0.9,spe:1},
-  'のんき': {atk:1,def:1.1,spa:1,spd:1,spe:0.9},
-  'ひかえめ': {atk:0.9,def:1,spa:1.1,spd:1,spe:1},
-  'うっかりや': {atk:1,def:0.9,spa:1.1,spd:1,spe:1},
-  'おだやか': {atk:1,def:1,spa:0.9,spd:1.1,spe:1},
-  'おとなしい': {atk:1,def:1,spa:1.1,spd:1,spe:0.9},
-  'しんちょう': {atk:1,def:1,spa:0.9,spd:1.1,spe:1},
-  'なまいき': {atk:1,def:1,spa:1,spd:1.1,spe:0.9},
-  'おくびょう': {atk:1,def:1,spa:1,spd:1,spe:1.1},
-  'せっかち': {atk:1,def:0.9,spa:1,spd:1,spe:1.1},
-  'ようき': {atk:1,def:1,spa:0.9,spd:1,spe:1.1},
-  'むじゃき': {atk:1,def:1,spa:1,spd:0.9,spe:1.1},
-  'おとぼけ': {atk:1,def:1,spa:1,spd:1,spe:1},
+  'がんばりや': {atk:1.0,def:1.0,spa:1.0,spd:1.0,spe:1.0},
+  'すなお':     {atk:1.0,def:1.0,spa:1.0,spd:1.0,spe:1.0},
+  'てれや':     {atk:1.0,def:1.0,spa:1.0,spd:1.0,spe:1.0},
+  'きまぐれ':   {atk:1.0,def:1.0,spa:1.0,spd:1.0,spe:1.0},
+  'おとぼけ':   {atk:1.0,def:1.0,spa:1.0,spd:1.0,spe:1.0},
+  'さみしがり': {atk:1.1,def:0.9,spa:1.0,spd:1.0,spe:1.0},
+  'いじっぱり': {atk:1.1,def:1.0,spa:0.9,spd:1.0,spe:1.0},
+  'やんちゃ':   {atk:1.1,def:1.0,spa:1.0,spd:0.9,spe:1.0},
+  'ゆうかん':   {atk:1.1,def:1.0,spa:1.0,spd:1.0,spe:0.9},
+  'ずぶとい':   {atk:0.9,def:1.1,spa:1.0,spd:1.0,spe:1.0},
+  'わんぱく':   {atk:1.0,def:1.1,spa:0.9,spd:1.0,spe:1.0},
+  'のうてんき': {atk:1.0,def:1.1,spa:1.0,spd:0.9,spe:1.0},
+  'のんき':     {atk:1.0,def:1.1,spa:1.0,spd:1.0,spe:0.9},
+  'ひかえめ':   {atk:0.9,def:1.0,spa:1.1,spd:1.0,spe:1.0},
+  'おっとり':   {atk:1.0,def:0.9,spa:1.1,spd:1.0,spe:1.0},
+  'うっかりや': {atk:1.0,def:1.0,spa:1.1,spd:0.9,spe:1.0},
+  'れいせい':   {atk:1.0,def:1.0,spa:1.1,spd:1.0,spe:0.9},
+  'おだやか':   {atk:0.9,def:1.0,spa:1.0,spd:1.1,spe:1.0},
+  'おとなしい': {atk:1.0,def:1.0,spa:0.9,spd:1.1,spe:1.0},
+  'しんちょう': {atk:1.0,def:1.0,spa:0.9,spd:1.1,spe:1.0},
+  'なまいき':   {atk:1.0,def:1.0,spa:1.0,spd:1.1,spe:0.9},
+  'おくびょう': {atk:1.0,def:1.0,spa:1.0,spd:0.9,spe:1.1},
+  'せっかち':   {atk:1.0,def:0.9,spa:1.0,spd:1.0,spe:1.1},
+  'ようき':     {atk:1.0,def:1.0,spa:0.9,spd:1.0,spe:1.1},
+  'むじゃき':   {atk:1.0,def:1.0,spa:1.0,spd:0.9,spe:1.1},
 };
 
 const TYPE_EFF = {
