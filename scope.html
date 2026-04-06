@@ -546,10 +546,13 @@ function addFromReg(id){
 function doSearch(side,q){
   const drop=document.getElementById(side+'-drop');
   const usableOnly=document.getElementById(side+'-usable-only')?.checked||false;
+  const qTrim=q?q.trim():'';
+  // チェックなし＆検索空の場合は非表示
+  if(!usableOnly && !qTrim){drop.classList.remove('show');return;}
   let pool=usableOnly?pokeIndex.filter(p=>isUsable(p.name)):pokeIndex;
-  const filtered=q.trim()?pool.filter(p=>p.name.includes(q)):pool;
+  const filtered=qTrim?pool.filter(p=>p.name.includes(qTrim)):pool;
   if(!filtered.length){drop.classList.remove('show');return;}
-  drop.innerHTML=filtered.slice(0,15).map(p=>{
+  drop.innerHTML=filtered.slice(0,20).map(p=>{
     const t1=p.type1?`<span class="tp tp-${p.type1}">${p.type1}</span>`:'';
     const t2=p.type2?`<span class="tp tp-${p.type2}">${p.type2}</span>`:'';
     return `<div class="di" onclick="addPoke('${side}','${p.name}')">${p.name}${t1}${t2}</div>`;
@@ -1061,6 +1064,7 @@ function closeNav(){var nav=document.querySelector('.header-nav');var hb=documen
 // ===== 初期化 =====
 window.onload=async()=>{
   await initAuth();
+  await loadSeasonData();
   loadRegSel();
   renderMyParty();
   renderOppParty();
