@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PokeEdge | バトルアナライザー</title>
+<title>PokeEdge | バトルアナライザー v2</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-sync.js"></script>
 <link rel="icon" type="image/png" href="favicon.png">
@@ -201,6 +201,10 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:16
 
         <!-- 名前検索で追加 -->
         <div class="reg-label">🔍 名前検索で追加</div>
+        <label style="display:flex;align-items:center;gap:6px;margin-bottom:6px;cursor:pointer;font-size:11px;color:var(--text);background:var(--bg2);border:1px solid var(--border2);padding:5px 8px;">
+          <input type="checkbox" id="my-usable-only" onchange="doSearch('my',document.getElementById('my-search').value)" style="accent-color:var(--accent3);width:14px;height:14px;">
+          <span>📅 使用可能ポケモンのみ表示</span>
+        </label>
         <div class="sw">
           <input class="si" id="my-search" type="text" placeholder="ポケモン名を入力..." autocomplete="off" oninput="doSearch('my',this.value)">
           <div class="dd" id="my-drop"></div>
@@ -219,6 +223,10 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:16
       <!-- 相手側 -->
       <div class="card">
         <div class="card-title red">相手の手持ち（最大6匹）</div>
+        <label style="display:flex;align-items:center;gap:6px;margin-bottom:6px;cursor:pointer;font-size:11px;color:var(--text);background:var(--bg2);border:1px solid var(--border2);padding:5px 8px;">
+          <input type="checkbox" id="opp-usable-only" onchange="doSearch('opp',document.getElementById('opp-search').value)" style="accent-color:var(--accent2);width:14px;height:14px;">
+          <span>📅 使用可能ポケモンのみ表示</span>
+        </label>
         <div class="sw">
           <input class="si" id="opp-search" type="text" placeholder="相手のポケモン名を入力..." autocomplete="off" oninput="doSearch('opp',this.value)">
           <div class="dd" id="opp-drop"></div>
@@ -381,6 +389,18 @@ const ABILITY_MAP= {"フシギダネ": ["しんりょく", "ようりょくそ"]
 const pokeIndex  = POKE_DATA.map((p,i)=>Object.assign({_i:i},p));
 const moveIndex  = MOVES_DATA.filter(m=>m.power>0);
 const LS_REG     = 'pokeedge_pokemon_v1';
+let SEASON_DATA  = {seasons:[]};
+
+async function loadSeasonData() {
+  try {
+    SEASON_DATA = await fetch('season.json?v='+Date.now()).then(r=>r.json());
+  } catch(e) { console.warn('season.json読み込み失敗'); }
+}
+
+function isUsable(pokeName) {
+  // いずれかのシーズンに含まれていればtrue
+  return SEASON_DATA.seasons.some(s => (SEASON_DATA[s]||[]).includes(pokeName));
+}
 
 // ===== タイプ相性 =====
 const TYPE_EFF = {
@@ -525,10 +545,11 @@ function addFromReg(id){
 // ===== ポケモン検索 =====
 function doSearch(side,q){
   const drop=document.getElementById(side+'-drop');
-  if(!q.trim()){drop.classList.remove('show');return;}
-  const res=pokeIndex.filter(p=>p.name.includes(q)).slice(0,12);
-  if(!res.length){drop.classList.remove('show');return;}
-  drop.innerHTML=res.map(p=>{
+  const usableOnly=document.getElementById(side+'-usable-only')?.checked||false;
+  let pool=usableOnly?pokeIndex.filter(p=>isUsable(p.name)):pokeIndex;
+  const filtered=q.trim()?pool.filter(p=>p.name.includes(q)):pool;
+  if(!filtered.length){drop.classList.remove('show');return;}
+  drop.innerHTML=filtered.slice(0,15).map(p=>{
     const t1=p.type1?`<span class="tp tp-${p.type1}">${p.type1}</span>`:'';
     const t2=p.type2?`<span class="tp tp-${p.type2}">${p.type2}</span>`:'';
     return `<div class="di" onclick="addPoke('${side}','${p.name}')">${p.name}${t1}${t2}</div>`;
