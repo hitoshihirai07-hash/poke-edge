@@ -1419,8 +1419,9 @@ function calcDamage() {
   if(defAbName==='わざわいのうつわ') defStatMult*=(1/0.75);
   if(['クォークチャージ','こだいかっせい'].includes(defAbName)) defStatMult*=1.3;
   if(defAbData&&defAbData.defDmgMult){
-    const d=defAbData.defDmgMult;
-    if(!d.type||d.type===mtype) dmgMult*=d.mult;
+    const dm=defAbData.defDmgMult;
+    const arr=Array.isArray(dm)?dm:[dm];
+    arr.forEach(d=>{if(!d.type||d.type===mtype) dmgMult*=d.mult;});
   }
   if(defItem==='def_1.5_kiseki') defStatMult*=1.5;
   if(defItem==='def_2_metaba'&&mcat==='物理') defStatMult*=2;

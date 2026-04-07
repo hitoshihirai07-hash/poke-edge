@@ -328,20 +328,21 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 
 <script>
 // ===== データ =====
-let POKEMON_DATA = [], MOVES_DATA = [], ABILITY_MAP = {}, SEASON_DATA = {seasons:[]};
+let POKEMON_DATA = [], MOVES_DATA = [], ABILITY_MAP = {}, SEASON_DATA = {seasons:[]}, ABILITIES_DATA = [];
 let pokeIndex = [], moveIndex = [];
 let _dataLoaded = false;
 
 async function loadGameData() {
   if(_dataLoaded) return;
   try {
-    const [pd, md, ad, sd] = await Promise.all([
+    const [pd, md, ad, sd, abd] = await Promise.all([
       fetch('pokemon.json?v='+Date.now()).then(r=>r.json()),
       fetch('moves.json?v='+Date.now()).then(r=>r.json()),
       fetch('abilities.json?v='+Date.now()).then(r=>r.json()).catch(()=>({})),
       fetch('season.json?v='+Date.now()).then(r=>r.json()).catch(()=>({seasons:[]})),
+      fetch('abilities_data.json?v='+Date.now()).then(r=>r.json()).catch(()=>[]),
     ]);
-    POKEMON_DATA = pd; MOVES_DATA = md; ABILITY_MAP = ad; SEASON_DATA = sd;
+    POKEMON_DATA = pd; MOVES_DATA = md; ABILITY_MAP = ad; SEASON_DATA = sd; ABILITIES_DATA = abd;
     pokeIndex = POKEMON_DATA.map((p,i)=>Object.assign({_i:i},p));
     moveIndex = MOVES_DATA.map((m,i)=>Object.assign({_i:i},m));
     _dataLoaded = true;
@@ -374,12 +375,34 @@ const TYPE_EFF = {
 };
 const IMMUNE_AB = {'ふゆう':'じめん','どしょく':'じめん','ひらいしん':'でんき','ちくでん':'でんき','でんきエンジン':'でんき','よびみず':'みず','ちょすい':'みず','もらいび':'ほのお','そうしょく':'くさ','くさのけがわ':'くさ','かんそうはだ':'みず'};
 
+function getAbilityData(name){ return ABILITIES_DATA.find(a=>a.name===name)||null; }
+
 function typeEffWithAbility(mt, defTypes, ability) {
   if(ability && IMMUNE_AB[ability] === mt) return 0;
+  // abilities_data.json immuneType check
+  if(ability) {
+    const ad = getAbilityData(ability);
+    if(ad && ad.immuneType && ad.immuneType === mt) return 0;
+  }
   let e = 1;
   const chart = TYPE_EFF[mt] || {};
   defTypes.forEach(t => { if(chart[t] !== undefined) e *= chart[t]; });
   return e;
+}
+
+function getAbilityDmgMult(ability, moveType, eff) {
+  if(!ability) return 1;
+  const ad = getAbilityData(ability);
+  if(!ad) return 1;
+  let mult = 1;
+  // defDmgMult (あついしぼう etc.)
+  if(ad.defDmgMult) {
+    const arr = Array.isArray(ad.defDmgMult) ? ad.defDmgMult : [ad.defDmgMult];
+    arr.forEach(d => { if(!d.type || d.type === moveType) mult *= d.mult; });
+  }
+  // フィルター・ハードロック (抜群時0.75倍)
+  if(['フィルター','ハードロック'].includes(ability) && eff >= 2) mult *= 0.75;
+  return mult;
 }
 
 // ===== 実数値計算 =====
@@ -833,11 +856,14 @@ function judge() {
       const defSt = mv.category==='物理' ? oppSt.def : oppSt.spd;
       const lv    = mySt.lv;
 
+      // 特性によるダメージ補正（あついしぼう、フィルター等）
+      const abDmgMult = getAbilityDmgMult(oppAbility, mv.type, eff);
+
       const s1 = Math.floor(lv*2/5+2);
       const s2 = Math.floor(Math.floor(s1*power*atkSt/defSt)/50)+2;
       const s3 = Math.floor(s2*stab);
-      const d1Max = Math.floor(s3*eff);
-      const d1Min = Math.floor(Math.floor(s3*0.85)*eff);
+      const d1Max = Math.floor(Math.floor(s3*eff)*abDmgMult);
+      const d1Min = Math.floor(Math.floor(Math.floor(s3*0.85)*eff)*abDmgMult);
 
       const hitsInfo = parseHits(mv.hits);
       const dmgMax = d1Max * hitsInfo.max;
