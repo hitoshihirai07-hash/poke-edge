@@ -492,7 +492,7 @@ function setupOppSlotSearch(slotId) {
     const q = inp.value.trim();
     if(!q) { drop.classList.remove('show'); return; }
     timer = setTimeout(() => {
-      const res = pokeIndex.filter(p=>p.name.includes(q)).slice(0,10);
+      const res = getSeasonFilteredPokes().filter(p=>p.name.includes(q)).slice(0,10);
       if(!res.length) { drop.classList.remove('show'); return; }
       drop.innerHTML = res.map(p => {
         const t1=p.type1?`<span class="tp tp-${p.type1}">${p.type1}</span>`:'';
