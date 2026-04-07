@@ -121,6 +121,21 @@ header{position:sticky;top:0;z-index:100;background:rgba(7,9,15,0.96);backdrop-f
 .score-fill{height:100%;background:var(--accent3);}
 /* type pills */
 .tp{display:inline-block;padding:1px 5px;font-size:8px;font-weight:700;}
+/* opponent slot */
+.opp-slot{background:var(--bg2);border:1px solid var(--border);padding:10px;margin-bottom:6px;position:relative;}
+.opp-slot-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.opp-slot-num{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--accent2);width:18px;flex-shrink:0;}
+.opp-slot-remove{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--text2);cursor:pointer;font-size:14px;line-height:1;}
+.opp-slot-remove:hover{color:var(--accent2);}
+.opp-slot-info{display:flex;align-items:center;gap:6px;font-size:12px;margin-bottom:6px;}
+.opp-slot-settings{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;}
+/* multi-target result breakdown */
+.rank-breakdown{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;}
+.rank-vs{font-size:10px;padding:3px 8px;background:var(--bg);border:1px solid var(--border);line-height:1.5;}
+.rank-vs-name{color:var(--text);font-weight:700;}
+.rank-vs-dmg{color:var(--text3);font-family:'JetBrains Mono',monospace;}
+.rank-vs-eff{font-size:9px;margin-left:4px;}
+.rank-vs-immune{color:var(--text2);opacity:.6;}
 .tp-ノーマル{background:#546e7a;color:#fff;}.tp-ほのお{background:#c62828;color:#fff;}.tp-みず{background:#1565c0;color:#fff;}
 .tp-でんき{background:#f9a825;color:#000;}.tp-くさ{background:#2e7d32;color:#fff;}.tp-こおり{background:#00838f;color:#fff;}
 .tp-かくとう{background:#b71c1c;color:#fff;}.tp-どく{background:#6a1b9a;color:#fff;}.tp-じめん{background:#6d4c41;color:#fff;}
@@ -159,7 +174,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 <div class="main">
   <div style="margin-bottom:14px;">
     <div style="font-size:10px;color:var(--text2);letter-spacing:2px;margin-bottom:3px;">MOVE JUDGE</div>
-    <div style="font-size:12px;color:var(--text3);">自分のポケモンの全技を相手に対してダメージ計算し、最適な技をランキング表示します。</div>
+    <div style="font-size:12px;color:var(--text3);">自分のポケモンの技を相手（最大6体）に対してダメージ計算し、交代されても通りやすい技を総合ランキングで表示します。</div>
   </div>
 
   <div class="grid2">
@@ -257,69 +272,36 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
       <div style="font-size:10px;color:var(--text3);">未選択の場合は全ての攻撃技から最適技を自動選定します。</div>
     </div>
 
-    <!-- 相手のポケモン -->
+    <!-- 相手のポケモン（最大6体） -->
     <div class="card">
-      <div class="card-title opp-title">相手のポケモン</div>
-      <div class="sw">
-        <input class="si" id="opp-search" type="text" placeholder="ポケモン名を入力..." autocomplete="off">
-        <div class="dd" id="opp-drop"></div>
-      </div>
-      <div class="poke-info" id="opp-info">
-        <div class="poke-info-row">
-          <span class="poke-info-name" id="opp-name"></span>
-          <span id="opp-types"></span>
+      <div class="card-title opp-title">相手のポケモン（最大6体）</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px;">交代先も含めて登録すると、どの技が全体的に通りやすいかを比較できます。</div>
+
+      <!-- 相手ポケモンスロット一覧 -->
+      <div id="opp-slots"></div>
+
+      <!-- 追加ボタン -->
+      <button id="opp-add-btn" onclick="addOppSlot()" style="width:100%;padding:10px;background:var(--bg2);border:1px dashed var(--border2);color:var(--text2);font-size:12px;cursor:pointer;transition:border-color 0.18s;margin-top:6px;" onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--border2)'">＋ 相手ポケモンを追加</button>
+
+      <!-- 共通設定 -->
+      <div style="margin-top:12px;padding:10px;background:var(--bg2);border:1px solid var(--border);">
+        <div class="lbl" style="margin-bottom:6px;">共通設定（全スロットに適用）</div>
+        <div class="mode-row">
+          <span class="mode-lbl">ゲーム:</span>
+          <label class="mode-radio"><input type="radio" name="opp-mode" id="opp-mode-classic" value="classic" checked><span style="color:var(--text);">従来作</span></label>
+          <label class="mode-radio"><input type="radio" name="opp-mode" id="opp-mode-champ" value="champions"><span style="color:var(--accent3);">Champions</span></label>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;">
+          <div>
+            <div class="lbl">レベル</div>
+            <input type="number" class="si" id="opp-lv" value="50" min="1" max="100" style="padding:4px 6px;font-size:11px;">
+          </div>
+          <div>
+            <div class="lbl">個体値</div>
+            <input type="number" class="si" id="opp-iv" value="31" min="0" max="31" style="padding:4px 6px;font-size:11px;">
+          </div>
         </div>
       </div>
-
-      <!-- 相手ゲームモード -->
-      <div class="mode-row" style="margin-top:8px;">
-        <span class="mode-lbl">ゲーム:</span>
-        <label class="mode-radio"><input type="radio" name="opp-mode" id="opp-mode-classic" value="classic" checked><span style="color:var(--text);">従来作（最大252）</span></label>
-        <label class="mode-radio"><input type="radio" name="opp-mode" id="opp-mode-champ" value="champions"><span style="color:var(--accent3);">Champions（最大32）</span></label>
-      </div>
-
-      <!-- 相手基本設定 -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;margin-top:8px;">
-        <div>
-          <div class="lbl">レベル</div>
-          <input type="number" class="si" id="opp-lv" value="50" min="1" max="100" style="padding:4px 6px;font-size:11px;">
-        </div>
-        <div>
-          <div class="lbl">個体値</div>
-          <input type="number" class="si" id="opp-iv" value="31" min="0" max="31" style="padding:4px 6px;font-size:11px;">
-        </div>
-      </div>
-
-      <!-- 相手努力値プリセット -->
-      <div class="lbl">相手の努力値配分</div>
-      <select class="sel" id="opp-ev-preset">
-        <option value="none">無振り（全0）</option>
-        <option value="H252">H252（HP特化）</option>
-        <option value="B252">B252（防御特化）</option>
-        <option value="D252">D252（特防特化）</option>
-        <option value="HB">HB（H252B252）</option>
-        <option value="HD">HD（H252D252）</option>
-        <option value="A252">A252（攻撃特化）</option>
-        <option value="C252">C252（特攻特化）</option>
-        <option value="S252">S252（素早さ特化）</option>
-      </select>
-
-      <!-- 相手HP% -->
-      <div class="lbl" style="margin-top:8px;">相手の現在HP</div>
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-        <input type="range" id="opp-hp-range" min="1" max="100" value="100" style="flex:1;accent-color:var(--accent2);" oninput="document.getElementById('opp-hp-num').value=this.value">
-        <input type="number" id="opp-hp-num" value="100" min="1" max="100" style="width:52px;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:3px 5px;font-size:11px;font-family:'JetBrains Mono',monospace;text-align:right;outline:none;" oninput="document.getElementById('opp-hp-range').value=this.value">
-        <span style="font-size:11px;color:var(--text2);">%</span>
-      </div>
-
-      <!-- 相手の実数値表示 -->
-      <div id="opp-stats-disp" style="font-size:10px;color:var(--text2);margin-bottom:8px;font-family:'JetBrains Mono',monospace;"></div>
-
-      <!-- 相手特性 -->
-      <div class="lbl">相手の特性（無効化に影響）</div>
-      <select class="sel" id="opp-ability">
-        <option value="">なし/不明</option>
-      </select>
     </div>
   </div>
 
@@ -328,7 +310,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 
   <!-- 結果 -->
   <div class="result-wrap" id="result-wrap">
-    <div class="result-title">判定結果 — 上位技ランキング</div>
+    <div class="result-title">判定結果 — 全相手に対する総合ランキング</div>
     <div id="result-list"></div>
   </div>
 </div>
@@ -433,8 +415,108 @@ function parseHits(s){ const str=String(s||'1').trim(); if(str.includes('～')){
 
 // ===== 状態管理 =====
 let myPoke = null;   // {poke, lv, iv, ev:{atk,spa,spe}, nature, champ}
-let oppPoke = null;  // {poke, lv, iv, ev, champ, hp, ability}
-let myMoves = [];    // 選択した技リスト [{name,type,category,power,hits,notes}]
+let oppSlots = [];   // [{id, poke, evPreset, hpPct, ability}]
+let myMoves = [];    // 選択した技リスト
+let _oppSlotCounter = 0;
+
+// ===== 相手スロット管理 =====
+function addOppSlot(pokeData) {
+  if(oppSlots.length >= 6) return;
+  const id = ++_oppSlotCounter;
+  oppSlots.push({id, poke:pokeData||null, evPreset:'none', hpPct:100, ability:''});
+  renderOppSlots();
+  if(oppSlots.length >= 6) document.getElementById('opp-add-btn').style.display='none';
+  checkJudgeBtn();
+}
+
+function removeOppSlot(id) {
+  oppSlots = oppSlots.filter(s=>s.id!==id);
+  renderOppSlots();
+  document.getElementById('opp-add-btn').style.display='';
+  checkJudgeBtn();
+}
+
+function renderOppSlots() {
+  const wrap = document.getElementById('opp-slots');
+  wrap.innerHTML = oppSlots.map((slot,i) => {
+    const p = slot.poke;
+    const nameVal = p ? p.name : '';
+    const t1 = p&&p.type1 ? `<span class="tp tp-${p.type1}">${p.type1}</span>` : '';
+    const t2 = p&&p.type2 ? `<span class="tp tp-${p.type2}">${p.type2}</span>` : '';
+    const infoStyle = p ? '' : 'display:none;';
+    const abs = p ? (ABILITY_MAP[p.name]||[]) : [];
+    const abOpts = '<option value="">なし/不明</option>' + abs.map(a=>`<option value="${a}"${slot.ability===a?' selected':''}>${a}</option>`).join('');
+    return `<div class="opp-slot" id="opp-slot-${slot.id}">
+      <button class="opp-slot-remove" onclick="removeOppSlot(${slot.id})" title="削除">×</button>
+      <div class="opp-slot-head">
+        <span class="opp-slot-num">${i+1}</span>
+        <div class="sw" style="flex:1;margin-bottom:0;">
+          <input class="si" id="opp-search-${slot.id}" type="text" placeholder="ポケモン名を入力..." autocomplete="off" value="${nameVal}">
+          <div class="dd" id="opp-drop-${slot.id}"></div>
+        </div>
+      </div>
+      <div class="opp-slot-info" id="opp-info-${slot.id}" style="${infoStyle}">${t1}${t2}</div>
+      <div class="opp-slot-settings">
+        <div>
+          <div class="lbl">努力値配分</div>
+          <select class="sel" id="opp-ev-${slot.id}" onchange="oppSlots.find(s=>s.id===${slot.id}).evPreset=this.value" style="margin-bottom:0;">
+            <option value="none"${slot.evPreset==='none'?' selected':''}>無振り</option>
+            <option value="H252"${slot.evPreset==='H252'?' selected':''}>H252</option>
+            <option value="HB"${slot.evPreset==='HB'?' selected':''}>HB</option>
+            <option value="HD"${slot.evPreset==='HD'?' selected':''}>HD</option>
+            <option value="B252"${slot.evPreset==='B252'?' selected':''}>B252</option>
+            <option value="D252"${slot.evPreset==='D252'?' selected':''}>D252</option>
+          </select>
+        </div>
+        <div>
+          <div class="lbl">特性</div>
+          <select class="sel" id="opp-ab-${slot.id}" onchange="oppSlots.find(s=>s.id===${slot.id}).ability=this.value" style="margin-bottom:0;">${abOpts}</select>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // 各スロットに検索機能を設定
+  oppSlots.forEach(slot => {
+    setupOppSlotSearch(slot.id);
+  });
+}
+
+function setupOppSlotSearch(slotId) {
+  const inp = document.getElementById(`opp-search-${slotId}`);
+  const drop = document.getElementById(`opp-drop-${slotId}`);
+  if(!inp||!drop) return;
+  let timer;
+  inp.addEventListener('input', () => {
+    clearTimeout(timer);
+    const q = inp.value.trim();
+    if(!q) { drop.classList.remove('show'); return; }
+    timer = setTimeout(() => {
+      const res = pokeIndex.filter(p=>p.name.includes(q)).slice(0,10);
+      if(!res.length) { drop.classList.remove('show'); return; }
+      drop.innerHTML = res.map(p => {
+        const t1=p.type1?`<span class="tp tp-${p.type1}">${p.type1}</span>`:'';
+        const t2=p.type2?`<span class="tp tp-${p.type2}">${p.type2}</span>`:'';
+        return `<div class="di" onclick="selectOppSlot(${slotId},'${p.name}')">${p.name}${t1}${t2}</div>`;
+      }).join('');
+      drop.classList.add('show');
+    }, 150);
+  });
+  document.addEventListener('click', e => {
+    if(!inp.contains(e.target)&&!drop.contains(e.target)) drop.classList.remove('show');
+  });
+}
+
+function selectOppSlot(slotId, name) {
+  const p = pokeIndex.find(x=>x.name===name);
+  if(!p) return;
+  const slot = oppSlots.find(s=>s.id===slotId);
+  if(!slot) return;
+  slot.poke = p;
+  slot.ability = '';
+  renderOppSlots();
+  checkJudgeBtn();
+}
 
 // ===== シーズンフィルター =====
 function getSeasonFilteredPokes() {
@@ -528,14 +610,6 @@ function selectPoke(inputId, name) {
     myPoke.poke = p;
     renderMyInfo(p);
     recalcMyStats();
-    // 特性セット
-    checkJudgeBtn();
-  } else {
-    oppPoke = oppPoke||{};
-    oppPoke.poke = p;
-    renderOppInfo(p);
-    renderOppAbility(p.name);
-    recalcOppStats();
     checkJudgeBtn();
   }
 }
@@ -547,18 +621,20 @@ function renderMyInfo(p) {
   document.getElementById('my-types').innerHTML = t1+t2;
   document.getElementById('my-info').classList.add('show');
 }
-function renderOppInfo(p) {
-  const t1=p.type1?`<span class="tp tp-${p.type1}">${p.type1}</span>`:'';
-  const t2=p.type2?`<span class="tp tp-${p.type2}">${p.type2}</span>`:'';
-  document.getElementById('opp-name').textContent = p.name;
-  document.getElementById('opp-types').innerHTML = t1+t2;
-  document.getElementById('opp-info').classList.add('show');
-}
-function renderOppAbility(pokeName) {
-  const abs = ABILITY_MAP[pokeName]||[];
-  const sel = document.getElementById('opp-ability');
-  sel.innerHTML = '<option value="">なし/不明</option>'
-    + abs.map(a=>`<option value="${a}">${a}</option>`).join('');
+
+function getOppStatsForSlot(slot) {
+  if(!slot||!slot.poke) return null;
+  const p = slot.poke;
+  const lv    = parseInt(document.getElementById('opp-lv').value)||50;
+  const iv    = parseInt(document.getElementById('opp-iv').value)||31;
+  const champ = document.getElementById('opp-mode-champ').checked;
+  const key   = slot.evPreset||'none';
+  const ev    = EV_PRESETS[key]||EV_PRESETS['none'];
+  const nat   = EV_PRESET_NAT[key]||{atk:1,def:1,spa:1,spd:1};
+  const hp  = calcHP(p.hp, iv, ev.hp,  lv, champ);
+  const def = calcStat(p.def,iv,ev.def,lv,nat.def||1,champ);
+  const spd = calcStat(p.spd,iv,ev.spd,lv,nat.spd||1,champ);
+  return {hp, def, spd, lv, weight:p.weight||0};
 }
 
 // ===== 登録ポケモンから読み込み =====
@@ -647,27 +723,7 @@ function recalcMyStats() {
     `攻撃: ${st.atk}  特攻: ${st.spa}  素早: ${st.spe}`;
 }
 
-function getOppStats() {
-  if(!oppPoke||!oppPoke.poke) return null;
-  const p = oppPoke.poke;
-  const lv    = parseInt(document.getElementById('opp-lv').value)||50;
-  const iv    = parseInt(document.getElementById('opp-iv').value)||31;
-  const champ = document.getElementById('opp-mode-champ').checked;
-  const key   = document.getElementById('opp-ev-preset').value;
-  const ev    = EV_PRESETS[key]||EV_PRESETS['none'];
-  const nat   = EV_PRESET_NAT[key]||{atk:1,def:1,spa:1,spd:1};
-  const hp  = calcHP(p.hp, iv, ev.hp,  lv, champ);
-  const def = calcStat(p.def,iv,ev.def,lv,nat.def||1,champ);
-  const spd = calcStat(p.spd,iv,ev.spd,lv,nat.spd||1,champ);
-  return {hp, def, spd, lv, weight:p.weight||0};
-}
-
-function recalcOppStats() {
-  const st = getOppStats();
-  if(!st) return;
-  document.getElementById('opp-stats-disp').textContent =
-    `HP: ${st.hp}  防御: ${st.def}  特防: ${st.spd}`;
-}
+// (opponent stats now handled by getOppStatsForSlot)
 
 // ===== 技管理 =====
 function addMove(idx) {
@@ -701,7 +757,8 @@ function renderMyMoves() {
 
 // ===== 判定ボタン有効化 =====
 function checkJudgeBtn() {
-  const ok = myPoke&&myPoke.poke&&oppPoke&&oppPoke.poke;
+  const hasOpp = oppSlots.some(s=>s.poke);
+  const ok = myPoke&&myPoke.poke&&hasOpp;
   document.getElementById('judge-btn').disabled = !ok;
 }
 
@@ -718,23 +775,19 @@ function getWeightPower(name, atkW, defW) {
   return 0;
 }
 
-// ===== メイン判定 =====
+// ===== メイン判定（複数相手対応） =====
 function judge() {
-  if(!myPoke||!myPoke.poke||!oppPoke||!oppPoke.poke) return;
+  if(!myPoke||!myPoke.poke) return;
+  const validSlots = oppSlots.filter(s=>s.poke);
+  if(!validSlots.length) return;
 
   const mySt  = getMyStats();
-  const oppSt = getOppStats();
-  if(!mySt||!oppSt) return;
+  if(!mySt) return;
 
   const myP   = myPoke.poke;
-  const oppP  = oppPoke.poke;
   const myTypes  = [myP.type1, myP.type2].filter(Boolean);
-  const oppTypes = [oppP.type1, oppP.type2].filter(Boolean);
-  const oppAbility = document.getElementById('opp-ability').value;
-  const oppHPpct   = parseInt(document.getElementById('opp-hp-num').value)||100;
-  const oppCurHP   = Math.floor(oppSt.hp * oppHPpct / 100);
 
-  // 計算対象の技（選択済みがあればそれ、なければ全攻撃技）
+  // 計算対象の技
   const targetMoves = myMoves.length > 0
     ? myMoves
     : moveIndex.filter(m=>m.power>0||m.notes==='体重依存').map(m=>({
@@ -745,75 +798,76 @@ function judge() {
   const results = [];
 
   targetMoves.forEach(mv => {
-    // タイプ相性
-    const eff = typeEffWithAbility(mv.type, oppTypes, oppAbility);
-    if(eff === 0) {
-      results.push({name:mv.name, type:mv.type, category:mv.category, eff:0, dmgMax:0, dmgMin:0, pctMax:0, pctMin:0, stab:false, score:0, ko:'無効', hits:'1'});
-      return;
-    }
+    let totalScore = 0;
+    const breakdowns = [];
 
-    // 威力
-    let power = mv.power;
-    let weightNote = '';
-    if(mv.notes==='体重依存') {
-      power = getWeightPower(mv.name, myP.weight||0, oppP.weight||0);
-      weightNote = `体重依存:威力${power}`;
-    }
-    if(!power) return;
+    validSlots.forEach(slot => {
+      const oppP = slot.poke;
+      const oppSt = getOppStatsForSlot(slot);
+      if(!oppSt) return;
+      const oppTypes = [oppP.type1, oppP.type2].filter(Boolean);
+      const oppAbility = slot.ability||'';
+      const oppHPpct = slot.hpPct||100;
+      const oppCurHP = Math.floor(oppSt.hp * oppHPpct / 100);
 
-    // STAB
-    const stab = myTypes.includes(mv.type) ? 1.5 : 1;
+      const eff = typeEffWithAbility(mv.type, oppTypes, oppAbility);
+      if(eff === 0) {
+        breakdowns.push({name:oppP.name, eff:0, dmgMin:0, dmgMax:0, pctMin:0, pctMax:0, ko:'無効', immune:true});
+        return;
+      }
 
-    // ステータス
-    const atkSt = mv.category==='物理' ? mySt.atk : mySt.spa;
-    const defSt = mv.category==='物理' ? oppSt.def : oppSt.spd;
-    const lv    = mySt.lv;
+      let power = mv.power;
+      if(mv.notes==='体重依存') {
+        power = getWeightPower(mv.name, myP.weight||0, oppP.weight||0);
+      }
+      if(!power) return;
 
-    // ダメージ計算（乱数max/minで2値）
-    const s1 = Math.floor(lv*2/5+2);
-    const s2 = Math.floor(Math.floor(s1*power*atkSt/defSt)/50)+2;
-    const s3 = Math.floor(s2*stab);
-    const d1Max = Math.floor(s3*eff);
-    const d1Min = Math.floor(Math.floor(s3*0.85)*eff);
+      const stab = myTypes.includes(mv.type) ? 1.5 : 1;
+      const atkSt = mv.category==='物理' ? mySt.atk : mySt.spa;
+      const defSt = mv.category==='物理' ? oppSt.def : oppSt.spd;
+      const lv    = mySt.lv;
 
-    // ヒット数
-    const hitsInfo = parseHits(mv.hits);
+      const s1 = Math.floor(lv*2/5+2);
+      const s2 = Math.floor(Math.floor(s1*power*atkSt/defSt)/50)+2;
+      const s3 = Math.floor(s2*stab);
+      const d1Max = Math.floor(s3*eff);
+      const d1Min = Math.floor(Math.floor(s3*0.85)*eff);
 
-    const dmgMax = d1Max * hitsInfo.max;
-    const dmgMin = d1Min * hitsInfo.min;
-    const pctMax = Math.round(dmgMax/oppSt.hp*100);
-    const pctMin = Math.round(dmgMin/oppSt.hp*100);
+      const hitsInfo = parseHits(mv.hits);
+      const dmgMax = d1Max * hitsInfo.max;
+      const dmgMin = d1Min * hitsInfo.min;
+      const pctMax = Math.round(dmgMax/oppSt.hp*100);
+      const pctMin = Math.round(dmgMin/oppSt.hp*100);
 
-    // KO判定
-    let ko = '';
-    if(dmgMax >= oppCurHP) ko = '確定1発';
-    else if(d1Max*2*hitsInfo.max >= oppCurHP) ko = '確定2発';
+      let ko = '';
+      if(dmgMin >= oppCurHP) ko = '確1';
+      else if(dmgMax >= oppCurHP) ko = '乱1';
+      else if(d1Min*2*hitsInfo.min >= oppCurHP) ko = '確2';
+      else if(d1Max*2*hitsInfo.max >= oppCurHP) ko = '乱2';
 
-    // スコア: ダメージ%×相性×STAB補正
-    const score = pctMax * eff * stab;
+      const slotScore = pctMax * eff * stab;
+      totalScore += slotScore;
 
+      breakdowns.push({name:oppP.name, eff, dmgMin, dmgMax, pctMin, pctMax, ko, immune:false});
+    });
+
+    const stab = myTypes.includes(mv.type);
     results.push({
       name:mv.name, type:mv.type, category:mv.category,
-      eff, dmgMax, dmgMin, pctMax, pctMin,
-      stab:stab>1, score, ko,
-      hitsInfo, weightNote
+      stab, totalScore, breakdowns
     });
   });
 
-  // スコア降順ソート
-  results.sort((a,b)=>b.score-a.score);
+  results.sort((a,b)=>b.totalScore-a.totalScore);
 
-  // 表示（上位10件 + 無効技）
-  const topResults = results.filter(r=>r.score>0).slice(0,10);
-  const immune = results.filter(r=>r.eff===0);
-
-  renderResults(topResults, immune, oppSt.hp, oppCurHP);
+  const topResults = results.filter(r=>r.totalScore>0).slice(0,10);
+  renderMultiResults(topResults, validSlots.length);
   document.getElementById('result-wrap').style.display='block';
   document.getElementById('result-wrap').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-function renderResults(top, immune, oppMaxHP, oppCurHP) {
-  const maxScore = top[0]?.score||1;
+function renderMultiResults(top, oppCount) {
+  const maxScore = top[0]?.totalScore||1;
   let html = '';
 
   if(!top.length) {
@@ -822,18 +876,20 @@ function renderResults(top, immune, oppMaxHP, oppCurHP) {
     html = top.map((r,i) => {
       const rankClass = i===0?'rank1':i===1?'rank2':'';
       const numClass  = i===0?'r1':i===1?'r2':'';
-      const koHtml = r.ko==='確定1発'
-        ? `<span class="rank-ko ko1">確定1発</span>`
-        : r.ko==='確定2発'
-        ? `<span class="rank-ko ko2">確定2発</span>` : '';
-      const effStr = r.eff>=2?`<span style="color:var(--accent3);">抜群×${r.eff}</span>`
-        : r.eff<1?`<span style="color:var(--text2);">今一つ×${r.eff}</span>`:'等倍';
-      const stabStr = r.stab ? ' STAB' : '';
-      const hitsStr = r.hitsInfo&&r.hitsInfo.max>1
-        ? (r.hitsInfo.min===r.hitsInfo.max?` ${r.hitsInfo.max}hit合計`:` ${r.hitsInfo.min}〜${r.hitsInfo.max}hit`)
-        : '';
-      const weightStr = r.weightNote ? `<span style="color:var(--accent3);margin-left:6px;">${r.weightNote}</span>` : '';
-      const pct = Math.round(r.score/maxScore*100);
+      const stabStr   = r.stab ? ' <span style="color:var(--accent);font-size:9px;">STAB</span>' : '';
+      const pct = Math.round(r.totalScore/maxScore*100);
+
+      // 各相手への内訳
+      const bkHtml = r.breakdowns.map(bk => {
+        if(bk.immune) {
+          return `<div class="rank-vs rank-vs-immune"><span class="rank-vs-name">${bk.name}</span> <span style="font-size:9px;">無効</span></div>`;
+        }
+        const effStr = bk.eff>=2?`<span class="rank-vs-eff" style="color:var(--accent3);">×${bk.eff}</span>`
+          : bk.eff<1?`<span class="rank-vs-eff" style="color:var(--text2);">×${bk.eff}</span>`:'';
+        const koStr = bk.ko ? `<span style="font-size:9px;font-weight:700;color:${bk.ko.includes('1')?'var(--accent2)':'var(--accent3)'};">${bk.ko}</span>` : '';
+        return `<div class="rank-vs"><span class="rank-vs-name">${bk.name}</span> <span class="rank-vs-dmg">${bk.pctMin}〜${bk.pctMax}%</span>${effStr} ${koStr}</div>`;
+      }).join('');
+
       return `<div class="move-rank ${rankClass}">
         <div class="rank-num ${numClass}">${i+1}</div>
         <div style="flex:1;">
@@ -841,22 +897,13 @@ function renderResults(top, immune, oppMaxHP, oppCurHP) {
             <span class="rank-name">${r.name}</span>
             <span class="tp tp-${r.type}" style="font-size:9px;">${r.type}</span>
             <span style="font-size:9px;color:var(--text2);">${r.category}</span>
-            ${koHtml}
+            ${stabStr}
           </div>
-          <div class="rank-detail">
-            ${effStr}${stabStr}${weightStr} &nbsp;
-            <span class="rank-dmg">${r.dmgMin}〜${r.dmgMax}ダメージ（${r.pctMin}〜${r.pctMax}%）${hitsStr}</span>
-          </div>
+          <div class="rank-breakdown">${bkHtml}</div>
           <div class="score-bar"><div class="score-fill" style="width:${pct}%"></div></div>
         </div>
       </div>`;
     }).join('');
-  }
-
-  if(immune.length) {
-    html += `<div style="margin-top:12px;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);font-size:11px;color:var(--text2);">
-      <span style="color:var(--text3);">特性/タイプ無効: </span>${immune.map(r=>`${r.name}（${r.type}）`).join('・')}
-    </div>`;
   }
 
   document.getElementById('result-list').innerHTML = html;
@@ -869,14 +916,10 @@ window.onload = async () => {
   initSeasonFilter();
   loadRegSelect();
   setupPokeSearch('my-search','my-drop');
-  setupPokeSearch('opp-search','opp-drop');
   setupMoveSearch();
 
-  // EV・ステータス変更時に再計算
-  ['opp-lv','opp-iv','opp-ev-preset','opp-hp-num','opp-ability'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.addEventListener('change',recalcOppStats);
-  });
+  // 最初の相手スロットを1つ追加
+  addOppSlot();
 };
 </script>
 
