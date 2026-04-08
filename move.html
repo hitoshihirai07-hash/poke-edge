@@ -915,8 +915,16 @@ function judge() {
 
       const stab = myTypes.includes(mvType) ? 1.5 : 1;
       const atkSt = mv.category==='物理' ? mySt.atk : mySt.spa;
-      const defSt = mv.category==='物理' ? oppSt.def : oppSt.spd;
+      let defSt = mv.category==='物理' ? oppSt.def : oppSt.spd;
       const lv    = mySt.lv;
+
+      // 天候による防御側ステータス補正
+      if(weather==='snow'&&oppTypes.includes('こおり')&&mv.category==='物理'){
+        defSt=Math.floor(defSt*1.5);
+      }
+      if(weather==='sand'&&oppTypes.includes('いわ')&&mv.category==='特殊'){
+        defSt=Math.floor(defSt*1.5);
+      }
 
       // 特性によるダメージ補正（あついしぼう、フィルター等）
       const abDmgMult = getAbilityDmgMult(oppAbility, mvType, eff);
