@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://poke-edge.pages.dev/articles/damage-calc-guide.html">
 <link rel="canonical" href="https://poke-edge.pages.dev/articles/damage-calc-guide.html">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../supabase-sync.js"></script>
+<script src="supabase-sync.js"></script>
 <script>
 (function(){
   var t=localStorage.getItem('pokeedge_theme')||'dark';
@@ -29,8 +29,8 @@
   for(var k in vars)root.setProperty(k,vars[k]);
 })();
 </script>
-<link rel="icon" type="image/png" href="../favicon.png">
-<link rel="apple-touch-icon" href="../favicon.png">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -144,20 +144,20 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 </head>
 <body>
 <header>
-  <div class="logo" onclick="location.href='../index.html'">Poke<em>Edge</em></div>
+  <div class="logo" onclick="location.href='index.html'">Poke<em>Edge</em></div>
   <div class="header-sep"></div>
   <div class="header-sub">記事</div>
   <div class="header-nav" id="main-nav">
-    <a class="nav-btn" href="../index.html">TOP</a>
-    <a class="nav-btn" href="../calc.html">ダメージ計算</a>
-    <a class="nav-btn" href="../move.html">技選択判定</a>
-    <a class="nav-btn" href="../party.html">パーティ管理</a>
-    <a class="nav-btn" href="../pokemon.html">ポケモン登録</a>
-    <a class="nav-btn" href="../stats.html">選出率</a>
-    <a class="nav-btn" href="../scope.html">アナライザー</a>
-    <a class="nav-btn" href="../season.html">使用可能</a>
-    <a class="nav-btn active" href="../blog.html">記事</a>
-    <a class="nav-btn" href="../policy.html">サイト情報</a>
+    <a class="nav-btn" href="index.html">TOP</a>
+    <a class="nav-btn" href="calc.html">ダメージ計算</a>
+    <a class="nav-btn" href="move.html">技選択判定</a>
+    <a class="nav-btn" href="party.html">パーティ管理</a>
+    <a class="nav-btn" href="pokemon.html">ポケモン登録</a>
+    <a class="nav-btn" href="stats.html">選出率</a>
+    <a class="nav-btn" href="scope.html">アナライザー</a>
+    <a class="nav-btn" href="season.html">使用可能</a>
+    <a class="nav-btn active" href="blog.html">記事</a>
+    <a class="nav-btn" href="policy.html">サイト情報</a>
   </div>
 
   <button id="theme-btn" onclick="toggleTheme()" style="background:transparent;border:1px solid var(--border);color:var(--text2);padding:4px 10px;font-size:16px;cursor:pointer;transition:all 0.18s;flex-shrink:0;line-height:1;" title="ライト/ダークモード切替">🌙</button>
@@ -172,9 +172,9 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 
   <!-- パンくずリスト -->
   <div class="breadcrumb">
-    <a href="../index.html">TOP</a>
+    <a href="index.html">TOP</a>
     <span class="sep">›</span>
-    <a href="../blog.html">記事一覧</a>
+    <a href="blog.html">記事一覧</a>
     <span class="sep">›</span>
     <span>ダメージ計算の仕組み</span>
   </div>
@@ -300,7 +300,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
     <!-- CTA -->
     <div class="article-cta">
       <div class="article-cta-text">実際にダメージ計算を試してみましょう</div>
-      <a class="article-cta-btn" href="../calc.html">ダメージ計算ツールを開く →</a>
+      <a class="article-cta-btn" href="calc.html">ダメージ計算ツールを開く →</a>
     </div>
 
     <h2>まとめ</h2>
@@ -320,7 +320,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
       <a class="related-link" href="ev-guide.html">努力値の基本と効率的な振り方ガイド</a>
       <a class="related-link" href="party-building.html">パーティ構築の考え方 — タイプバランスと役割分担</a>
       -->
-      <a class="related-link" href="../blog.html">← 記事一覧に戻る</a>
+      <a class="related-link" href="blog.html">← 記事一覧に戻る</a>
     </div>
   </div>
 
@@ -329,7 +329,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 <footer>
   <div class="footer-logo">PokeEdge</div>
   <div class="footer-text">非公式ファンサイト / Unofficial Fan Tool<br>© 2026 PokeEdge</div>
-  <div style="font-size:10px;"><a href="../policy.html" style="color:var(--text2);text-decoration:none;">プライバシーポリシー / 利用規約</a></div>
+  <div style="font-size:10px;"><a href="policy.html" style="color:var(--text2);text-decoration:none;">プライバシーポリシー / 利用規約</a></div>
 </footer>
 
 <script>
