@@ -552,6 +552,16 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
               </select>
             </div>
             <div>
+              <label class="corr-item">天候</label>
+              <select class="corr-select" id="atk-weather">
+                <option value="">なし</option>
+                <option value="sunny">にほんばれ（晴れ）</option>
+                <option value="rain">あめ</option>
+                <option value="sand">すなあらし</option>
+                <option value="snow">ゆき</option>
+              </select>
+            </div>
+            <div>
               <label class="corr-item">手助け・その他</label>
               <select class="corr-select" id="atk-other">
                 <option value="1">なし ×1.0</option>
@@ -1330,10 +1340,11 @@ function calcDamage() {
   const alwaysCrit=el('atk-move-crit').value||'';
   const hitsRaw=el('atk-move-hits').value||'1';
   const hitsInfo=parseHits(hitsRaw);
-  const mtype=el('atk-move-type').value;
+  let mtype=el('atk-move-type').value;
   const mcat=el('atk-move-cat').value;
   let power=parseInt(el('atk-move-pow').value)||0;
   let weightInfo='';
+  let skinInfo='';
   if(notes==='体重依存') {
     const defW=window._defBase?.weight||0;
     const atkW=window._atkBase?.weight||0;
@@ -1343,6 +1354,38 @@ function calcDamage() {
     if(!power){alert('体重依存技の計算に失敗しました');return;}
   }
   if(!power){alert('この技はダメージ技ではありません（変化技）');return;}
+
+  // スキン特性（ノーマル技のタイプ変更＋威力1.2倍）
+  const atkAbNamePre=el('atk-ability').value||'';
+  const SKIN_MAP={'スカイスキン':'ひこう','フリーズスキン':'こおり','フェアリースキン':'フェアリー','エレキスキン':'でんき'};
+  let skinMult=1;
+  if(SKIN_MAP[atkAbNamePre]&&mtype==='ノーマル'){
+    mtype=SKIN_MAP[atkAbNamePre];
+    skinMult=1.2;
+    skinInfo=atkAbNamePre+'→'+mtype+'化(×1.2)';
+  }
+
+  // ウェザーボール（天候でタイプ変更＋威力2倍）
+  const weather=el('atk-weather')?el('atk-weather').value:'';
+  let weatherInfo='';
+  if(moveName==='ウェザーボール'&&weather){
+    const WB_MAP={'sunny':'ほのお','rain':'みず','sand':'いわ','snow':'こおり'};
+    if(WB_MAP[weather]){
+      mtype=WB_MAP[weather];
+      power=100;
+      weatherInfo='ウェザーボール→'+mtype+'(威力100)';
+    }
+  }
+
+  // 天候によるタイプ補正（ほのお/みず）
+  let weatherDmgMult=1;
+  if(weather==='sunny'){
+    if(mtype==='ほのお') weatherDmgMult=1.5;
+    else if(mtype==='みず') weatherDmgMult=0.5;
+  } else if(weather==='rain'){
+    if(mtype==='みず') weatherDmgMult=1.5;
+    else if(mtype==='ほのお') weatherDmgMult=0.5;
+  }
 
   const lv=parseInt(el('atk-lv').value)||50;
   const atkStat=mcat==='物理'?window._atkStats.atk:window._atkStats.spa;
@@ -1437,11 +1480,11 @@ function calcDamage() {
   const defRank=RANK[(parseInt(el('def-rank').value)||0)+6];
   const effAtk=Math.floor(atkStat*atkStatMult*atkRank);
   const effDef=Math.floor(defStat*defStatMult*defRank);
-  const effPow=Math.floor(power*powerMult);
+  const effPow=Math.floor(power*powerMult*skinMult);
 
   // 16乱数ダメージ
   const base=Math.floor(Math.floor(Math.floor(lv*2/5+2)*effPow*effAtk/effDef)/50+2);
-  const baseMult=Math.floor(base*stab)*eff*itemMult*dmgMult;
+  const baseMult=Math.floor(base*stab)*eff*itemMult*dmgMult*weatherDmgMult;
   const rolls=[];
   for(let i=0;i<16;i++) rolls.push(Math.floor(baseMult*(85+i)/100));
   const mn=rolls[0], mx=rolls[15];
@@ -1456,7 +1499,8 @@ function calcDamage() {
 
   el('result-box').classList.add('show');
   el('dmg-num').textContent=hitsInfo.min!==hitsInfo.max?`${dmg1Min*hitsInfo.min} 〜 ${dmg1Max*hitsInfo.max}`:`${mn} 〜 ${mx}`;
-  el('dmg-range').textContent=`乱数幅 ${mn}〜${mx}（1hit）  相性:×${eff}${stabLabel}${weightInfo?' ('+weightInfo+')':''}`;
+  const extraInfo = [weightInfo, skinInfo, weatherInfo].filter(Boolean).map(s=>' ('+s+')').join('');
+  el('dmg-range').textContent=`乱数幅 ${mn}〜${mx}（1hit）  相性:×${eff}${stabLabel}${extraInfo}`;
   el('dmg-bar').style.width=Math.min(pmx,100)+'%';
   el('dmg-pct').textContent=`${pmn}〜${pmx}%`;
   el('hp-disp').textContent=`${hp} / ${hp}`;

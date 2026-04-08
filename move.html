@@ -268,6 +268,26 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
       </div>
       <div id="my-stats-disp" style="font-size:10px;color:var(--text2);margin-bottom:8px;font-family:'JetBrains Mono',monospace;"></div>
 
+      <!-- 特性・天候 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
+        <div>
+          <div class="lbl">自分の特性</div>
+          <select class="sel" id="my-ability" style="margin-bottom:0;">
+            <option value="">なし/不明</option>
+          </select>
+        </div>
+        <div>
+          <div class="lbl">天候</div>
+          <select class="sel" id="my-weather" style="margin-bottom:0;">
+            <option value="">なし</option>
+            <option value="sunny">にほんばれ（晴れ）</option>
+            <option value="rain">あめ</option>
+            <option value="sand">すなあらし</option>
+            <option value="snow">ゆき</option>
+          </select>
+        </div>
+      </div>
+
       <!-- 技選択 -->
       <div class="lbl">使用する技（複数選択可・未選択で全技から計算）</div>
       <div class="sw">
@@ -638,6 +658,7 @@ function selectPoke(inputId, name) {
     myPoke = myPoke||{};
     myPoke.poke = p;
     renderMyInfo(p);
+    renderMyAbility(p.name);
     recalcMyStats();
     checkJudgeBtn();
   }
@@ -649,6 +670,13 @@ function renderMyInfo(p) {
   document.getElementById('my-name').textContent = p.name;
   document.getElementById('my-types').innerHTML = t1+t2;
   document.getElementById('my-info').classList.add('show');
+}
+
+function renderMyAbility(pokeName) {
+  const abs = ABILITY_MAP[pokeName]||[];
+  const sel = document.getElementById('my-ability');
+  sel.innerHTML = '<option value="">なし/不明</option>'
+    + abs.map(a=>`<option value="${a}">${a}</option>`).join('');
 }
 
 function getOppStatsForSlot(slot) {
@@ -686,6 +714,7 @@ function loadFromReg(id) {
   document.getElementById('my-search').value = rec.displayName||rec.pokeName;
   myPoke = {poke:p};
   renderMyInfo(p);
+  renderMyAbility(p.name);
 
   // レベル・個体値・性格
   document.getElementById('my-lv').value    = rec.lv||50;
@@ -816,6 +845,14 @@ function judge() {
   const myP   = myPoke.poke;
   const myTypes  = [myP.type1, myP.type2].filter(Boolean);
 
+  const myAbility = document.getElementById('my-ability').value||'';
+  const weather = document.getElementById('my-weather').value||'';
+
+  // スキン特性マップ
+  const SKIN_MAP = {'スカイスキン':'ひこう','フリーズスキン':'こおり','フェアリースキン':'フェアリー','エレキスキン':'でんき'};
+  // ウェザーボールタイプマップ
+  const WB_MAP = {'sunny':'ほのお','rain':'みず','sand':'いわ','snow':'こおり'};
+
   // 計算対象の技
   const targetMoves = myMoves.length > 0
     ? myMoves
@@ -830,6 +867,31 @@ function judge() {
     let totalScore = 0;
     const breakdowns = [];
 
+    // スキン特性によるタイプ変更
+    let mvType = mv.type;
+    let skinMult = 1;
+    if(SKIN_MAP[myAbility] && mvType === 'ノーマル') {
+      mvType = SKIN_MAP[myAbility];
+      skinMult = 1.2;
+    }
+
+    // ウェザーボールによるタイプ変更
+    let mvPowerBase = mv.power;
+    if(mv.name === 'ウェザーボール' && weather && WB_MAP[weather]) {
+      mvType = WB_MAP[weather];
+      mvPowerBase = 100;
+    }
+
+    // 天候によるダメージ補正
+    let weatherMult = 1;
+    if(weather === 'sunny') {
+      if(mvType === 'ほのお') weatherMult = 1.5;
+      else if(mvType === 'みず') weatherMult = 0.5;
+    } else if(weather === 'rain') {
+      if(mvType === 'みず') weatherMult = 1.5;
+      else if(mvType === 'ほのお') weatherMult = 0.5;
+    }
+
     validSlots.forEach(slot => {
       const oppP = slot.poke;
       const oppSt = getOppStatsForSlot(slot);
@@ -839,31 +901,31 @@ function judge() {
       const oppHPpct = slot.hpPct||100;
       const oppCurHP = Math.floor(oppSt.hp * oppHPpct / 100);
 
-      const eff = typeEffWithAbility(mv.type, oppTypes, oppAbility);
+      const eff = typeEffWithAbility(mvType, oppTypes, oppAbility);
       if(eff === 0) {
         breakdowns.push({name:oppP.name, eff:0, dmgMin:0, dmgMax:0, pctMin:0, pctMax:0, ko:'無効', immune:true});
         return;
       }
 
-      let power = mv.power;
+      let power = mvPowerBase;
       if(mv.notes==='体重依存') {
         power = getWeightPower(mv.name, myP.weight||0, oppP.weight||0);
       }
       if(!power) return;
 
-      const stab = myTypes.includes(mv.type) ? 1.5 : 1;
+      const stab = myTypes.includes(mvType) ? 1.5 : 1;
       const atkSt = mv.category==='物理' ? mySt.atk : mySt.spa;
       const defSt = mv.category==='物理' ? oppSt.def : oppSt.spd;
       const lv    = mySt.lv;
 
       // 特性によるダメージ補正（あついしぼう、フィルター等）
-      const abDmgMult = getAbilityDmgMult(oppAbility, mv.type, eff);
+      const abDmgMult = getAbilityDmgMult(oppAbility, mvType, eff);
 
       const s1 = Math.floor(lv*2/5+2);
-      const s2 = Math.floor(Math.floor(s1*power*atkSt/defSt)/50)+2;
+      const s2 = Math.floor(Math.floor(s1*Math.floor(power*skinMult)*atkSt/defSt)/50)+2;
       const s3 = Math.floor(s2*stab);
-      const d1Max = Math.floor(Math.floor(s3*eff)*abDmgMult);
-      const d1Min = Math.floor(Math.floor(Math.floor(s3*0.85)*eff)*abDmgMult);
+      const d1Max = Math.floor(Math.floor(s3*eff)*abDmgMult*weatherMult);
+      const d1Min = Math.floor(Math.floor(Math.floor(s3*0.85)*eff)*abDmgMult*weatherMult);
 
       const hitsInfo = parseHits(mv.hits);
       const dmgMax = d1Max * hitsInfo.max;
@@ -883,10 +945,11 @@ function judge() {
       breakdowns.push({name:oppP.name, eff, dmgMin, dmgMax, pctMin, pctMax, ko, immune:false});
     });
 
-    const stab = myTypes.includes(mv.type);
+    const stab = myTypes.includes(mvType);
     results.push({
-      name:mv.name, type:mv.type, category:mv.category,
-      stab, totalScore, breakdowns
+      name:mv.name, type:mvType, category:mv.category,
+      stab, totalScore, breakdowns,
+      skinChanged: mvType !== mv.type
     });
   });
 
@@ -909,6 +972,7 @@ function renderMultiResults(top, oppCount) {
       const rankClass = i===0?'rank1':i===1?'rank2':'';
       const numClass  = i===0?'r1':i===1?'r2':'';
       const stabStr   = r.stab ? ' <span style="color:var(--accent);font-size:9px;">STAB</span>' : '';
+      const skinStr  = r.skinChanged ? ' <span style="color:var(--accent3);font-size:9px;">タイプ変化</span>' : '';
       const pct = Math.round(r.totalScore/maxScore*100);
 
       // 各相手への内訳
@@ -929,7 +993,7 @@ function renderMultiResults(top, oppCount) {
             <span class="rank-name">${r.name}</span>
             <span class="tp tp-${r.type}" style="font-size:9px;">${r.type}</span>
             <span style="font-size:9px;color:var(--text2);">${r.category}</span>
-            ${stabStr}
+            ${stabStr}${skinStr}
           </div>
           <div class="rank-breakdown">${bkHtml}</div>
           <div class="score-bar"><div class="score-fill" style="width:${pct}%"></div></div>
