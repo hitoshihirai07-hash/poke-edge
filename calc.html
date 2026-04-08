@@ -1116,9 +1116,9 @@ function setupMoveSearch(inputId,dropId,onSelect) {
     clearTimeout(timer); const q=inp.value.trim();
     if(!q){drop.classList.remove('show');return;}
     timer=setTimeout(()=>{
-      const res=moveIndex.filter(m=>m.name.includes(q)&&m.power).slice(0,12);
+      const res=moveIndex.filter(m=>m.name.includes(q)&&(m.power>0||m.notes==='体重依存')).slice(0,12);
       if(!res.length){drop.classList.remove('show');return;}
-      drop.innerHTML=res.map(m=>`<div class="drop-item" onclick="moveDrop('${inputId}','${dropId}','${m.name}')">${m.name} <span style="font-size:10px;color:var(--text2);">[${m.type}/${m.category}] 威力${m.power}</span></div>`).join('');
+      drop.innerHTML=res.map(m=>`<div class="drop-item" onclick="moveDrop('${inputId}','${dropId}','${m.name}')">${m.name} <span style="font-size:10px;color:var(--text2);">[${m.type}/${m.category}] ${m.notes==='体重依存'?'体重依存':'威力'+m.power}</span></div>`).join('');
       drop.classList.add('show');
     },150);
   });
