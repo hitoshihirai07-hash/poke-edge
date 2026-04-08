@@ -578,6 +578,17 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
                 <option value="0.5">火傷あり ×0.5（物理技）</option>
               </select>
             </div>
+            <div>
+              <label class="corr-item">味方の倒れた数（おはかまいり用）</label>
+              <select class="corr-select" id="atk-fainted">
+                <option value="0">0体（威力50）</option>
+                <option value="1">1体（威力100）</option>
+                <option value="2">2体（威力150）</option>
+                <option value="3">3体（威力200）</option>
+                <option value="4">4体（威力250）</option>
+                <option value="5">5体（威力300）</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
@@ -1345,6 +1356,33 @@ function calcDamage() {
   let power=parseInt(el('atk-move-pow').value)||0;
   let weightInfo='';
   let skinInfo='';
+  let specialMoveInfo='';
+
+  // おはかまいり: 基本威力50 + 倒された味方の数 × 50
+  if(moveName==='おはかまいり') {
+    const fainted = parseInt(el('atk-fainted')?.value||'0');
+    power = 50 + fainted * 50;
+    specialMoveInfo = 'おはかまいり: 倒れた味方'+fainted+'体→威力'+power;
+  }
+
+  // トリプルアクセル: 1発目20, 2発目40, 3発目60（計120）
+  // トリプルキック: 1発目10, 2発目20, 3発目30（計60）
+  // → 各ヒットで威力が異なるので個別に計算する必要がある（後で処理）
+  let isTripleEscalating = false;
+  let tripleHits = [];
+  if(moveName==='トリプルアクセル') {
+    isTripleEscalating = true;
+    tripleHits = [20, 40, 60];
+    power = 20; // 表示用の基本威力
+    specialMoveInfo = 'トリプルアクセル: 20+40+60=120（全命中時）';
+  }
+  if(moveName==='トリプルキック') {
+    isTripleEscalating = true;
+    tripleHits = [10, 20, 30];
+    power = 10;
+    specialMoveInfo = 'トリプルキック: 10+20+30=60（全命中時）';
+  }
+
   if(notes==='体重依存') {
     const defW=window._defBase?.weight||0;
     const atkW=window._atkBase?.weight||0;
@@ -1494,23 +1532,55 @@ function calcDamage() {
   const effPow=Math.floor(power*powerMult*skinMult);
 
   // 16乱数ダメージ
-  const base=Math.floor(Math.floor(Math.floor(lv*2/5+2)*effPow*effAtk/effDef)/50+2);
-  const baseMult=Math.floor(base*stab)*eff*itemMult*dmgMult*weatherDmgMult;
-  const rolls=[];
-  for(let i=0;i<16;i++) rolls.push(Math.floor(baseMult*(85+i)/100));
-  const mn=rolls[0], mx=rolls[15];
+  let mn, mx, totalMn, totalMx, pmn, pmx, rolls, dmg1Min, dmg1Max;
+
+  if(isTripleEscalating) {
+    // トリプルアクセル/キック: 各ヒットの威力が異なるので個別計算
+    let triTotalMin = 0, triTotalMax = 0;
+    const triDetails = [];
+    tripleHits.forEach((hitPow, idx) => {
+      const ep = Math.floor(hitPow * powerMult * skinMult);
+      const b = Math.floor(Math.floor(Math.floor(lv*2/5+2)*ep*effAtk/effDef)/50+2);
+      const bm = Math.floor(b*stab)*eff*itemMult*dmgMult*weatherDmgMult;
+      const hMin = Math.floor(bm*85/100);
+      const hMax = Math.floor(bm);
+      triTotalMin += hMin;
+      triTotalMax += hMax;
+      triDetails.push({pow:hitPow, min:hMin, max:hMax});
+    });
+    mn = triDetails[0].min;
+    mx = triDetails[0].max;
+    totalMn = triTotalMin;
+    totalMx = triTotalMax;
+    pmn = Math.round(totalMn/hp*100);
+    pmx = Math.round(totalMx/hp*100);
+    dmg1Min = mn;
+    dmg1Max = mx;
+    // 16段階の乱数ロール（1hit目ベース）
+    rolls = [];
+    const ep1 = Math.floor(tripleHits[0]*powerMult*skinMult);
+    const b1 = Math.floor(Math.floor(Math.floor(lv*2/5+2)*ep1*effAtk/effDef)/50+2);
+    const bm1 = Math.floor(b1*stab)*eff*itemMult*dmgMult*weatherDmgMult;
+    for(let i=0;i<16;i++) rolls.push(Math.floor(bm1*(85+i)/100));
+  } else {
+    const base=Math.floor(Math.floor(Math.floor(lv*2/5+2)*effPow*effAtk/effDef)/50+2);
+    const baseMult=Math.floor(base*stab)*eff*itemMult*dmgMult*weatherDmgMult;
+    rolls=[];
+    for(let i=0;i<16;i++) rolls.push(Math.floor(baseMult*(85+i)/100));
+    mn=rolls[0]; mx=rolls[15];
+    dmg1Min=mn; dmg1Max=mx;
+    totalMn=dmg1Min*hitsInfo.min; totalMx=dmg1Max*hitsInfo.max;
+    pmn=Math.round(totalMn/hp*100); pmx=Math.round(totalMx/hp*100);
+  }
   const hitPatterns=[];
   if(hitsInfo.min!==hitsInfo.max){
     if(hitsInfo.min===2&&hitsInfo.max===5){hitPatterns.push(2,3,4,5);}
     else{for(let h=hitsInfo.min;h<=hitsInfo.max;h++)hitPatterns.push(h);}
   } else {hitPatterns.push(hitsInfo.min);}
-  const dmg1Min=mn, dmg1Max=mx;
-  const totalMn=dmg1Min*hitsInfo.min, totalMx=dmg1Max*hitsInfo.max;
-  const pmn=Math.round(totalMn/hp*100), pmx=Math.round(totalMx/hp*100);
 
   el('result-box').classList.add('show');
-  el('dmg-num').textContent=hitsInfo.min!==hitsInfo.max?`${dmg1Min*hitsInfo.min} 〜 ${dmg1Max*hitsInfo.max}`:`${mn} 〜 ${mx}`;
-  const extraInfo = [weightInfo, skinInfo, weatherInfo].filter(Boolean).map(s=>' ('+s+')').join('');
+  el('dmg-num').textContent=isTripleEscalating?`${totalMn} 〜 ${totalMx}（${tripleHits.join('+')}）`:hitsInfo.min!==hitsInfo.max?`${dmg1Min*hitsInfo.min} 〜 ${dmg1Max*hitsInfo.max}`:`${mn} 〜 ${mx}`;
+  const extraInfo = [weightInfo, skinInfo, weatherInfo, specialMoveInfo].filter(Boolean).map(s=>' ('+s+')').join('');
   el('dmg-range').textContent=`乱数幅 ${mn}〜${mx}（1hit）  相性:×${eff}${stabLabel}${extraInfo}${weatherDefLabel}`;
   el('dmg-bar').style.width=Math.min(pmx,100)+'%';
   el('dmg-pct').textContent=`${pmn}〜${pmx}%`;
@@ -1523,7 +1593,20 @@ function calcDamage() {
   // 乱数表示
   const isMulti=hitsInfo.max>1;
   let rollsHtml='';
-  if(isMulti){
+  if(isTripleEscalating){
+    // トリプルアクセル/キック: 各ヒットの威力別ダメージを表示
+    let cumMin=0, cumMax=0;
+    rollsHtml=tripleHits.map((hitPow, idx)=>{
+      const ep=Math.floor(hitPow*powerMult*skinMult);
+      const b=Math.floor(Math.floor(Math.floor(lv*2/5+2)*ep*effAtk/effDef)/50+2);
+      const bm=Math.floor(b*stab)*eff*itemMult*dmgMult*weatherDmgMult;
+      const hMin=Math.floor(bm*85/100), hMax=Math.floor(bm);
+      cumMin+=hMin; cumMax+=hMax;
+      const pMin=Math.round(cumMin/hp*100), pMax=Math.round(cumMax/hp*100);
+      const koMark=cumMax>=hp?'<span style="color:var(--accent2);font-weight:700;"> KO圏</span>':'';
+      return `<div style="margin-bottom:4px;"><span style="font-size:10px;color:var(--accent3);font-family:'Bebas Neue',monospace;">${idx+1}hit(威力${hitPow}): </span><span style="font-size:11px;">${hMin}〜${hMax}ダメージ / 累計${cumMin}〜${cumMax}（${pMin}〜${pMax}%）${koMark}</span></div>`;
+    }).join('');
+  } else if(isMulti){
     rollsHtml=hitPatterns.map(h=>{
       const tMin=dmg1Min*h,tMax=dmg1Max*h;
       const pMin=Math.round(tMin/hp*100),pMax=Math.round(tMax/hp*100);
