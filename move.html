@@ -797,7 +797,7 @@ function getWeightPower(name, atkW, defW) {
     if(defW<10)return 20; if(defW<25)return 40; if(defW<50)return 60;
     if(defW<100)return 80; if(defW<200)return 100; return 120;
   }
-  if(name==='ヘビーボンバー'){
+  if(name==='ヘビーボンバー'||name==='ヒートスタンプ'){
     const r=atkW/defW;
     if(r>=5)return 120; if(r>=4)return 100; if(r>=3)return 80; if(r>=2)return 60; return 40;
   }
