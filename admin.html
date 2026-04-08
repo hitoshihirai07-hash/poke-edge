@@ -325,6 +325,15 @@ input[type=file]{display:none;}
       <div class="drop-sub">またはクリックしてファイルを選択</div>
     </div>
     <input type="file" id="f-ab_data" accept=".csv" style="display:none" onchange="loadFile(event,'ab_data')">
+    <div class="preview" id="prev-ab_data">
+      <div class="preview-head">
+        <div class="prev-stat"><div class="prev-val" id="prev-ab_data-n">0</div><div class="prev-lbl">件数</div></div>
+        <div class="prev-stat"><div class="prev-val" id="prev-ab_data-c">0</div><div class="prev-lbl">カラム数</div></div>
+      </div>
+        <div class="prev-lbl" style="margin-bottom:4px;">カラム名</div>
+        <div style="font-size:10px;color:var(--text3);margin-bottom:8px;" id="prev-ab_data-cols"></div>
+      <table class="preview-table" id="prev-ab_data-table"><thead></thead><tbody></tbody></table>
+    </div>
     <div class="btn-row">
       <button class="btn btn-gen" id="btn-ab_data-gen" onclick="generateJSON('ab_data')" disabled>⚡ JSON生成</button>
       <button class="btn btn-dl"  id="btn-ab_data-dl"  onclick="downloadJSON('ab_data')"  disabled>💾 abilities_data.json ダウンロード</button>
