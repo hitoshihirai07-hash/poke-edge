@@ -377,46 +377,9 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
 
 /* 結果カードテンプレート（画面外で描画） */
 #export-card{
-  position:fixed;left:-9999px;top:0;width:520px;
+  position:fixed;left:-9999px;top:0;width:540px;
   font-family:'Noto Sans JP','Helvetica Neue',sans-serif;
 }
-.xcard{
-  background:linear-gradient(160deg,#0a0e1c 0%,#0f1628 40%,#121a30 100%);
-  color:#d8e8ff;padding:28px 26px 20px;width:520px;
-  border:1px solid rgba(0,200,240,0.15);
-}
-.xcard-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
-.xcard-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:5px;color:#00c8f0;}
-.xcard-logo em{color:#ff3060;font-style:normal;}
-.xcard-badge{font-size:9px;letter-spacing:2px;color:#4a6080;border:1px solid #1a2540;padding:3px 8px;}
-.xcard-matchup{display:flex;align-items:center;gap:14px;margin-bottom:18px;}
-.xcard-poke{flex:1;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:12px;min-width:0;}
-.xcard-poke-label{font-size:8px;letter-spacing:3px;color:#4a6080;text-transform:uppercase;margin-bottom:6px;}
-.xcard-poke-name{font-size:17px;font-weight:700;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.xcard-poke-types{display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap;}
-.xcard-type-pill{display:inline-block;padding:2px 7px;font-size:8px;font-weight:700;letter-spacing:1px;}
-.xcard-poke-meta{font-size:9px;color:#7a90b0;line-height:1.9;}
-.xcard-poke-meta span{color:#a0b8d0;}
-.xcard-arrow{font-family:'Bebas Neue',sans-serif;font-size:20px;color:#ff3060;flex-shrink:0;margin:0 2px;}
-.xcard-move{background:rgba(0,200,240,0.05);border:1px solid rgba(0,200,240,0.12);padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-.xcard-move-name{font-size:14px;font-weight:700;color:#00c8f0;}
-.xcard-move-info{font-size:10px;color:#7a90b0;}
-.xcard-result{margin-bottom:14px;}
-.xcard-ko{display:inline-block;padding:3px 12px;font-size:12px;font-weight:700;letter-spacing:2px;margin-bottom:10px;}
-.xcard-ko.ko1{background:#ff3060;color:#fff;}
-.xcard-ko.ko2{background:#ffc800;color:#000;}
-.xcard-ko.ko3{background:#4a6080;color:#fff;}
-.xcard-dmg-row{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
-.xcard-dmg-num{font-family:'Bebas Neue',sans-serif;font-size:42px;color:#00c8f0;line-height:1;text-shadow:0 0 16px rgba(0,200,240,0.3);}
-.xcard-dmg-pct{font-family:'JetBrains Mono',monospace;font-size:20px;color:#00c8f0;}
-.xcard-bar-wrap{height:7px;background:rgba(255,255,255,0.05);overflow:hidden;margin:8px 0;}
-.xcard-bar-fill{height:100%;background:linear-gradient(90deg,#00c8f0,#ff3060);transition:none;}
-.xcard-conds{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
-.xcard-cond-pill{font-size:9px;padding:3px 8px;background:rgba(255,200,0,0.08);border:1px solid rgba(255,200,0,0.2);color:#ffc800;letter-spacing:1px;}
-.xcard-footer{display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px;margin-top:4px;}
-.xcard-footer-logo{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:4px;color:#243356;}
-.xcard-footer-logo em{color:#ff3060;font-style:normal;}
-.xcard-footer-url{font-size:9px;color:#243356;letter-spacing:1px;}
 </style>
 </head>
 <body>
@@ -1886,6 +1849,7 @@ window.onload = async()=>{
 };
 </script>
 <script>
+<script>
 // ===== 画像エクスポート =====
 function getItemLabel(key){
   const m={'hachimaki':'こだわりハチマキ','megane':'こだわりメガネ','inochi':'いのちのたま','tatsujin':'たつじんのおび','juel':'ジュエル','pangro':'パンプジン','hone':'ふとい骨','none':'なし'};
@@ -1900,26 +1864,19 @@ function getFieldLabel(v){
   const m={'1.5_help':'てだすけ','1.33_inazuma':'エレキフィールド','1.3_grass':'グラスフィールド','1.3_psycho':'サイコフィールド'};
   return m[v]||'';
 }
-function getTypePillHTML(t){
+function xTypePill(t){
   if(!t) return '';
   const colors={'ノーマル':'#9e9e9e','ほのお':'#c62828','みず':'#1565c0','でんき':'#f9a825','くさ':'#2e7d32',
     'こおり':'#00838f','かくとう':'#b71c1c','どく':'#6a1b9a','じめん':'#6d4c41','ひこう':'#0277bd',
     'エスパー':'#ad1457','むし':'#558b2f','いわ':'#4e342e','ゴースト':'#4a148c','ドラゴン':'#4527a0',
-    'あく':'#212121','はがね':'#455a64','フェアリー':'#880e4f',
-    '炎':'#c62828','水':'#1565c0','電気':'#f9a825','草':'#2e7d32','氷':'#00838f',
-    '格闘':'#b71c1c','毒':'#6a1b9a','地面':'#6d4c41','飛行':'#0277bd','虫':'#558b2f',
-    '岩':'#4e342e','鋼':'#455a64','悪':'#212121'};
+    'あく':'#212121','はがね':'#455a64','フェアリー':'#880e4f'};
   const bg=colors[t]||'#4a6080';
-  return `<span class="xcard-type-pill" style="background:${bg};color:#fff;">${t}</span>`;
+  return '<span style="display:inline-block;padding:2px 8px;font-size:9px;font-weight:700;letter-spacing:1px;color:#fff;background:'+bg+';margin-right:4px;">'+t+'</span>';
 }
 
 function buildExportCard(){
   const atkBase=window._atkBase, defBase=window._defBase;
   if(!atkBase||!defBase) return null;
-
-  const atkName=atkBase.name, defName=defBase.name;
-  const atkT1=atkBase.type1, atkT2=atkBase.type2;
-  const defT1=defBase.type1, defT2=defBase.type2;
 
   const atkNature=el('atk-nature').value;
   const atkEvAtk=el('atk-ev-atk').value||'0';
@@ -1941,79 +1898,127 @@ function buildExportCard(){
   const dmgPctText=el('dmg-pct').textContent;
   const koTagEl=el('ko-tag');
   const koText=koTagEl?koTagEl.textContent.trim():'';
-  let koClass='ko3';
-  if(koText.includes('確定1発')||koText.includes('確定2発')) koClass='ko1';
-  else if(koText.includes('乱数')) koClass='ko2';
+  let koBg='#4a6080', koColor='#fff';
+  if(koText.includes('確定1発')||koText.includes('確定2発')){koBg='#ff3060';koColor='#fff';}
+  else if(koText.includes('乱数')){koBg='#ffc800';koColor='#000';}
 
   const barEl=el('dmg-bar');
   const barWidth=barEl?barEl.style.width:'0%';
 
-  // 条件
+  // 条件ピル
   const conds=[];
   const weather=getWeatherLabel(el('atk-weather')?.value);
   if(weather) conds.push(weather);
   const field=getFieldLabel(el('atk-other')?.value);
   if(field) conds.push(field);
-  const burn=el('atk-burn')?.value;
-  if(burn==='0.5') conds.push('やけど');
-  const atkRank=parseInt(el('atk-rank')?.value||0);
-  if(atkRank!==0) conds.push('攻撃ランク'+(atkRank>0?'+':'')+atkRank);
-  const defRank=parseInt(el('def-rank')?.value||0);
-  if(defRank!==0) conds.push('防御ランク'+(defRank>0?'+':'')+defRank);
-  const defWall=el('def-wall')?.value||'1';
-  if(defWall.includes('hikari')) conds.push('ひかりのかべ');
-  if(defWall.includes('reflect')) conds.push('リフレクター');
+  if(el('atk-burn')?.value==='0.5') conds.push('やけど');
+  const aR=parseInt(el('atk-rank')?.value||0);
+  if(aR!==0) conds.push('攻撃ランク'+(aR>0?'+':'')+aR);
+  const dR=parseInt(el('def-rank')?.value||0);
+  if(dR!==0) conds.push('防御ランク'+(dR>0?'+':'')+dR);
+  const dW=el('def-wall')?.value||'1';
+  if(dW.includes('hikari')) conds.push('ひかりのかべ');
+  if(dW.includes('reflect')) conds.push('リフレクター');
 
-  const condsHtml=conds.length?
-    `<div class="xcard-conds">${conds.map(c=>`<span class="xcard-cond-pill">${c}</span>`).join('')}</div>`:'';
+  const condsPills=conds.map(c=>'<span style="display:inline-block;font-size:9px;padding:3px 9px;background:#2a2200;border:1px solid #554400;color:#ffc800;letter-spacing:1px;margin-right:6px;margin-bottom:4px;">'+c+'</span>').join('');
+  const condsRow=conds.length?'<div style="padding:0 0 12px 0;">'+condsPills+'</div>':'';
 
-  const html=`
-<div class="xcard">
-  <div class="xcard-header">
-    <div class="xcard-logo">Poke<em>Edge</em></div>
-    <div class="xcard-badge">DAMAGE CALC</div>
+  // atkItem line
+  const itemLine=atkAbility
+    ?('特性: <span style="color:#b0c8e0;">'+atkAbility+'</span> / '+(atkItem!=='なし'?'<span style="color:#b0c8e0;">'+atkItem+'</span>':'持ち物なし'))
+    :(atkItem!=='なし'?'<span style="color:#b0c8e0;">'+atkItem+'</span>':'持ち物なし');
+
+  // Use table layout for html2canvas compatibility
+  return `
+<div style="width:540px;background:#0b0f1e;color:#d8e8ff;font-family:'Noto Sans JP',sans-serif;padding:0;border:1px solid #162040;">
+
+  <!-- Header -->
+  <table style="width:100%;border-collapse:collapse;padding:0;">
+    <tr>
+      <td style="padding:20px 24px 14px 24px;">
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:6px;color:#00c8f0;">Poke</span><span style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:6px;color:#ff3060;">Edge</span>
+      </td>
+      <td style="padding:20px 24px 14px 0;text-align:right;">
+        <span style="font-size:9px;letter-spacing:2px;color:#4a6080;border:1px solid #1e2e4a;padding:4px 10px;">DAMAGE CALC</span>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Matchup: ATK vs DEF -->
+  <table style="width:100%;border-collapse:collapse;">
+    <tr>
+      <td style="width:46%;padding:0 0 0 24px;vertical-align:top;">
+        <div style="background:#101828;border:1px solid #1a2540;padding:14px;">
+          <div style="font-size:8px;letter-spacing:3px;color:#4a6080;text-transform:uppercase;margin-bottom:6px;">ATTACKER</div>
+          <div style="font-size:18px;font-weight:700;color:#d8e8ff;margin-bottom:5px;">${atkBase.name}</div>
+          <div style="margin-bottom:6px;">${xTypePill(atkBase.type1)}${xTypePill(atkBase.type2)}</div>
+          <div style="font-size:10px;color:#7a90b0;line-height:2;">
+            <span style="color:#b0c8e0;">${atkNature}</span> / A:${atkEvAtk} C:${atkEvSpa}<br>
+            ${itemLine}
+          </div>
+        </div>
+      </td>
+      <td style="width:8%;text-align:center;vertical-align:middle;padding:0;">
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#ff3060;">▶</span>
+      </td>
+      <td style="width:46%;padding:0 24px 0 0;vertical-align:top;">
+        <div style="background:#101828;border:1px solid #1a2540;padding:14px;">
+          <div style="font-size:8px;letter-spacing:3px;color:#4a6080;text-transform:uppercase;margin-bottom:6px;">DEFENDER</div>
+          <div style="font-size:18px;font-weight:700;color:#d8e8ff;margin-bottom:5px;">${defBase.name}</div>
+          <div style="margin-bottom:6px;">${xTypePill(defBase.type1)}${xTypePill(defBase.type2)}</div>
+          <div style="font-size:10px;color:#7a90b0;line-height:2;">
+            HP実数値: <span style="color:#b0c8e0;">${defHp}</span><br>
+            H:${defEvHp} B:${defEvDef} D:${defEvSpd}
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Move -->
+  <div style="margin:14px 24px;background:#0a1828;border:1px solid #0e3050;padding:10px 16px;">
+    <span style="font-size:15px;font-weight:700;color:#00c8f0;margin-right:8px;">${moveName}</span>
+    ${xTypePill(moveType)}
+    <span style="font-size:11px;color:#7a90b0;margin-left:4px;">${moveCat} / 威力${movePow}</span>
   </div>
-  <div class="xcard-matchup">
-    <div class="xcard-poke">
-      <div class="xcard-poke-label">ATTACKER</div>
-      <div class="xcard-poke-name">${atkName}</div>
-      <div class="xcard-poke-types">${getTypePillHTML(atkT1)}${getTypePillHTML(atkT2)}</div>
-      <div class="xcard-poke-meta">
-        <span>${atkNature}</span> / A:${atkEvAtk} C:${atkEvSpa}<br>
-        ${atkAbility?'特性: <span>'+atkAbility+'</span> / ':''}${atkItem!=='なし'?'<span>'+atkItem+'</span>':'持ち物なし'}
-      </div>
+
+  <!-- Result -->
+  <div style="padding:0 24px 4px 24px;">
+    <div style="margin-bottom:10px;">
+      <span style="display:inline-block;padding:4px 14px;font-size:13px;font-weight:700;letter-spacing:2px;background:${koBg};color:${koColor};">${koText}</span>
     </div>
-    <div class="xcard-arrow">▶</div>
-    <div class="xcard-poke">
-      <div class="xcard-poke-label">DEFENDER</div>
-      <div class="xcard-poke-name">${defName}</div>
-      <div class="xcard-poke-types">${getTypePillHTML(defT1)}${getTypePillHTML(defT2)}</div>
-      <div class="xcard-poke-meta">
-        HP実数値: <span>${defHp}</span><br>
-        H:${defEvHp} B:${defEvDef} D:${defEvSpd}
-      </div>
+    <table style="border-collapse:collapse;"><tr>
+      <td style="padding:0 16px 0 0;vertical-align:bottom;">
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:46px;color:#00c8f0;line-height:1;">${dmgNumText}</span>
+      </td>
+      <td style="padding:0;vertical-align:bottom;">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:22px;color:#00c8f0;">${dmgPctText}</span>
+      </td>
+    </tr></table>
+    <!-- Damage bar -->
+    <div style="height:8px;background:#141e30;overflow:hidden;margin:10px 0 14px 0;width:100%;">
+      <div style="height:8px;width:${barWidth};background:linear-gradient(90deg,#00c8f0,#ff3060);"></div>
     </div>
   </div>
-  <div class="xcard-move">
-    <span class="xcard-move-name">${moveName}</span>
-    ${getTypePillHTML(moveType)}
-    <span class="xcard-move-info">${moveCat} / 威力${movePow}</span>
+
+  <!-- Conditions -->
+  <div style="padding:0 24px;">
+    ${condsRow}
   </div>
-  <div class="xcard-result">
-    <div class="xcard-ko ${koClass}">${koText}</div>
-    <div class="xcard-dmg-row">
-      <div class="xcard-dmg-num">${dmgNumText}</div>
-      <div class="xcard-dmg-pct">${dmgPctText}</div>
-    </div>
-    <div class="xcard-bar-wrap"><div class="xcard-bar-fill" style="width:${barWidth}"></div></div>
+
+  <!-- Footer -->
+  <div style="border-top:1px solid #162040;margin:4px 24px 0 24px;padding:12px 0 16px 0;">
+    <table style="width:100%;border-collapse:collapse;"><tr>
+      <td style="padding:0;">
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:4px;color:#243356;">Poke</span><span style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:4px;color:#ff3060;">Edge</span>
+      </td>
+      <td style="text-align:right;padding:0;">
+        <span style="font-size:10px;color:#2a3a56;letter-spacing:1px;">poke-edge.pages.dev</span>
+      </td>
+    </tr></table>
   </div>
-  ${condsHtml}
-  <div class="xcard-footer">
-    <div class="xcard-footer-logo">Poke<em>Edge</em></div>
-    <div class="xcard-footer-url">poke-edge.pages.dev/calc.html</div>
-  </div>
+
 </div>`;
-  return html;
 }
 
 function showExportToast(msg){
@@ -2031,22 +2036,24 @@ async function exportCardImage(mode){
   const container=el('export-card');
   container.innerHTML=cardHtml;
 
-  // html2canvasがフォントを読めるよう少し待つ
-  await new Promise(r=>setTimeout(r,100));
+  await new Promise(r=>setTimeout(r,150));
 
   try{
-    const canvas=await html2canvas(container.querySelector('.xcard'),{
-      backgroundColor:null,
+    const target=container.firstElementChild;
+    const canvas=await html2canvas(target,{
+      backgroundColor:'#0b0f1e',
       scale:2,
       useCORS:true,
       logging:false,
+      width:540,
+      windowWidth:540,
     });
 
     if(mode==='download'){
       const link=document.createElement('a');
-      const atkName=window._atkBase?.name||'atk';
-      const defName=window._defBase?.name||'def';
-      link.download=`PokeEdge_${atkName}_vs_${defName}.png`;
+      const aN=window._atkBase?.name||'atk';
+      const dN=window._defBase?.name||'def';
+      link.download='PokeEdge_'+aN+'_vs_'+dN+'.png';
       link.href=canvas.toDataURL('image/png');
       link.click();
       showExportToast('画像を保存しました');
@@ -2057,7 +2064,6 @@ async function exportCardImage(mode){
           await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
           showExportToast('クリップボードにコピーしました');
         }catch(e){
-          // フォールバック：ダウンロード
           const link=document.createElement('a');
           link.download='PokeEdge_result.png';
           link.href=canvas.toDataURL('image/png');
