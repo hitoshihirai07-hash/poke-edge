@@ -442,7 +442,21 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
           </div>
         </div>
         <label>持ち物</label>
-        <input type="text" id="f-item" placeholder="例: こだわりハチマキ">
+        <div class="search-wrap">
+          <input class="search-input" type="text" id="f-item" placeholder="例: こだわりハチマキ" autocomplete="off">
+          <div class="dropdown" id="item-drop"></div>
+        </div>
+        <div id="item-meta" style="display:none;background:var(--bg2);border:1px solid var(--border);padding:10px 12px;margin-top:8px;font-size:11px;line-height:1.8;">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:6px;">
+            <span id="item-meta-cat" style="font-size:9px;padding:2px 6px;border:1px solid var(--accent3);color:var(--accent3);"></span>
+            <span id="item-meta-name" style="font-weight:700;color:var(--text);"></span>
+          </div>
+          <div><span style="color:var(--text2);">入手:</span> <span id="item-meta-obtain"></span></div>
+          <div><span style="color:var(--text2);">効果:</span> <span id="item-meta-effect"></span></div>
+        </div>
+        <div style="margin-top:8px;font-size:11px;">
+          <a href="items.html" style="color:var(--accent);text-decoration:none;">現在使える道具一覧を見る →</a>
+        </div>
       </div>
 
       <!-- 個体値 -->
@@ -566,25 +580,30 @@ let POKEMON_DATA = [];
 let MOVES_DATA   = [];
 let ABILITY_MAP  = {};
 let SEASON_DATA  = {seasons:[]};
+let BELONGINGS_DATA = [];
 let pokeIndex    = [];
 let moveIndex    = [];
+let belongingsIndex = [];
 let _dataLoaded  = false;
 
 async function loadGameData() {
   if(_dataLoaded) return;
   try {
-    const [pd, md, ad, sd] = await Promise.all([
+    const [pd, md, ad, sd, bd] = await Promise.all([
       fetch('pokemon.json?v='+Date.now()).then(r=>r.json()),
       fetch('moves.json?v='+Date.now()).then(r=>r.json()),
       fetch('abilities.json?v='+Date.now()).then(r=>r.json()).catch(()=>({})),
       fetch('season.json?v='+Date.now()).then(r=>r.json()).catch(()=>({seasons:[]})),
+      fetch('belongings.json?v='+Date.now()).then(r=>r.json()).catch(()=>([])),
     ]);
     POKEMON_DATA = pd;
     MOVES_DATA   = md;
     ABILITY_MAP  = ad;
     SEASON_DATA  = sd;
+    BELONGINGS_DATA = Array.isArray(bd) ? bd : [];
     pokeIndex    = POKEMON_DATA.map((p,i)=>Object.assign({_i:i},p));
     moveIndex    = MOVES_DATA.map((m,i)=>Object.assign({_i:i},m));
+    belongingsIndex = BELONGINGS_DATA.map((b,i)=>Object.assign({_i:i},b));
     _dataLoaded  = true;
   } catch(e) {
     console.error('データ読み込みエラー:', e);
@@ -858,6 +877,69 @@ function renderMoves() {
   }).join('');
 }
 
+
+
+// ===== 持ち物検索 =====
+function getBelongingByName(name) {
+  const q = (name || '').trim();
+  if(!q) return null;
+  return belongingsIndex.find(x => x.name === q) || null;
+}
+function updateItemMeta(name) {
+  const box = document.getElementById('item-meta');
+  if(!box) return;
+  const data = getBelongingByName(name);
+  if(!data) {
+    box.style.display = 'none';
+    return;
+  }
+  document.getElementById('item-meta-cat').textContent = data.category || '道具';
+  document.getElementById('item-meta-name').textContent = data.name || '';
+  document.getElementById('item-meta-obtain').textContent = data.obtain || '—';
+  document.getElementById('item-meta-effect').textContent = data.effect || '—';
+  box.style.display = 'block';
+}
+function selectItem(name) {
+  const inp = document.getElementById('f-item');
+  const drop = document.getElementById('item-drop');
+  if(inp) inp.value = name;
+  if(drop) drop.classList.remove('show');
+  updateItemMeta(name);
+}
+function setupItemSearch() {
+  const inp = document.getElementById('f-item');
+  const drop = document.getElementById('item-drop');
+  if(!inp || !drop) return;
+  let timer;
+  function renderItemDrop(showAll){
+    const q = inp.value.trim();
+    const base = belongingsIndex || [];
+    const res = (q ? base.filter(x => x.name.includes(q) || (x.obtain||'').includes(q)) : (showAll ? base : [])).slice(0, 12);
+    if(!res.length){
+      drop.classList.remove('show');
+      return;
+    }
+    drop.innerHTML = res.map(x => `
+      <div class="drop-item" onclick="selectItem('${(x.name||'').replace(/'/g, "&#39;")}')">
+        <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            <span style="font-weight:700;">${x.name}</span>
+            <span style="font-size:9px;padding:1px 6px;border:1px solid var(--border2);color:var(--accent3);">${x.category || '道具'}</span>
+          </div>
+          <div style="font-size:10px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${x.obtain || '入手方法未設定'}</div>
+        </div>
+      </div>`).join('');
+    drop.classList.add('show');
+  }
+  inp.addEventListener('focus',()=>{ renderItemDrop(true); updateItemMeta(inp.value); });
+  inp.addEventListener('input',()=>{
+    clearTimeout(timer);
+    timer=setTimeout(()=>{ renderItemDrop(false); updateItemMeta(inp.value); },120);
+  });
+  inp.addEventListener('change',()=>updateItemMeta(inp.value));
+  document.addEventListener('click',e=>{if(!inp.contains(e.target)&&!drop.contains(e.target))drop.classList.remove('show');});
+}
+
 // ===== 登録済みリスト =====
 function renderRegList(filter) {
   const list=document.getElementById('reg-list');
@@ -898,6 +980,7 @@ function newPokemon() {
   document.getElementById('f-lv').value=50;
   document.getElementById('f-nature').value='おっとり';
   document.getElementById('f-item').value='';
+  updateItemMeta('');
   document.getElementById('f-memo').value='';
   document.getElementById('iv-range').value=31;
   document.getElementById('iv-num').value=31;
@@ -962,6 +1045,7 @@ function loadPokemon(id) {
   document.getElementById('f-lv').value=rec.lv||50;
   document.getElementById('f-nature').value=(rec.nature==='おとぼけ'?'まじめ':(rec.nature||'おっとり'));
   document.getElementById('f-item').value=rec.item||'';
+  updateItemMeta(rec.item||'');
   document.getElementById('f-memo').value=rec.memo||'';
   document.getElementById('iv-range').value=rec.iv||31;
   document.getElementById('iv-num').value=rec.iv||31;
@@ -1022,6 +1106,7 @@ window.onload = async () => {
   registeredPokes = await initPokemonData();
   setupPokeSearch();
   setupMoveSearch();
+  setupItemSearch();
   renderMoves();
   renderRegList();
 

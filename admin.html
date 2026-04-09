@@ -39,8 +39,8 @@ header{position:sticky;top:0;z-index:100;background:rgba(7,9,15,0.96);backdrop-f
 .main{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:24px 16px;}
 
 /* ステータス */
-.status-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px;}
-@media(max-width:600px){.status-grid{grid-template-columns:1fr;}}
+.status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+@media(max-width:900px){.status-grid{grid-template-columns:1fr;}}
 .status-card{background:var(--panel);border:1px solid var(--border);padding:16px;text-align:center;}
 .status-val{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--accent);}
 .status-lbl{font-size:9px;color:var(--text2);letter-spacing:2px;margin-top:2px;}
@@ -186,6 +186,11 @@ input[type=file]{display:none;}
       <div class="status-val" id="s-move">—</div>
       <div class="status-lbl">moves.json（技数）</div>
       <div class="status-date" id="s-move-d">未取得</div>
+    </div>
+    <div class="status-card">
+      <div class="status-val" id="s-belongings">—</div>
+      <div class="status-lbl">belongings.json（道具数）</div>
+      <div class="status-date" id="s-belongings-d">未取得</div>
     </div>
   </div>
   <div style="text-align:right;margin-bottom:20px;">
@@ -382,6 +387,44 @@ input[type=file]{display:none;}
     <div class="log" id="log-season">CSVを読み込んでください</div>
   </div>
 
+
+  <!-- belongings.csv → belongings.json -->
+  <div class="section">
+    <div class="sec-title">道具データ更新</div>
+    <div class="sec-file">belongings.csv → belongings.json</div>
+    <div class="sec-cols">
+      必須カラム：<span>No</span>・<span>名前</span>・<span>種類</span>・<span>入手</span>・<span>効果</span>・<span>更新日</span>
+    </div>
+    <div class="steps">
+      <div class="step"><span class="step-n">1</span><span>belongings.csv をドロップ or クリックして選択</span></div>
+      <div class="step"><span class="step-n">2</span><span>プレビューを確認して「JSON生成」をクリック</span></div>
+      <div class="step"><span class="step-n">3</span><span>ダウンロードした belongings.json をCloudflare Pagesにアップロード（既存のファイルを上書き）</span></div>
+    </div>
+    <div class="drop-zone" id="dz-belongings" onclick="document.getElementById('f-belongings').click()"
+      ondragover="onDragOver(event,'dz-belongings')" ondragleave="onDragLeave('dz-belongings')" ondrop="onDrop(event,'belongings')">
+      <div class="drop-icon">🎒</div>
+      <div class="drop-text">belongings.csv をここにドロップ</div>
+      <div class="drop-sub">またはクリックしてファイルを選択</div>
+    </div>
+    <input type="file" id="f-belongings" accept=".csv" onchange="loadFile(event,'belongings')">
+    <div class="preview" id="prev-belongings">
+      <div class="preview-head">
+        <div class="prev-stat"><div class="prev-val" id="prev-belongings-n">0</div><div class="prev-lbl">件数</div></div>
+        <div class="prev-stat"><div class="prev-val" id="prev-belongings-c">0</div><div class="prev-lbl">カラム数</div></div>
+        <div class="prev-stat" style="flex:1;text-align:left;padding-left:16px;">
+          <div class="prev-lbl" style="margin-bottom:4px;">カラム名</div>
+          <div id="prev-belongings-cols" style="font-size:10px;color:var(--text3);"></div>
+        </div>
+      </div>
+      <table class="preview-table" id="prev-belongings-table"><thead></thead><tbody></tbody></table>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gen" id="btn-belongings-gen" onclick="generateJSON('belongings')" disabled>⚡ JSON生成</button>
+      <button class="btn btn-dl"  id="btn-belongings-dl"  onclick="downloadJSON('belongings')" disabled>💾 belongings.json ダウンロード</button>
+    </div>
+    <div class="log" id="log-belongings">CSVを読み込んでください</div>
+  </div>
+
   <!-- 記事テンプレート -->
   <div class="section">
     <div class="sec-title">記事テンプレート</div>
@@ -422,6 +465,7 @@ const state = {
   ab:     { csv: null, json: null },
   season:  { csv: null, json: null },
   ab_data: { csv: null, json: null },
+  belongings: { csv: null, json: null },
 };
 
 // ===== CSV パーサー =====
@@ -566,6 +610,21 @@ function generateJSON(type) {
       const info = seasonCols.map(s => s+':'+result[s].length+'件').join(' / ');
       log.innerHTML = `<span class="ok">✅ シーズンデータを生成しました（${info}）</span>`;
     }
+    else if(type==='belongings') {
+      const required = ['No','名前','種類','入手','効果'];
+      const missing = required.filter(k=>!data.headers.includes(k));
+      if(missing.length) { log.innerHTML=`<span class="err">❌ 必須カラムが不足: ${missing.join(', ')}</span>`; return; }
+      json = data.rows.filter(r=>r['名前']&&r['名前'].trim()).map(r=>({
+        no: parseInt(r['No']) || r['No'] || '',
+        name: (r['名前']||'').trim(),
+        category: (r['種類']||'').trim(),
+        obtain: (r['入手']||'').trim(),
+        effect: (r['効果']||'').trim(),
+        updatedAt: (r['更新日']||'').trim(),
+      }));
+      const cats = [...new Set(json.map(x=>x.category).filter(Boolean))];
+      log.innerHTML = `<span class="ok">✅ ${json.length}件の道具データを生成しました（${cats.join('・')}）</span>`;
+    }
     else if(type==='ab_data') {
       const result = data.rows.map(r => ({
         name:     (r['特性']||'').trim(),
@@ -607,7 +666,7 @@ function generateJSON(type) {
 function downloadJSON(type) {
   const json = state[type].json;
   if(!json) return;
-  const names = { poke:'pokemon', move:'moves', ab:'abilities', season:'season', ab_data:'abilities_data' };
+  const names = { poke:'pokemon', move:'moves', ab:'abilities', season:'season', ab_data:'abilities_data', belongings:'belongings' };
   const filename = names[type]+'.json';
   const blob = new Blob([JSON.stringify(json, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
@@ -623,6 +682,7 @@ async function checkStatus() {
   const files = [
     {key:'poke', file:'pokemon.json', valId:'s-poke', dateId:'s-poke-d'},
     {key:'move', file:'moves.json',   valId:'s-move', dateId:'s-move-d'},
+    {key:'belongings', file:'belongings.json', valId:'s-belongings', dateId:'s-belongings-d'},
   ];
   for(const f of files) {
     try {

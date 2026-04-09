@@ -13,4 +13,10 @@
   <url><loc>https://poke-edge.pages.dev/articles/damage-calc-guide.html</loc><lastmod>2026-04-08</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://poke-edge.pages.dev/articles/features-guide.html</loc><lastmod>2026-04-08</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://poke-edge.pages.dev/policy.html</loc><lastmod>2026-04-08</lastmod><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url>
+    <loc>https://poke-edge.pages.dev/items.html</loc>
+    <lastmod>2026-04-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>
