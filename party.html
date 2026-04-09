@@ -451,6 +451,10 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
               <div style="font-size:9px;color:var(--text2);margin-bottom:2px;">性格</div>
               <select id="pe-nature" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:4px 6px;font-size:10px;font-family:'Noto Sans JP',sans-serif;outline:none;" onchange="updateRealStats()">
             <option value="がんばりや">がんばりや（補正なし）</option>
+            <option value="てれや">てれや（補正なし）</option>
+            <option value="すなお">すなお（補正なし）</option>
+            <option value="まじめ">まじめ（補正なし）</option>
+            <option value="きまぐれ">きまぐれ（補正なし）</option>
             <option value="さみしがり">さみしがり（攻↑防↓）</option>
             <option value="いじっぱり">いじっぱり（攻↑特攻↓）</option>
             <option value="やんちゃ">やんちゃ（攻↑特防↓）</option>
@@ -464,10 +468,10 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
             <option value="うっかりや">うっかりや（特攻↑特防↓）</option>
             <option value="れいせい">れいせい（特攻↑素早↓）</option>
             <option value="おだやか">おだやか（特防↑攻↓）</option>
-            <option value="おとなしい">おとなしい（特防↑特攻↓）</option>
+            <option value="おとなしい">おとなしい（特防↑防↓）</option>
             <option value="しんちょう">しんちょう（特防↑特攻↓）</option>
             <option value="なまいき">なまいき（特防↑素早↓）</option>
-            <option value="おくびょう">おくびょう（素早↑攻撃↓）</option>
+            <option value="おくびょう">おくびょう（素早↑攻↓）</option>
             <option value="せっかち">せっかち（素早↑防↓）</option>
             <option value="ようき">ようき（素早↑特攻↓）</option>
             <option value="むじゃき">むじゃき（素早↑特防↓）</option>
@@ -576,7 +580,7 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
 
 <footer>
   <div class="footer-logo">PokeEdge</div>
-  <div class="footer-text">非公式ファンサイト / Unofficial Fan Tool<br>ポケモン1210種・技520種対応</div>
+  <div class="footer-text">非公式ファンサイト / Unofficial Fan Tool<br>ポケモン1239種・技795種対応</div>
   <div style="font-size:10px;"><a href="policy.html" style="color:var(--text2);text-decoration:none;">プライバシーポリシー / 利用規約</a></div>
 </footer>
 
@@ -619,10 +623,11 @@ async function loadGameData() {
 // MOVES_DATA: 外部JSONから読み込み (loadGameData)
 const PERSONALITIES = {
   'がんばりや': {atk:1.0,def:1.0,spa:1.0,spd:1.0,spe:1.0},
-  'すなお':     {atk:1.0,def:1.0,spa:1.0,spd:1.0,spe:1.0},
   'てれや':     {atk:1.0,def:1.0,spa:1.0,spd:1.0,spe:1.0},
+  'すなお':     {atk:1.0,def:1.0,spa:1.0,spd:1.0,spe:1.0},
+  'まじめ':     {atk:1.0,def:1.0,spa:1.0,spd:1.0,spe:1.0},
   'きまぐれ':   {atk:1.0,def:1.0,spa:1.0,spd:1.0,spe:1.0},
-  'おとぼけ':   {atk:1.0,def:1.0,spa:1.0,spd:1.0,spe:1.0},
+  'おとぼけ':   {atk:1.0,def:1.0,spa:1.0,spd:1.0,spe:1.0}, // 旧保存データ互換
   'さみしがり': {atk:1.1,def:0.9,spa:1.0,spd:1.0,spe:1.0},
   'いじっぱり': {atk:1.1,def:1.0,spa:0.9,spd:1.0,spe:1.0},
   'やんちゃ':   {atk:1.1,def:1.0,spa:1.0,spd:0.9,spe:1.0},
@@ -636,7 +641,7 @@ const PERSONALITIES = {
   'うっかりや': {atk:1.0,def:1.0,spa:1.1,spd:0.9,spe:1.0},
   'れいせい':   {atk:1.0,def:1.0,spa:1.1,spd:1.0,spe:0.9},
   'おだやか':   {atk:0.9,def:1.0,spa:1.0,spd:1.1,spe:1.0},
-  'おとなしい': {atk:1.0,def:1.0,spa:0.9,spd:1.1,spe:1.0},
+  'おとなしい': {atk:1.0,def:0.9,spa:1.0,spd:1.1,spe:1.0},
   'しんちょう': {atk:1.0,def:1.0,spa:0.9,spd:1.1,spe:1.0},
   'なまいき':   {atk:1.0,def:1.0,spa:1.0,spd:1.1,spe:0.9},
   'おくびょう': {atk:0.9,def:1.0,spa:1.0,spd:1.0,spe:1.1},
@@ -1320,7 +1325,7 @@ function addRegPoke(id) {
     _regId: rec.id,
     poke: pokeData,
     lv:   rec.lv||50,
-    nature: rec.nature||'おっとり',
+    nature: (rec.nature==='おとぼけ'?'まじめ':(rec.nature||'おっとり')),
     iv:   rec.iv||31,
     ev:   rec.ev||{hp:0,atk:0,def:0,spa:0,spd:0,spe:0},
     moves: rec.moves||[],
@@ -1383,7 +1388,7 @@ function selectSlot(i) {
   const t2=p.type2?`<span class="type-pill tp-${p.type2}">${p.type2}</span>`:'';
   document.getElementById('pe-types').innerHTML = t1+t2;
   document.getElementById('pe-lv').value = m.lv;
-  document.getElementById('pe-nature').value = m.nature;
+  document.getElementById('pe-nature').value = (m.nature==='おとぼけ'?'まじめ':m.nature);
   document.getElementById('pe-iv').value = m.iv;
   document.getElementById('pe-iv-range').value = m.iv;
   document.getElementById('pe-iv-disp').textContent = m.iv;
@@ -1636,7 +1641,7 @@ async function loadPartyById(id) {
   const d = s.data || s;
   party = (d.members||[]).map(m=>{
     const poke = pokeIndex.find(x=>x.name===m.pokeName)||{name:m.pokeName,no:m.pokeNo,type1:m.type1,type2:m.type2,hp:0,atk:0,def:0,spa:0,spd:0,spe:0};
-    return {poke, lv:m.lv||50, nature:m.nature||'おっとり', iv:m.iv||31, ev:m.ev||{hp:0,atk:0,def:0,spa:0,spd:0,spe:0}, moves:m.moves||[], item:m.item||'', memo:m.memo||''};
+    return {poke, lv:m.lv||50, nature:(m.nature==='おとぼけ'?'まじめ':(m.nature||'おっとり')), iv:m.iv||31, ev:m.ev||{hp:0,atk:0,def:0,spa:0,spd:0,spe:0}, moves:m.moves||[], item:m.item||'', memo:m.memo||''};
   });
   selectedSlot = -1;
   renderPartySlotList();
@@ -1657,7 +1662,7 @@ function loadParty(i) {
   if(!s) return;
   party = s.members.map(m=>{
     const poke = pokeIndex.find(x=>x.name===m.pokeName) || {name:m.pokeName,no:m.pokeNo,type1:m.type1,type2:m.type2,hp:0,atk:0,def:0,spa:0,spd:0,spe:0};
-    return {poke, lv:m.lv||50, nature:m.nature||'おっとり', iv:m.iv||31, ev:m.ev||{hp:0,atk:0,def:0,spa:0,spd:0,spe:0}, moves:m.moves||[], item:m.item||'', memo:m.memo||''};
+    return {poke, lv:m.lv||50, nature:(m.nature==='おとぼけ'?'まじめ':(m.nature||'おっとり')), iv:m.iv||31, ev:m.ev||{hp:0,atk:0,def:0,spa:0,spd:0,spe:0}, moves:m.moves||[], item:m.item||'', memo:m.memo||''};
   });
   selectedSlot = -1;
   renderPartySlotList();

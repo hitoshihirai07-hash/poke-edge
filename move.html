@@ -235,6 +235,10 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
           <div class="lbl">性格</div>
           <select class="sel" id="my-nature" style="margin-bottom:0;" onchange="recalcMyStats()">
             <option value="がんばりや">がんばりや（補正なし）</option>
+            <option value="てれや">てれや（補正なし）</option>
+            <option value="すなお">すなお（補正なし）</option>
+            <option value="まじめ">まじめ（補正なし）</option>
+            <option value="きまぐれ">きまぐれ（補正なし）</option>
             <option value="さみしがり">さみしがり（攻↑防↓）</option>
             <option value="いじっぱり">いじっぱり（攻↑特攻↓）</option>
             <option value="やんちゃ">やんちゃ（攻↑特防↓）</option>
@@ -248,10 +252,10 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
             <option value="うっかりや">うっかりや（特攻↑特防↓）</option>
             <option value="れいせい">れいせい（特攻↑素早↓）</option>
             <option value="おだやか">おだやか（特防↑攻↓）</option>
-            <option value="おとなしい">おとなしい（特防↑特攻↓）</option>
+            <option value="おとなしい">おとなしい（特防↑防↓）</option>
             <option value="しんちょう">しんちょう（特防↑特攻↓）</option>
             <option value="なまいき">なまいき（特防↑素早↓）</option>
-            <option value="おくびょう">おくびょう（素早↑攻撃↓）</option>
+            <option value="おくびょう">おくびょう（素早↑攻↓）</option>
             <option value="せっかち">せっかち（素早↑防↓）</option>
             <option value="ようき">ようき（素早↑特攻↓）</option>
             <option value="むじゃき">むじゃき（素早↑特防↓）</option>
@@ -427,16 +431,32 @@ function getAbilityDmgMult(ability, moveType, eff) {
 
 // ===== 実数値計算 =====
 const NATURES = {
-  'おっとり':{atk:1,def:1,spa:1,spd:1,spe:1},
-  'いじっぱり':{atk:1.1,def:1,spa:0.9,spd:1,spe:1},'やんちゃ':{atk:1.1,def:1,spa:1,spd:0.9,spe:1},
-  'ゆうかん':{atk:1.1,def:1,spa:1,spd:1,spe:0.9},'さみしがり':{atk:1.1,def:0.9,spa:1,spd:1,spe:1},
-  'ひかえめ':{atk:0.9,def:1,spa:1.1,spd:1,spe:1},'おくびょう':{atk:0.9,def:1,spa:1,spd:1,spe:1.1},
-  'ようき':{atk:1,def:1,spa:0.9,spd:1,spe:1.1},'むじゃき':{atk:1,def:1,spa:1,spd:0.9,spe:1.1},
-  'せっかち':{atk:1,def:0.9,spa:1,spd:1,spe:1.1},'ずぶとい':{atk:0.9,def:1.1,spa:1,spd:1,spe:1},
-  'わんぱく':{atk:1,def:1.1,spa:0.9,spd:1,spe:1},'のんき':{atk:1,def:1.1,spa:1,spd:1,spe:0.9},
-  'のうてんき':{atk:1,def:1.1,spa:1,spd:0.9,spe:1},'おとなしい':{atk:0.9,def:1,spa:1.1,spd:1,spe:0.9},
-  'うっかりや':{atk:1,def:0.9,spa:1.1,spd:1,spe:1},'しんちょう':{atk:1,def:1,spa:0.9,spd:1.1,spe:1},
-  'おだやか':{atk:1,def:1,spa:0.9,spd:1.1,spe:1},'なまいき':{atk:1,def:1,spa:1,spd:1.1,spe:0.9},
+  'がんばりや': {atk:1,def:1,spa:1,spd:1,spe:1},
+  'てれや':     {atk:1,def:1,spa:1,spd:1,spe:1},
+  'すなお':     {atk:1,def:1,spa:1,spd:1,spe:1},
+  'まじめ':     {atk:1,def:1,spa:1,spd:1,spe:1},
+  'きまぐれ':   {atk:1,def:1,spa:1,spd:1,spe:1},
+  'おとぼけ':   {atk:1,def:1,spa:1,spd:1,spe:1}, // 旧保存データ互換
+  'さみしがり': {atk:1.1,def:0.9,spa:1,spd:1,spe:1},
+  'いじっぱり': {atk:1.1,def:1,spa:0.9,spd:1,spe:1},
+  'やんちゃ':   {atk:1.1,def:1,spa:1,spd:0.9,spe:1},
+  'ゆうかん':   {atk:1.1,def:1,spa:1,spd:1,spe:0.9},
+  'ずぶとい':   {atk:0.9,def:1.1,spa:1,spd:1,spe:1},
+  'わんぱく':   {atk:1,def:1.1,spa:0.9,spd:1,spe:1},
+  'のうてんき': {atk:1,def:1.1,spa:1,spd:0.9,spe:1},
+  'のんき':     {atk:1,def:1.1,spa:1,spd:1,spe:0.9},
+  'ひかえめ':   {atk:0.9,def:1,spa:1.1,spd:1,spe:1},
+  'おっとり':   {atk:1,def:0.9,spa:1.1,spd:1,spe:1},
+  'うっかりや': {atk:1,def:1,spa:1.1,spd:0.9,spe:1},
+  'れいせい':   {atk:1,def:1,spa:1.1,spd:1,spe:0.9},
+  'おだやか':   {atk:0.9,def:1,spa:1,spd:1.1,spe:1},
+  'おとなしい': {atk:1,def:0.9,spa:1,spd:1.1,spe:1},
+  'しんちょう': {atk:1,def:1,spa:0.9,spd:1.1,spe:1},
+  'なまいき':   {atk:1,def:1,spa:1,spd:1.1,spe:0.9},
+  'おくびょう': {atk:0.9,def:1,spa:1,spd:1,spe:1.1},
+  'せっかち':   {atk:1,def:0.9,spa:1,spd:1,spe:1.1},
+  'ようき':     {atk:1,def:1,spa:0.9,spd:1,spe:1.1},
+  'むじゃき':   {atk:1,def:1,spa:1,spd:0.9,spe:1.1},
 };
 const EV_PRESETS = {
   'none':{hp:0,atk:0,def:0,spa:0,spd:0,spe:0},
@@ -720,7 +740,8 @@ function loadFromReg(id) {
   document.getElementById('my-lv').value    = rec.lv||50;
   document.getElementById('my-iv').value    = rec.iv||31;
   const natSel = document.getElementById('my-nature');
-  if(natSel) { for(let i=0;i<natSel.options.length;i++) { if(natSel.options[i].value===rec.nature) { natSel.selectedIndex=i; break; } } }
+  const savedNature = rec.nature==='おとぼけ' ? 'まじめ' : rec.nature;
+  if(natSel) { for(let i=0;i<natSel.options.length;i++) { if(natSel.options[i].value===savedNature) { natSel.selectedIndex=i; break; } } }
 
   // ゲームモード
   const champ = rec.gameMode==='champions';
@@ -761,7 +782,7 @@ function getMyStats() {
   const p = myPoke.poke;
   const lv  = parseInt(document.getElementById('my-lv').value)||50;
   const iv  = parseInt(document.getElementById('my-iv').value)||31;
-  const nat = NATURES[document.getElementById('my-nature').value]||NATURES['おっとり'];
+  const nat = NATURES[document.getElementById('my-nature').value]||NATURES['がんばりや'];
   const champ = document.getElementById('my-mode-champ').checked;
   const evA = parseInt(document.getElementById('my-ev-atk').value)||0;
   const evS = parseInt(document.getElementById('my-ev-spa').value)||0;

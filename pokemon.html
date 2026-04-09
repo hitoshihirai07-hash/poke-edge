@@ -414,6 +414,10 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
             <label>性格</label>
             <select id="f-nature" onchange="recalcReal()">
             <option value="がんばりや">がんばりや（補正なし）</option>
+            <option value="てれや">てれや（補正なし）</option>
+            <option value="すなお">すなお（補正なし）</option>
+            <option value="まじめ">まじめ（補正なし）</option>
+            <option value="きまぐれ">きまぐれ（補正なし）</option>
             <option value="さみしがり">さみしがり（攻↑防↓）</option>
             <option value="いじっぱり">いじっぱり（攻↑特攻↓）</option>
             <option value="やんちゃ">やんちゃ（攻↑特防↓）</option>
@@ -427,10 +431,10 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
             <option value="うっかりや">うっかりや（特攻↑特防↓）</option>
             <option value="れいせい">れいせい（特攻↑素早↓）</option>
             <option value="おだやか">おだやか（特防↑攻↓）</option>
-            <option value="おとなしい">おとなしい（特防↑特攻↓）</option>
+            <option value="おとなしい">おとなしい（特防↑防↓）</option>
             <option value="しんちょう">しんちょう（特防↑特攻↓）</option>
             <option value="なまいき">なまいき（特防↑素早↓）</option>
-            <option value="おくびょう">おくびょう（素早↑攻撃↓）</option>
+            <option value="おくびょう">おくびょう（素早↑攻↓）</option>
             <option value="せっかち">せっかち（素早↑防↓）</option>
             <option value="ようき">ようき（素早↑特攻↓）</option>
             <option value="むじゃき">むじゃき（素早↑特防↓）</option>
@@ -591,26 +595,32 @@ async function loadGameData() {
 // POKEMON_DATA: 外部JSONから読み込み (loadGameData)
 // MOVES_DATA: 外部JSONから読み込み (loadGameData)
 const NATURES = {
-  'おっとり':{atk:1,def:1,spa:1,spd:1,spe:1},
-  'いじっぱり':{atk:1.1,def:1,spa:0.9,spd:1,spe:1},
-  'やんちゃ':{atk:1.1,def:1,spa:1,spd:0.9,spe:1},
-  'ゆうかん':{atk:1.1,def:1,spa:1,spd:1,spe:0.9},
-  'さみしがり':{atk:1.1,def:0.9,spa:1,spd:1,spe:1},
-  'ずぶとい':{atk:0.9,def:1.1,spa:1,spd:1,spe:1},
-  'わんぱく':{atk:1,def:1.1,spa:0.9,spd:1,spe:1},
-  'のうてんき':{atk:1,def:1.1,spa:1,spd:0.9,spe:1},
-  'のんき':{atk:1,def:1.1,spa:1,spd:1,spe:0.9},
-  'ひかえめ':{atk:0.9,def:1,spa:1.1,spd:1,spe:1},
-  'うっかりや':{atk:1,def:0.9,spa:1.1,spd:1,spe:1},
-  'おだやか':{atk:1,def:1,spa:0.9,spd:1.1,spe:1},
-  'おとなしい':{atk:1,def:1,spa:1.1,spd:1,spe:0.9},
-  'しんちょう':{atk:1,def:1,spa:0.9,spd:1.1,spe:1},
-  'なまいき':{atk:1,def:1,spa:1,spd:1.1,spe:0.9},
-  'おくびょう':{atk:0.9,def:1,spa:1,spd:1,spe:1.1},
-  'せっかち':{atk:1,def:0.9,spa:1,spd:1,spe:1.1},
-  'ようき':{atk:1,def:1,spa:0.9,spd:1,spe:1.1},
-  'むじゃき':{atk:1,def:1,spa:1,spd:0.9,spe:1.1},
-  'おとぼけ':{atk:1,def:1,spa:1,spd:1,spe:1},
+  'がんばりや': {atk:1,def:1,spa:1,spd:1,spe:1},
+  'てれや':     {atk:1,def:1,spa:1,spd:1,spe:1},
+  'すなお':     {atk:1,def:1,spa:1,spd:1,spe:1},
+  'まじめ':     {atk:1,def:1,spa:1,spd:1,spe:1},
+  'きまぐれ':   {atk:1,def:1,spa:1,spd:1,spe:1},
+  'おとぼけ':   {atk:1,def:1,spa:1,spd:1,spe:1}, // 旧保存データ互換
+  'さみしがり': {atk:1.1,def:0.9,spa:1,spd:1,spe:1},
+  'いじっぱり': {atk:1.1,def:1,spa:0.9,spd:1,spe:1},
+  'やんちゃ':   {atk:1.1,def:1,spa:1,spd:0.9,spe:1},
+  'ゆうかん':   {atk:1.1,def:1,spa:1,spd:1,spe:0.9},
+  'ずぶとい':   {atk:0.9,def:1.1,spa:1,spd:1,spe:1},
+  'わんぱく':   {atk:1,def:1.1,spa:0.9,spd:1,spe:1},
+  'のうてんき': {atk:1,def:1.1,spa:1,spd:0.9,spe:1},
+  'のんき':     {atk:1,def:1.1,spa:1,spd:1,spe:0.9},
+  'ひかえめ':   {atk:0.9,def:1,spa:1.1,spd:1,spe:1},
+  'おっとり':   {atk:1,def:0.9,spa:1.1,spd:1,spe:1},
+  'うっかりや': {atk:1,def:1,spa:1.1,spd:0.9,spe:1},
+  'れいせい':   {atk:1,def:1,spa:1.1,spd:1,spe:0.9},
+  'おだやか':   {atk:0.9,def:1,spa:1,spd:1.1,spe:1},
+  'おとなしい': {atk:1,def:0.9,spa:1,spd:1.1,spe:1},
+  'しんちょう': {atk:1,def:1,spa:0.9,spd:1.1,spe:1},
+  'なまいき':   {atk:1,def:1,spa:1,spd:1.1,spe:0.9},
+  'おくびょう': {atk:0.9,def:1,spa:1,spd:1,spe:1.1},
+  'せっかち':   {atk:1,def:0.9,spa:1,spd:1,spe:1.1},
+  'ようき':     {atk:1,def:1,spa:0.9,spd:1,spe:1.1},
+  'むじゃき':   {atk:1,def:1,spa:1,spd:0.9,spe:1.1},
 };
 const STAT_COLORS = {hp:'#e53935',atk:'#fb8c00',def:'#fdd835',spa:'#1e88e5',spd:'#00acc1',spe:'#43a047'};
 const STAT_LABELS = {hp:'HP',atk:'こうげき',def:'ぼうぎょ',spa:'とくこう',spd:'とくぼう',spe:'すばやさ'};
@@ -950,7 +960,7 @@ function loadPokemon(id) {
   document.getElementById('poke-search').value=rec.pokeName||'';
   document.getElementById('nickname').value=rec.nickname||'';
   document.getElementById('f-lv').value=rec.lv||50;
-  document.getElementById('f-nature').value=rec.nature||'おっとり';
+  document.getElementById('f-nature').value=(rec.nature==='おとぼけ'?'まじめ':(rec.nature||'おっとり'));
   document.getElementById('f-item').value=rec.item||'';
   document.getElementById('f-memo').value=rec.memo||'';
   document.getElementById('iv-range').value=rec.iv||31;
