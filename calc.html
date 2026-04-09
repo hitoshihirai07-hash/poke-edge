@@ -363,15 +363,15 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
   <div class="header-sep"></div>
   <div class="header-sub">ダメージ計算</div>
   <div class="header-nav" id="main-nav">
-    <a class="nav-btn" href="index.html">トップ</a>
+    <a class="nav-btn" href="index.html">TOP</a>
     <a class="nav-btn active" href="calc.html">ダメージ計算</a>
     <a class="nav-btn" href="move.html">技選択判定</a>
     <a class="nav-btn" href="party.html">パーティ管理</a>
     <a class="nav-btn" href="pokemon.html">ポケモン登録</a>
-    <a class="nav-btn" href="stats.html">選出率記録</a>
-    <a class="nav-btn" href="scope.html">バトルアナライザー</a>
-    <a class="nav-btn" href="season.html">使用可能ポケモン</a>
-    <a class="nav-btn" href="speed.html">素早さライン</a>
+    <a class="nav-btn" href="stats.html">選出率</a>
+    <a class="nav-btn" href="scope.html">アナライザー</a>
+    <a class="nav-btn" href="season.html">使用可能</a>
+    <a class="nav-btn" href="speed.html">素早さ</a>
     <a class="nav-btn" href="blog.html">記事</a>
     <a class="nav-btn" href="policy.html">サイト情報</a>
   </div>
@@ -417,10 +417,6 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
         <label>性格</label>
         <select id="atk-nature">
             <option value="がんばりや">がんばりや（補正なし）</option>
-            <option value="てれや">てれや（補正なし）</option>
-            <option value="すなお">すなお（補正なし）</option>
-            <option value="まじめ">まじめ（補正なし）</option>
-            <option value="きまぐれ">きまぐれ（補正なし）</option>
             <option value="さみしがり">さみしがり（攻↑防↓）</option>
             <option value="いじっぱり">いじっぱり（攻↑特攻↓）</option>
             <option value="やんちゃ">やんちゃ（攻↑特防↓）</option>
@@ -434,10 +430,10 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
             <option value="うっかりや">うっかりや（特攻↑特防↓）</option>
             <option value="れいせい">れいせい（特攻↑素早↓）</option>
             <option value="おだやか">おだやか（特防↑攻↓）</option>
-            <option value="おとなしい">おとなしい（特防↑防↓）</option>
+            <option value="おとなしい">おとなしい（特防↑特攻↓）</option>
             <option value="しんちょう">しんちょう（特防↑特攻↓）</option>
             <option value="なまいき">なまいき（特防↑素早↓）</option>
-            <option value="おくびょう">おくびょう（素早↑攻↓）</option>
+            <option value="おくびょう">おくびょう（素早↑特防↓）</option>
             <option value="せっかち">せっかち（素早↑防↓）</option>
             <option value="ようき">ようき（素早↑特攻↓）</option>
             <option value="むじゃき">むじゃき（素早↑特防↓）</option>
@@ -527,9 +523,9 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
           <option value="inochi">いのちのたま ×1.3</option>
           <option value="tatsujin">たつじんのおび ×1.2（抜群時）</option>
           <option value="juel">ジュエル ×1.3</option>
-          <option value="chikara">ちからのハチマキ ×1.1（物理）</option>
-          <option value="monoshiri">ものしりメガネ ×1.1（特殊）</option>
+          <option value="pangro">パンプジン ×1.1</option>
           <option value="hone">ふとい骨 ×2（ポケモン限定）</option>
+          <option value="none">なし</option>
         </select>
 
         <div class="corr-section">
@@ -621,10 +617,6 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
         <label>性格</label>
         <select id="def-nature">
             <option value="がんばりや">がんばりや（補正なし）</option>
-            <option value="てれや">てれや（補正なし）</option>
-            <option value="すなお">すなお（補正なし）</option>
-            <option value="まじめ">まじめ（補正なし）</option>
-            <option value="きまぐれ">きまぐれ（補正なし）</option>
             <option value="さみしがり">さみしがり（攻↑防↓）</option>
             <option value="いじっぱり">いじっぱり（攻↑特攻↓）</option>
             <option value="やんちゃ">やんちゃ（攻↑特防↓）</option>
@@ -638,10 +630,10 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
             <option value="うっかりや">うっかりや（特攻↑特防↓）</option>
             <option value="れいせい">れいせい（特攻↑素早↓）</option>
             <option value="おだやか">おだやか（特防↑攻↓）</option>
-            <option value="おとなしい">おとなしい（特防↑防↓）</option>
+            <option value="おとなしい">おとなしい（特防↑特攻↓）</option>
             <option value="しんちょう">しんちょう（特防↑特攻↓）</option>
             <option value="なまいき">なまいき（特防↑素早↓）</option>
-            <option value="おくびょう">おくびょう（素早↑攻↓）</option>
+            <option value="おくびょう">おくびょう（素早↑特防↓）</option>
             <option value="せっかち">せっかち（素早↑防↓）</option>
             <option value="ようき">ようき（素早↑特攻↓）</option>
             <option value="むじゃき">むじゃき（素早↑特防↓）</option>
@@ -773,7 +765,7 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
       </div>
     </div>
 
-    <button class="main-btn" onclick="calcDamage()">ダメージ計算</button>
+    <button class="main-btn" onclick="calcDamage()">CALCULATE DAMAGE</button>
     <div style="display:flex;align-items:center;gap:10px;margin:-4px 0 8px;">
       <button id="add-toggle-btn" onclick="toggleAddMode()" style="background:transparent;border:1px solid var(--border2);color:var(--text2);padding:6px 16px;cursor:pointer;font-size:11px;font-family:'Noto Sans JP',sans-serif;letter-spacing:1px;transition:all 0.18s;">＋ 加算計算を使う</button>
       <span style="font-size:10px;color:var(--text2);">2体・2技の合計ダメージで倒せるか判定</span>
@@ -824,10 +816,6 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
           <label>性格</label>
           <select id="atk2-nature" onchange="recalcAtk2()">
             <option value="がんばりや">がんばりや（補正なし）</option>
-            <option value="てれや">てれや（補正なし）</option>
-            <option value="すなお">すなお（補正なし）</option>
-            <option value="まじめ">まじめ（補正なし）</option>
-            <option value="きまぐれ">きまぐれ（補正なし）</option>
             <option value="さみしがり">さみしがり（攻↑防↓）</option>
             <option value="いじっぱり">いじっぱり（攻↑特攻↓）</option>
             <option value="やんちゃ">やんちゃ（攻↑特防↓）</option>
@@ -841,10 +829,10 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
             <option value="うっかりや">うっかりや（特攻↑特防↓）</option>
             <option value="れいせい">れいせい（特攻↑素早↓）</option>
             <option value="おだやか">おだやか（特防↑攻↓）</option>
-            <option value="おとなしい">おとなしい（特防↑防↓）</option>
+            <option value="おとなしい">おとなしい（特防↑特攻↓）</option>
             <option value="しんちょう">しんちょう（特防↑特攻↓）</option>
             <option value="なまいき">なまいき（特防↑素早↓）</option>
-            <option value="おくびょう">おくびょう（素早↑攻↓）</option>
+            <option value="おくびょう">おくびょう（素早↑特防↓）</option>
             <option value="せっかち">せっかち（素早↑防↓）</option>
             <option value="ようき">ようき（素早↑特攻↓）</option>
             <option value="むじゃき">むじゃき（素早↑特防↓）</option>
@@ -970,7 +958,7 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
 
 <footer>
   <div class="footer-logo">PokeEdge</div>
-  <div class="footer-text">非公式ファンサイト / 個人運営<br>ポケモン1239種・技795種対応</div>
+  <div class="footer-text">非公式ファンサイト / Unofficial Fan Tool<br>ポケモン1210種・技520種対応</div>
   <div style="font-size:10px;"><a href="policy.html" style="color:var(--text2);text-decoration:none;">プライバシーポリシー / 利用規約</a></div>
 </footer>
 <script>
@@ -1005,32 +993,31 @@ async function loadAbilitiesData() {
 
 // ===== 性格 =====
 const PERSONALITIES = {
-  'がんばりや': {atk:1.0,def:1.0,spa:1.0,spd:1.0,spe:1.0},
-  'てれや':     {atk:1.0,def:1.0,spa:1.0,spd:1.0,spe:1.0},
-  'すなお':     {atk:1.0,def:1.0,spa:1.0,spd:1.0,spe:1.0},
-  'まじめ':     {atk:1.0,def:1.0,spa:1.0,spd:1.0,spe:1.0},
-  'きまぐれ':   {atk:1.0,def:1.0,spa:1.0,spd:1.0,spe:1.0},
-  'おとぼけ':   {atk:1.0,def:1.0,spa:1.0,spd:1.0,spe:1.0}, // 旧保存データ互換
-  'さみしがり': {atk:1.1,def:0.9,spa:1.0,spd:1.0,spe:1.0},
-  'いじっぱり': {atk:1.1,def:1.0,spa:0.9,spd:1.0,spe:1.0},
-  'やんちゃ':   {atk:1.1,def:1.0,spa:1.0,spd:0.9,spe:1.0},
-  'ゆうかん':   {atk:1.1,def:1.0,spa:1.0,spd:1.0,spe:0.9},
-  'ずぶとい':   {atk:0.9,def:1.1,spa:1.0,spd:1.0,spe:1.0},
-  'わんぱく':   {atk:1.0,def:1.1,spa:0.9,spd:1.0,spe:1.0},
-  'のうてんき': {atk:1.0,def:1.1,spa:1.0,spd:0.9,spe:1.0},
-  'のんき':     {atk:1.0,def:1.1,spa:1.0,spd:1.0,spe:0.9},
-  'ひかえめ':   {atk:0.9,def:1.0,spa:1.1,spd:1.0,spe:1.0},
-  'おっとり':   {atk:1.0,def:0.9,spa:1.1,spd:1.0,spe:1.0},
-  'うっかりや': {atk:1.0,def:1.0,spa:1.1,spd:0.9,spe:1.0},
-  'れいせい':   {atk:1.0,def:1.0,spa:1.1,spd:1.0,spe:0.9},
-  'おだやか':   {atk:0.9,def:1.0,spa:1.0,spd:1.1,spe:1.0},
-  'おとなしい': {atk:1.0,def:0.9,spa:1.0,spd:1.1,spe:1.0},
-  'しんちょう': {atk:1.0,def:1.0,spa:0.9,spd:1.1,spe:1.0},
-  'なまいき':   {atk:1.0,def:1.0,spa:1.0,spd:1.1,spe:0.9},
-  'おくびょう': {atk:0.9,def:1.0,spa:1.0,spd:1.0,spe:1.1},
-  'せっかち':   {atk:1.0,def:0.9,spa:1.0,spd:1.0,spe:1.1},
-  'ようき':     {atk:1.0,def:1.0,spa:0.9,spd:1.0,spe:1.1},
-  'むじゃき':   {atk:1.0,def:1.0,spa:1.0,spd:0.9,spe:1.1},
+  'がんばりや':{atk:1.0,def:1.0,spa:1.0,spd:1.0,spe:1.0},
+  'すなお':    {atk:1.0,def:1.0,spa:1.0,spd:1.0,spe:1.0},
+  'てれや':    {atk:1.0,def:1.0,spa:1.0,spd:1.0,spe:1.0},
+  'きまぐれ':  {atk:1.0,def:1.0,spa:1.0,spd:1.0,spe:1.0},
+  'おとぼけ':  {atk:1.0,def:1.0,spa:1.0,spd:1.0,spe:1.0},
+  'さみしがり':{atk:1.1,def:0.9,spa:1.0,spd:1.0,spe:1.0},
+  'いじっぱり':{atk:1.1,def:1.0,spa:0.9,spd:1.0,spe:1.0},
+  'やんちゃ':  {atk:1.1,def:1.0,spa:1.0,spd:0.9,spe:1.0},
+  'ゆうかん':  {atk:1.1,def:1.0,spa:1.0,spd:1.0,spe:0.9},
+  'ずぶとい':  {atk:0.9,def:1.1,spa:1.0,spd:1.0,spe:1.0},
+  'わんぱく':  {atk:1.0,def:1.1,spa:0.9,spd:1.0,spe:1.0},
+  'のうてんき':{atk:1.0,def:1.1,spa:1.0,spd:0.9,spe:1.0},
+  'のんき':    {atk:1.0,def:1.1,spa:1.0,spd:1.0,spe:0.9},
+  'ひかえめ':  {atk:0.9,def:1.0,spa:1.1,spd:1.0,spe:1.0},
+  'おっとり':  {atk:1.0,def:0.9,spa:1.1,spd:1.0,spe:1.0},
+  'うっかりや':{atk:1.0,def:1.0,spa:1.1,spd:0.9,spe:1.0},
+  'れいせい':  {atk:1.0,def:1.0,spa:1.1,spd:1.0,spe:0.9},
+  'おだやか':  {atk:0.9,def:1.0,spa:1.0,spd:1.1,spe:1.0},
+  'おとなしい':{atk:1.0,def:1.0,spa:0.9,spd:1.1,spe:1.0},
+  'しんちょう':{atk:1.0,def:1.0,spa:0.9,spd:1.1,spe:1.0},
+  'なまいき':  {atk:1.0,def:1.0,spa:1.0,spd:1.1,spe:0.9},
+  'おくびょう':{atk:1.0,def:1.0,spa:1.0,spd:0.9,spe:1.1},
+  'せっかち':  {atk:1.0,def:0.9,spa:1.0,spd:1.0,spe:1.1},
+  'ようき':    {atk:1.0,def:1.0,spa:0.9,spd:1.0,spe:1.1},
+  'むじゃき':  {atk:1.0,def:1.0,spa:1.0,spd:0.9,spe:1.1},
 };
 
 // ===== タイプ相性 =====
@@ -1104,6 +1091,26 @@ function parseHits(raw) {
     return {min:mn,max:mx};
   }
   const n=parseInt(s)||1; return {min:n,max:n};
+}
+
+const PARENTAL_BOND_SPREAD_MOVES = new Set([
+  'じしん','じならし','なみのり','だくりゅう','ねっぷう','ふんか','しおふき','いわなだれ','こごえるかぜ','マジカルシャイン',
+  'バークアウト','ほうでん','ヘドロウェーブ','こんげんのはどう','だんがいのつるぎ','ふぶき','ワイドフォース','マッドショット',
+  'かふんだんご','ハイパーボイス','むしのさざめき','はなふぶき','ぶんまわす','じばく','だいばくはつ'
+]);
+function isParentalBondBlocked(moveName, hitsInfo, notes='') {
+  if(!moveName) return false;
+  const noteText = String(notes||'');
+  if((hitsInfo&&hitsInfo.max>1) || noteText.includes('全体') || noteText.includes('複数')) return true;
+  return PARENTAL_BOND_SPREAD_MOVES.has(moveName);
+}
+function calcBaseDamageRolls(lv, effPow, effAtk, effDef, stab, eff, itemMult, dmgMult, weatherDmgMult) {
+  const safePow = Math.max(1, Math.floor(effPow||0));
+  const base = Math.floor(Math.floor(Math.floor(lv*2/5+2)*safePow*effAtk/effDef)/50+2);
+  const baseMult = Math.floor(base*stab)*eff*itemMult*dmgMult*weatherDmgMult;
+  const rolls = [];
+  for(let i=0;i<16;i++) rolls.push(Math.floor(baseMult*(85+i)/100));
+  return {base, rolls, mn:rolls[0], mx:rolls[15]};
 }
 
 // ===== 検索 =====
@@ -1467,8 +1474,7 @@ function calcDamage() {
   else if(itemKey==='inochi') itemMult=1.3;
   else if(itemKey==='tatsujin'&&eff>1) itemMult=1.2;
   else if(itemKey==='juel') itemMult=1.3;
-  else if(itemKey==='chikara'&&mcat==='物理') itemMult=1.1;
-  else if(itemKey==='monoshiri'&&mcat==='特殊') itemMult=1.1;
+  else if(itemKey==='pangro') itemMult=1.1;
   else if(itemKey==='hone') itemMult=2.0;
 
   // 攻撃側補正
@@ -1505,6 +1511,12 @@ function calcDamage() {
   if(atkAbName==='ちからずく') dmgMult*=1.3;
   if(atkAbName==='いろめがね'&&eff<1) dmgMult*=2;
   if(atkBurn==='0.5'&&mcat==='物理') dmgMult*=0.5;
+
+  const parentalBondBlocked = atkAbName==='おやこあい' && isParentalBondBlocked(moveName, hitsInfo, notes);
+  const parentalBondActive = atkAbName==='おやこあい' && !parentalBondBlocked;
+  const parentalBondInfo = atkAbName==='おやこあい'
+    ? (parentalBondActive ? 'おやこあい: 1hit目100% + 2hit目25%' : 'おやこあい: 連続技・複数相手技は追加攻撃なし')
+    : '';
 
   // 防御側補正
   const defAbName=el('def-ability').value||'';
@@ -1547,6 +1559,7 @@ function calcDamage() {
 
   // 16乱数ダメージ
   let mn, mx, totalMn, totalMx, pmn, pmx, rolls, dmg1Min, dmg1Max;
+  let parentalSecondMn=0, parentalSecondMx=0, parentalSecondRolls=[];
 
   if(isTripleEscalating) {
     // トリプルアクセル/キック: 各ヒットの威力が異なるので個別計算
@@ -1577,13 +1590,23 @@ function calcDamage() {
     const bm1 = Math.floor(b1*stab)*eff*itemMult*dmgMult*weatherDmgMult;
     for(let i=0;i<16;i++) rolls.push(Math.floor(bm1*(85+i)/100));
   } else {
-    const base=Math.floor(Math.floor(Math.floor(lv*2/5+2)*effPow*effAtk/effDef)/50+2);
-    const baseMult=Math.floor(base*stab)*eff*itemMult*dmgMult*weatherDmgMult;
-    rolls=[];
-    for(let i=0;i<16;i++) rolls.push(Math.floor(baseMult*(85+i)/100));
-    mn=rolls[0]; mx=rolls[15];
-    dmg1Min=mn; dmg1Max=mx;
-    totalMn=dmg1Min*hitsInfo.min; totalMx=dmg1Max*hitsInfo.max;
+    const firstHit = calcBaseDamageRolls(lv, effPow, effAtk, effDef, stab, eff, itemMult, dmgMult, weatherDmgMult);
+    rolls = firstHit.rolls;
+    mn = firstHit.mn; mx = firstHit.mx;
+    dmg1Min = mn; dmg1Max = mx;
+
+    if(parentalBondActive){
+      const secondPower = Math.max(1, Math.floor(effPow * 0.25));
+      const secondHit = calcBaseDamageRolls(lv, secondPower, effAtk, effDef, stab, eff, itemMult, dmgMult, weatherDmgMult);
+      parentalSecondRolls = secondHit.rolls;
+      parentalSecondMn = secondHit.mn;
+      parentalSecondMx = secondHit.mx;
+      totalMn = (dmg1Min + parentalSecondMn) * hitsInfo.min;
+      totalMx = (dmg1Max + parentalSecondMx) * hitsInfo.max;
+    } else {
+      totalMn = dmg1Min * hitsInfo.min;
+      totalMx = dmg1Max * hitsInfo.max;
+    }
     pmn=Math.round(totalMn/hp*100); pmx=Math.round(totalMx/hp*100);
   }
   const hitPatterns=[];
@@ -1593,21 +1616,48 @@ function calcDamage() {
   } else {hitPatterns.push(hitsInfo.min);}
 
   el('result-box').classList.add('show');
-  el('dmg-num').textContent=isTripleEscalating?`${totalMn} 〜 ${totalMx}（${tripleHits.join('+')}）`:hitsInfo.min!==hitsInfo.max?`${dmg1Min*hitsInfo.min} 〜 ${dmg1Max*hitsInfo.max}`:`${mn} 〜 ${mx}`;
-  const extraInfo = [weightInfo, skinInfo, weatherInfo, specialMoveInfo].filter(Boolean).map(s=>' ('+s+')').join('');
-  el('dmg-range').textContent=`乱数幅 ${mn}〜${mx}（1hit）  相性:×${eff}${stabLabel}${extraInfo}${weatherDefLabel}`;
+  el('dmg-num').textContent=isTripleEscalating
+    ? `${totalMn} 〜 ${totalMx}（${tripleHits.join('+')}）`
+    : parentalBondActive
+      ? `${totalMn} 〜 ${totalMx}`
+      : hitsInfo.min!==hitsInfo.max
+        ? `${dmg1Min*hitsInfo.min} 〜 ${dmg1Max*hitsInfo.max}`
+        : `${mn} 〜 ${mx}`;
+  const extraInfo = [weightInfo, skinInfo, weatherInfo, specialMoveInfo, parentalBondInfo].filter(Boolean).map(s=>' ('+s+')').join('');
+  el('dmg-range').textContent=parentalBondActive
+    ? `乱数幅 ${mn}〜${mx}（1hit目） / ${parentalSecondMn}〜${parentalSecondMx}（2hit目）  相性:×${eff}${stabLabel}${extraInfo}${weatherDefLabel}`
+    : `乱数幅 ${mn}〜${mx}（1hit）  相性:×${eff}${stabLabel}${extraInfo}${weatherDefLabel}`;
   el('dmg-bar').style.width=Math.min(pmx,100)+'%';
   el('dmg-pct').textContent=`${pmn}〜${pmx}%`;
   el('hp-disp').textContent=`${hp} / ${hp}`;
 
-  const critRolls=rolls.map(d=>Math.floor(d*1.5));
-  const dm=mn,dM=mx;
+  const totalRolls=parentalBondActive?rolls.map((d,i)=>d+(parentalSecondRolls[i]||0)):rolls.slice();
+  const critRolls=parentalBondActive
+    ? rolls.map((d,i)=>Math.floor(d*1.5)+Math.floor((parentalSecondRolls[i]||0)*1.5))
+    : rolls.map(d=>Math.floor(d*1.5));
+  const dm=parentalBondActive?totalRolls[0]:mn,dM=parentalBondActive?totalRolls[15]:mx;
   const dmC=critRolls[0],dMC=critRolls[15];
 
   // 乱数表示
   const isMulti=hitsInfo.max>1;
   let rollsHtml='';
-  if(isTripleEscalating){
+  if(parentalBondActive){
+    rollsHtml = `<div style="font-size:10px;color:var(--accent3);margin-bottom:6px;">⚡ おやこあい内訳</div>`+
+      `<div style="margin-bottom:4px;"><span style="font-size:10px;color:var(--accent3);font-family:'Bebas Neue',monospace;">1hit目: </span><span style="font-size:11px;">${mn}〜${mx}ダメージ</span></div>`+
+      `<div style="margin-bottom:8px;"><span style="font-size:10px;color:var(--accent3);font-family:'Bebas Neue',monospace;">2hit目: </span><span style="font-size:11px;">${parentalSecondMn}〜${parentalSecondMx}ダメージ（威力0.25倍）</span></div>`+
+      totalRolls.map((d,i)=>{
+        const pct=Math.round(d/hp*100);
+        const hi=d>=hp;
+        return `<span style="font-size:10px;padding:2px 5px;background:${i===0||i===15?'var(--border2)':'var(--bg)'};border:1px solid var(--border);color:${hi?'var(--accent2)':'var(--text)'};">${d}(${pct}%)</span>`;
+      }).join(' ');
+    if(String(alwaysCrit).toUpperCase()==='TRUE'){
+      rollsHtml+=`<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);"><div style="font-size:10px;color:var(--accent3);margin-bottom:4px;">⚡ 急所時（合計）</div>`;
+      rollsHtml+=critRolls.map((d,i)=>{
+        const pct=Math.round(d/hp*100);
+        return `<span style="font-size:10px;padding:2px 5px;background:${i===0||i===15?'var(--border2)':'var(--bg)'};border:1px solid var(--accent3);color:${d>=hp?'var(--accent2)':'var(--accent3)'};">${d}(${pct}%)</span>`;
+      }).join(' ')+'</div>';
+    }
+  } else if(isTripleEscalating){
     // トリプルアクセル/キック: 各ヒットの威力別ダメージを表示
     let cumMin=0, cumMax=0;
     rollsHtml=tripleHits.map((hitPow, idx)=>{
@@ -1703,24 +1753,28 @@ function recalcAtk2(){
 }
 function calcAddDamage(){
   if(!window._atkStats||!window._defStats){alert('メインの攻撃側・防御側ポケモンを選択してください');return;}
+  const moveName1=(el('atk-move-search').value||'').trim();
   const pow1=parseInt(el('atk-move-pow').value)||0;
   const type1=el('atk-move-type').value, cat1=el('atk-move-cat').value;
-  const hits1=parseInt(el('atk-move-hits').value)||1, item1=el('atk-item').value;
+  const hits1=el('atk-move-hits').value||'1', item1=el('atk-item').value;
   const lv1=parseInt(el('atk-lv').value)||50;
+  const atkAbility1=el('atk-ability').value||'';
   if(!pow1||!type1){alert('1体目の技を選択してください');return;}
+  const moveName1b=(el('atk1b-move-search').value||'').trim();
   const pow1b=parseInt(el('atk1b-move-pow').value)||0;
   const type1b=el('atk1b-move-type').value, cat1b=el('atk1b-move-cat').value;
-  const hits1b=parseInt(el('atk1b-move-hits').value)||1, item1b=el('atk1b-item').value;
+  const hits1b=el('atk1b-move-hits').value||'1', item1b=el('atk1b-item').value;
+  const moveName2=(el('atk2-move-search').value||'').trim();
   const pow2=parseInt(el('atk2-move-pow').value)||0;
   const type2=el('atk2-move-type').value, cat2=el('atk2-move-cat').value;
-  const hits2=parseInt(el('atk2-move-hits').value)||1, item2=el('atk2-item').value;
+  const hits2=el('atk2-move-hits').value||'1', item2=el('atk2-item').value;
   const lv2=parseInt(el('atk2-lv').value)||50;
   if(!pow2||!type2){alert('2体目のポケモンと技を選択してください');return;}
   if(!window._atk2Stats){alert('2体目のポケモンを選択してください');return;}
   const hp=window._defStats.hp;
-  const r1=calcOneDamage(window._atkStats,window._atkBase,window._defStats,window._defBase,lv1,type1,cat1,hits1,pow1,item1);
-  const r1b=pow1b?calcOneDamage(window._atkStats,window._atkBase,window._defStats,window._defBase,lv1,type1b,cat1b,hits1b,pow1b,item1b):null;
-  const r2=calcOneDamage(window._atk2Stats,window._atk2Base,window._defStats,window._defBase,lv2,type2,cat2,hits2,pow2,item2);
+  const r1=calcOneDamage(window._atkStats,window._atkBase,window._defStats,window._defBase,lv1,type1,cat1,hits1,pow1,item1,moveName1,atkAbility1);
+  const r1b=pow1b?calcOneDamage(window._atkStats,window._atkBase,window._defStats,window._defBase,lv1,type1b,cat1b,hits1b,pow1b,item1b,moveName1b,atkAbility1):null;
+  const r2=calcOneDamage(window._atk2Stats,window._atk2Base,window._defStats,window._defBase,lv2,type2,cat2,hits2,pow2,item2,moveName2,'');
   const totalMn=r1.mn+(r1b?r1b.mn:0)+r2.mn;
   const totalMx=r1.mx+(r1b?r1b.mx:0)+r2.mx;
   const pctMn=Math.round(totalMn/hp*100), pctMx=Math.round(totalMx/hp*100);
@@ -1746,22 +1800,30 @@ function calcAddDamage(){
     }
   }
 }
-function calcOneDamage(atkSt,atkBase,defSt,defBase,lv,mtype,mcat,hits,power,itemKey){
+function calcOneDamage(atkSt,atkBase,defSt,defBase,lv,mtype,mcat,hits,power,itemKey,moveName='',abilityName=''){
   const atkStat=mcat==='物理'?atkSt.atk:atkSt.spa;
   const defStat=mcat==='物理'?defSt.def:defSt.spd;
-  const hp=defSt.hp;
   const defTypes=defBase?[defBase.type1,defBase.type2].filter(Boolean):[];
   const eff=getTypeEff(mtype,defTypes);
   const atkTypes=atkBase?[atkBase.type1,atkBase.type2].filter(Boolean):[];
   const stab=atkTypes.includes(mtype)?1.5:1;
+  const hitsInfo=parseHits(hits);
   let itemMult=1;
   if(itemKey==='hachimaki'&&mcat==='物理') itemMult=1.5;
   else if(itemKey==='megane'&&mcat==='特殊') itemMult=1.5;
   else if(itemKey==='inochi') itemMult=1.3;
-  const base=Math.floor(Math.floor(Math.floor(lv*2/5+2)*power*atkStat/defStat)/50+2);
-  const mn=Math.floor(Math.floor(base*stab)*eff*itemMult*(85/100))*hits;
-  const mx=Math.floor(Math.floor(base*stab)*eff*itemMult)*hits;
-  return {mn,mx};
+
+  const firstHit = calcBaseDamageRolls(lv, power, atkStat, defStat, stab, eff, itemMult, 1, 1);
+  const parentalBondActive = abilityName==='おやこあい' && !isParentalBondBlocked(moveName, hitsInfo);
+  if(parentalBondActive){
+    const secondPower = Math.max(1, Math.floor((power||0) * 0.25));
+    const secondHit = calcBaseDamageRolls(lv, secondPower, atkStat, defStat, stab, eff, itemMult, 1, 1);
+    return {
+      mn:(firstHit.mn + secondHit.mn) * hitsInfo.min,
+      mx:(firstHit.mx + secondHit.mx) * hitsInfo.max
+    };
+  }
+  return {mn:firstHit.mn*hitsInfo.min,mx:firstHit.mx*hitsInfo.max};
 }
 
 // ===== シーズンフィルター =====
