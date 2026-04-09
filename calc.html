@@ -815,6 +815,11 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
         <div style="font-size:10px;color:var(--text2);margin-bottom:4px;letter-spacing:2px;">乱数16段階（最小〜最大）</div>
         <div class="rolls-wrap" id="dmg-rolls"></div>
       </div>
+      <div style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
+        <div style="font-size:10px;color:var(--text2);line-height:1.7;">現在の計算条件を、SNSやnoteに貼りやすい画像として保存できます。</div>
+        <button class="save-btn" id="export-dmg-btn" type="button" onclick="exportDamageResultImage()" style="width:auto;margin-top:0;white-space:nowrap;">📷 投稿用画像を保存</button>
+      </div>
+      <div id="export-dmg-status" style="font-size:10px;color:var(--text2);margin-top:8px;min-height:16px;"></div>
     </div>
 
     <!-- 加算計算セクション -->
@@ -1937,6 +1942,305 @@ function calcOneDamage(atkSt,atkBase,defSt,defBase,lv,mtype,mcat,hits,power,item
     };
   }
   return {mn:firstHit.mn*hitsInfo.min,mx:firstHit.mx*hitsInfo.max};
+}
+function getTypeColor(type){
+  const map={
+    'ノーマル':'#9e9e9e','ほのお':'#c62828','炎':'#c62828','みず':'#1565c0','水':'#1565c0','でんき':'#f9a825','電気':'#f9a825',
+    'くさ':'#2e7d32','草':'#2e7d32','こおり':'#00838f','氷':'#00838f','かくとう':'#b71c1c','格闘':'#b71c1c','どく':'#6a1b9a','毒':'#6a1b9a',
+    'じめん':'#6d4c41','地面':'#6d4c41','ひこう':'#0277bd','飛行':'#0277bd','エスパー':'#ad1457','むし':'#558b2f','虫':'#558b2f',
+    'いわ':'#4e342e','岩':'#4e342e','ゴースト':'#4a148c','ドラゴン':'#4527a0','あく':'#212121','悪':'#212121','はがね':'#455a64','鋼':'#455a64','フェアリー':'#880e4f'
+  };
+  return map[type]||'#4a6080';
+}
+function getSelectedLabel(id){
+  const s=el(id); if(!s) return '';
+  return s.options&&s.selectedIndex>=0 ? (s.options[s.selectedIndex].textContent||'').trim() : '';
+}
+function getCurrentCalcModeLabel(){
+  const atk=isAtkChampions();
+  const de=isDefChampions();
+  if(atk&&de) return 'Champions';
+  if(!atk&&!de) return '従来作';
+  return '混在設定';
+}
+function collectRollLines(){
+  const box=el('dmg-rolls');
+  if(!box) return [];
+  const lines=[];
+  let spanTexts=[];
+  const flush=()=>{
+    if(!spanTexts.length) return;
+    for(let i=0;i<spanTexts.length;i+=8){
+      lines.push(spanTexts.slice(i,i+8).join('  '));
+    }
+    spanTexts=[];
+  };
+  box.childNodes.forEach(node=>{
+    const text=((node.textContent||'').replace(/\s+/g,' ').trim());
+    if(!text) return;
+    if(node.nodeType===1 && node.tagName && node.tagName.toLowerCase()==='span'){
+      spanTexts.push(text);
+    } else {
+      flush();
+      lines.push(text);
+    }
+  });
+  flush();
+  return lines.slice(0,6);
+}
+function getDamageExportData(){
+  const box=el('result-box');
+  if(!box || !box.classList.contains('show') || !window._atkBase || !window._defBase || !window._atkStats || !window._defStats) return null;
+  return {
+    mode: getCurrentCalcModeLabel(),
+    attacker: {
+      name: window._atkBase.name||'—',
+      no: window._atkBase.no||'',
+      types: [window._atkBase.type1,window._atkBase.type2].filter(Boolean),
+      level: el('atk-lv')?.value||'50',
+      nature: el('atk-nature')?.value||'',
+      ability: el('atk-ability')?.value||'なし',
+      item: getSelectedLabel('atk-item')||'なし',
+      stats: `攻撃 ${window._atkStats.atk} / 特攻 ${window._atkStats.spa}`
+    },
+    defender: {
+      name: window._defBase.name||'—',
+      no: window._defBase.no||'',
+      types: [window._defBase.type1,window._defBase.type2].filter(Boolean),
+      level: el('def-lv')?.value||'50',
+      nature: el('def-nature')?.value||'',
+      ability: el('def-ability')?.value||'なし',
+      item: getSelectedLabel('def-item')||'なし',
+      stats: `HP ${window._defStats.hp} / 防御 ${window._defStats.def} / 特防 ${window._defStats.spd}`,
+      hazards: (el('def-hazard-info')?.textContent||'').trim()||'場ダメなし'
+    },
+    move: {
+      name: (el('atk-move-search')?.value||'').trim()||'—',
+      type: el('atk-move-type')?.value||'',
+      category: el('atk-move-cat')?.value||'',
+      power: el('atk-move-pow')?.value||'0',
+      weather: getSelectedLabel('atk-weather')||'なし'
+    },
+    result: {
+      damage: (el('dmg-num')?.textContent||'—').trim(),
+      range: (el('dmg-range')?.textContent||'').trim(),
+      hazardSummary: (el('hazard-summary')?.textContent||'').trim(),
+      ko: (el('ko-tag')?.textContent||'').replace(/\s+/g,' ').trim(),
+      desc: (el('dmg-desc')?.textContent||'').trim(),
+      percent: (el('dmg-pct')?.textContent||'').trim(),
+      rolls: collectRollLines()
+    },
+    exportedAt: new Date().toLocaleString('ja-JP'),
+    site: 'https://poke-edge.pages.dev/'
+  };
+}
+function drawRoundedRect(ctx,x,y,w,h,r,fill,stroke){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+  if(fill){ ctx.fillStyle=fill; ctx.fill(); }
+  if(stroke){ ctx.strokeStyle=stroke; ctx.lineWidth=1; ctx.stroke(); }
+}
+function drawPill(ctx,text,x,y,bg,color){
+  ctx.font='700 20px "Noto Sans JP", sans-serif';
+  const w=ctx.measureText(text).width+28;
+  drawRoundedRect(ctx,x,y,w,34,17,bg,null);
+  ctx.fillStyle=color||'#fff';
+  ctx.fillText(text,x+14,y+23);
+  return w;
+}
+function wrapTextLines(ctx,text,maxWidth){
+  if(!text) return [];
+  const raw=String(text).split(/\n+/).map(s=>s.trim()).filter(Boolean);
+  const out=[];
+  raw.forEach(part=>{
+    let line='';
+    for(const ch of part){
+      const test=line+ch;
+      if(ctx.measureText(test).width>maxWidth && line){
+        out.push(line);
+        line=ch;
+      } else {
+        line=test;
+      }
+    }
+    if(line) out.push(line);
+  });
+  return out;
+}
+function drawTextBlock(ctx,text,x,y,maxWidth,lineHeight,color){
+  ctx.fillStyle=color;
+  const lines=wrapTextLines(ctx,text,maxWidth);
+  lines.forEach((line,i)=>ctx.fillText(line,x,y+i*lineHeight));
+  return y + lines.length*lineHeight;
+}
+function drawInfoRows(ctx,rows,x,y,w){
+  const labelW=94;
+  rows.forEach(row=>{
+    ctx.fillStyle='#7a90b0';
+    ctx.font='500 18px "Noto Sans JP", sans-serif';
+    ctx.fillText(row.label,x,y);
+    ctx.fillStyle='#d8e8ff';
+    ctx.font='500 18px "Noto Sans JP", sans-serif';
+    const endY=drawTextBlock(ctx,row.value,x+labelW,y,w-labelW,26,'#d8e8ff');
+    y=endY+10;
+  });
+  return y;
+}
+async function exportDamageResultImage(){
+  const data=getDamageExportData();
+  const statusEl=el('export-dmg-status');
+  const btn=el('export-dmg-btn');
+  if(!data){
+    alert('先にダメージ計算を実行してください');
+    return;
+  }
+  if(btn) btn.disabled=true;
+  if(statusEl) statusEl.textContent='画像を生成しています…';
+  try {
+    const canvas=document.createElement('canvas');
+    canvas.width=1600;
+    canvas.height=900;
+    const ctx=canvas.getContext('2d');
+    const grad=ctx.createLinearGradient(0,0,1600,900);
+    grad.addColorStop(0,'#07090f');
+    grad.addColorStop(1,'#0b1630');
+    ctx.fillStyle=grad;
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.fillStyle='rgba(0,200,240,0.06)';
+    for(let i=0;i<canvas.width;i+=48){ ctx.fillRect(i,0,1,canvas.height); }
+    for(let i=0;i<canvas.height;i+=48){ ctx.fillRect(0,i,canvas.width,1); }
+
+    drawRoundedRect(ctx,44,36,1512,94,24,'rgba(15,20,35,0.96)','rgba(36,51,86,0.9)');
+    ctx.fillStyle='#00c8f0';
+    ctx.font='700 44px "Bebas Neue", "Noto Sans JP", sans-serif';
+    ctx.fillText('PokeEdge DAMAGE REPORT',68,94);
+    ctx.fillStyle='#d8e8ff';
+    ctx.font='500 20px "Noto Sans JP", sans-serif';
+    ctx.fillText('現在のダメージ計算結果を、そのまま投稿用画像として保存できます。',68,120);
+    drawPill(ctx,data.mode,1310,64,'#ffc800','#000');
+
+    drawRoundedRect(ctx,44,150,400,660,24,'rgba(15,20,35,0.95)','rgba(36,51,86,0.9)');
+    drawRoundedRect(ctx,468,150,688,660,24,'rgba(11,14,26,0.98)','rgba(36,51,86,0.9)');
+    drawRoundedRect(ctx,1180,150,376,660,24,'rgba(15,20,35,0.95)','rgba(36,51,86,0.9)');
+
+    ctx.fillStyle='#ffc800';
+    ctx.font='700 18px "Noto Sans JP", sans-serif';
+    ctx.fillText('攻撃側',68,190);
+    ctx.fillStyle='#d8e8ff';
+    ctx.font='700 34px "Noto Sans JP", sans-serif';
+    ctx.fillText(data.attacker.name,68,236);
+    ctx.fillStyle='#7a90b0';
+    ctx.font='500 16px "JetBrains Mono", monospace';
+    ctx.fillText('#'+String(data.attacker.no).padStart(3,'0'),68,262);
+    let tx=68;
+    (data.attacker.types.length?data.attacker.types:['不明']).forEach(type=>{ tx += drawPill(ctx,type,tx,280,getTypeColor(type), type==='でんき'||type==='電気'?'#000':'#fff') + 8; });
+    let ay=344;
+    ay=drawInfoRows(ctx,[
+      {label:'レベル',value:String(data.attacker.level)},
+      {label:'性格',value:data.attacker.nature||'—'},
+      {label:'特性',value:data.attacker.ability||'—'},
+      {label:'持ち物',value:data.attacker.item||'なし'},
+      {label:'実数値',value:data.attacker.stats}
+    ],68,ay,340);
+
+    ctx.fillStyle='#ffc800';
+    ctx.font='700 18px "Noto Sans JP", sans-serif';
+    ctx.fillText('技 / 結果',492,190);
+    ctx.fillStyle='#d8e8ff';
+    ctx.font='700 38px "Noto Sans JP", sans-serif';
+    ctx.fillText(data.move.name,492,238);
+    let mx=492;
+    if(data.move.type) mx += drawPill(ctx,data.move.type,mx,260,getTypeColor(data.move.type), data.move.type==='でんき'||data.move.type==='電気'?'#000':'#fff') + 8;
+    if(data.move.category) mx += drawPill(ctx,data.move.category,mx,260,'#243356','#d8e8ff') + 8;
+    drawPill(ctx,'威力 '+data.move.power,Math.min(mx,1000),260,'#1a2540','#d8e8ff');
+
+    drawRoundedRect(ctx,492,320,640,160,20,'rgba(0,200,240,0.08)','rgba(0,200,240,0.35)');
+    ctx.fillStyle='#00c8f0';
+    ctx.font='700 76px "Bebas Neue", "Noto Sans JP", sans-serif';
+    ctx.fillText(data.result.damage,522,398);
+    ctx.fillStyle='#d8e8ff';
+    ctx.font='600 26px "Noto Sans JP", sans-serif';
+    ctx.fillText(data.result.percent||'',522,438);
+    ctx.fillStyle='#7a90b0';
+    ctx.font='500 20px "Noto Sans JP", sans-serif';
+    drawTextBlock(ctx,data.result.range,522,466,570,28,'#7a90b0');
+
+    if(data.result.ko){
+      const koBg=data.result.ko.includes('確定1発')||data.result.ko.includes('確定KO')||data.result.ko.includes('場ダメでKO')?'#ff3060':data.result.ko.includes('乱数')?'#ffc800':'#4a6080';
+      const koColor=koBg==='#ffc800' ? '#000' : '#fff';
+      drawPill(ctx,data.result.ko,950,198,koBg,koColor);
+    }
+
+    let cy=520;
+    ctx.fillStyle='#ffc800';
+    ctx.font='700 18px "Noto Sans JP", sans-serif';
+    ctx.fillText('補足',492,cy);
+    cy+=28;
+    ctx.fillStyle='#d8e8ff';
+    ctx.font='500 19px "Noto Sans JP", sans-serif';
+    const descLines=[data.result.desc,data.result.hazardSummary,`天候: ${data.move.weather||'なし'}`].filter(Boolean);
+    descLines.forEach(line=>{ cy=drawTextBlock(ctx,line,492,cy,620,28,'#d8e8ff')+6; });
+
+    ctx.fillStyle='#ffc800';
+    ctx.font='700 18px "Noto Sans JP", sans-serif';
+    ctx.fillText('乱数・詳細',492,cy+18);
+    cy+=46;
+    ctx.fillStyle='#7a90b0';
+    ctx.font='500 16px "JetBrains Mono", "Noto Sans JP", monospace';
+    const rollLines=data.result.rolls.length?data.result.rolls:['詳細表示なし'];
+    rollLines.forEach(line=>{ cy=drawTextBlock(ctx,line,492,cy,620,22,'#7a90b0')+4; });
+
+    ctx.fillStyle='#ffc800';
+    ctx.font='700 18px "Noto Sans JP", sans-serif';
+    ctx.fillText('防御側',1204,190);
+    ctx.fillStyle='#d8e8ff';
+    ctx.font='700 32px "Noto Sans JP", sans-serif';
+    ctx.fillText(data.defender.name,1204,236);
+    ctx.fillStyle='#7a90b0';
+    ctx.font='500 16px "JetBrains Mono", monospace';
+    ctx.fillText('#'+String(data.defender.no).padStart(3,'0'),1204,262);
+    let dx=1204;
+    (data.defender.types.length?data.defender.types:['不明']).forEach(type=>{ dx += drawPill(ctx,type,dx,280,getTypeColor(type), type==='でんき'||type==='電気'?'#000':'#fff') + 8; });
+    let dy=344;
+    dy=drawInfoRows(ctx,[
+      {label:'レベル',value:String(data.defender.level)},
+      {label:'性格',value:data.defender.nature||'—'},
+      {label:'特性',value:data.defender.ability||'—'},
+      {label:'持ち物',value:data.defender.item||'なし'},
+      {label:'実数値',value:data.defender.stats},
+      {label:'場ダメ',value:data.defender.hazards||'場ダメなし'}
+    ],1204,dy,320);
+
+    drawRoundedRect(ctx,44,834,1512,34,17,'rgba(15,20,35,0.96)','rgba(36,51,86,0.9)');
+    ctx.fillStyle='#7a90b0';
+    ctx.font='500 16px "Noto Sans JP", sans-serif';
+    ctx.fillText('PokeEdge | '+data.site+' | 出力: '+data.exportedAt,68,857);
+    ctx.fillStyle='#d8e8ff';
+    ctx.fillText('※ 現在画面の入力条件をもとに生成した投稿用画像です。',1160,857);
+
+    const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download='pokeedge-damage-result-'+Date.now()+'.png';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    if(statusEl) statusEl.textContent='画像を保存しました。SNSやnoteにそのまま使えます。';
+  } catch(err){
+    console.error(err);
+    if(statusEl) statusEl.textContent='画像の生成に失敗しました。';
+    alert('画像の生成に失敗しました');
+  } finally {
+    if(btn) btn.disabled=false;
+  }
 }
 
 // ===== シーズンフィルター =====
