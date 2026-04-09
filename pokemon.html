@@ -319,8 +319,9 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
   <!-- 右: 編集フォーム -->
   <div class="edit-panel" id="edit-panel">
     <div id="edit-empty" style="color:var(--text2);font-size:13px;padding:20px 0;line-height:2;">
-      左の「＋ 新規登録」からポケモンを追加してください。<br>
-      登録したポケモンはパーティ管理で選択して編成できます。
+      まだポケモンは登録されていません。<br>
+      左の「＋ 新規登録」から、よく使うポケモンを1体ずつ追加できます。<br>
+      登録した内容は、ダメージ計算や技選択判定、パーティ管理でも呼び出せます。
     </div>
 
     <div id="edit-form" style="display:none;">
@@ -473,7 +474,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
             <div style="font-size:10px;color:var(--text2);margin-top:4px;">現在: <span id="iv-disp" style="color:var(--accent3);font-family:'JetBrains Mono',monospace;">31</span></div>
           </div>
           <div style="font-size:10px;color:var(--text2);line-height:1.8;padding-top:16px;">
-            ※ 全ステータスに同じ個体値を適用します。<br>ステータスごとに異なる場合は個別に設定できます（準備中）。
+            ※ いまは全ステータスに同じ個体値を適用します。<br>ステータスごとに分けて設定する機能は、今後の対応予定です。
           </div>
         </div>
       </div>
