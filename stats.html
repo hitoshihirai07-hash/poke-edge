@@ -285,13 +285,14 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 <header>
   <div class="logo" onclick="location.href='index.html'">Poke<em>Edge</em></div>
   <div class="header-sep"></div>
-  <div class="header-sub">選出率記録</div>
+  <div class="header-sub">選出率</div>
   <div class="header-nav" id="main-nav">
     <a class="nav-btn" href="index.html">トップ</a>
     <a class="nav-btn" href="calc.html">ダメージ計算</a>
     <a class="nav-btn" href="move.html">技選択判定</a>
     <a class="nav-btn" href="party.html">パーティ管理</a>
     <a class="nav-btn" href="pokemon.html">ポケモン登録</a>
+    <a class="nav-btn" href="items.html">アイテム</a>
     <a class="nav-btn active" href="stats.html">選出率記録</a>
     <a class="nav-btn" href="scope.html">バトルアナライザー</a>
     <a class="nav-btn" href="season.html">使用可能ポケモン</a>
@@ -365,8 +366,8 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
       <div class="block">
         <div class="sec">勝敗</div>
         <div class="result-btns">
-          <button class="result-btn" data-r="win" onclick="setResult('win')">勝ち</button>
-          <button class="result-btn" data-r="lose" onclick="setResult('lose')">負け</button>
+          <button class="result-btn" data-r="win" onclick="setResult('win')">WIN</button>
+          <button class="result-btn" data-r="lose" onclick="setResult('lose')">LOSE</button>
         </div>
       </div>
 
@@ -398,7 +399,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 
 <footer>
   <div class="footer-logo">PokeEdge</div>
-  <div class="footer-text">非公式ファンサイト / 個人運営</div>
+  <div class="footer-text">非公式ファンサイト / Unofficial Fan Tool</div>
   <div style="font-size:10px;"><a href="policy.html" style="color:var(--text2);text-decoration:none;">プライバシーポリシー / 利用規約</a></div>
 </footer>
 
@@ -806,7 +807,7 @@ async function renderHistory(){
   el.innerHTML = battles.slice(0,30).map((b,i)=>`
     <div class="history-item ${b.result}">
       <div class="history-header">
-        <span class="history-result ${b.result}">${b.result==='win'?'勝ち':'負け'}</span>
+        <span class="history-result ${b.result}">${b.result==='win'?'WIN':'LOSE'}</span>
         <span style="font-size:11px;color:var(--text2);">${b.date}</span>
         <button class="del-btn" onclick="deleteBattle(${b.id})">削除</button>
       </div>

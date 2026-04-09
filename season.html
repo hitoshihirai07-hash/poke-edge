@@ -123,6 +123,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
     <a class="nav-btn" href="move.html">技選択判定</a>
     <a class="nav-btn" href="party.html">パーティ管理</a>
     <a class="nav-btn" href="pokemon.html">ポケモン登録</a>
+    <a class="nav-btn" href="items.html">アイテム</a>
     <a class="nav-btn" href="stats.html">選出率記録</a>
     <a class="nav-btn" href="scope.html">バトルアナライザー</a>
     <a class="nav-btn active" href="season.html">使用可能ポケモン</a>
@@ -148,8 +149,8 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 
   <!-- 統計 -->
   <div class="stats-bar">
-    <div class="stat-item"><b id="stat-total">—</b>件表示</div>
-    <div class="stat-item"><b id="stat-nintei">—</b>件使用可能</div>
+    <div class="stat-item"><b id="stat-total">0</b>件表示</div>
+    <div class="stat-item"><b id="stat-nintei">0</b>件使用可能</div>
   </div>
 
   <!-- テーブル -->
@@ -170,7 +171,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
           <th>使用可</th>
         </tr>
       </thead>
-      <tbody id="poke-tbody"><tr><td colspan="11" class="empty">読み込み中…</td></tr></tbody>
+      <tbody id="poke-tbody"></tbody>
     </table>
   </div>
 </div>
@@ -313,10 +314,7 @@ window.onload = async () => {
     SEASON_DATA = sd;
   } catch(e) {
     console.error('データ読み込みエラー:', e);
-    document.getElementById('stat-total').textContent = '—';
-    document.getElementById('stat-nintei').textContent = '—';
-    document.getElementById('poke-tbody').innerHTML = '<tr><td colspan="11" class="empty">データの読み込みに失敗しました。時間をおいて再読み込みしてください。</td></tr>';
-    return;
+    alert('データの読み込みに失敗しました。');
   }
   buildSeasonBtns();
   render();

@@ -173,6 +173,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:16
     <a class="nav-btn" href="move.html">技選択判定</a>
     <a class="nav-btn" href="party.html">パーティ管理</a>
     <a class="nav-btn" href="pokemon.html">ポケモン登録</a>
+    <a class="nav-btn" href="items.html">アイテム</a>
     <a class="nav-btn" href="stats.html">選出率記録</a>
     <a class="nav-btn active" href="scope.html">バトルアナライザー</a>
     <a class="nav-btn" href="season.html">使用可能ポケモン</a>
@@ -442,31 +443,16 @@ function typeEff(mt, dts) {
 // ===== 実数値計算 =====
 const PERSONALITIES={
   'がんばりや':{atk:1,def:1,spa:1,spd:1,spe:1},
-  'てれや':{atk:1,def:1,spa:1,spd:1,spe:1},
-  'すなお':{atk:1,def:1,spa:1,spd:1,spe:1},
-  'まじめ':{atk:1,def:1,spa:1,spd:1,spe:1},
-  'きまぐれ':{atk:1,def:1,spa:1,spd:1,spe:1},
-  'おとぼけ':{atk:1,def:1,spa:1,spd:1,spe:1},// 旧保存データ互換
-  'さみしがり':{atk:1.1,def:.9,spa:1,spd:1,spe:1},
-  'いじっぱり':{atk:1.1,def:1,spa:.9,spd:1,spe:1},
-  'やんちゃ':{atk:1.1,def:1,spa:1,spd:.9,spe:1},
-  'ゆうかん':{atk:1.1,def:1,spa:1,spd:1,spe:.9},
-  'ずぶとい':{atk:.9,def:1.1,spa:1,spd:1,spe:1},
-  'わんぱく':{atk:1,def:1.1,spa:.9,spd:1,spe:1},
-  'のうてんき':{atk:1,def:1.1,spa:1,spd:.9,spe:1},
-  'のんき':{atk:1,def:1.1,spa:1,spd:1,spe:.9},
-  'ひかえめ':{atk:.9,def:1,spa:1.1,spd:1,spe:1},
-  'おっとり':{atk:1,def:.9,spa:1.1,spd:1,spe:1},
-  'うっかりや':{atk:1,def:1,spa:1.1,spd:.9,spe:1},
-  'れいせい':{atk:1,def:1,spa:1.1,spd:1,spe:.9},
-  'おだやか':{atk:.9,def:1,spa:1,spd:1.1,spe:1},
-  'おとなしい':{atk:1,def:.9,spa:1,spd:1.1,spe:1},
-  'しんちょう':{atk:1,def:1,spa:.9,spd:1.1,spe:1},
-  'なまいき':{atk:1,def:1,spa:1,spd:1.1,spe:.9},
-  'おくびょう':{atk:.9,def:1,spa:1,spd:1,spe:1.1},
-  'せっかち':{atk:1,def:.9,spa:1,spd:1,spe:1.1},
-  'ようき':{atk:1,def:1,spa:.9,spd:1,spe:1.1},
-  'むじゃき':{atk:1,def:1,spa:1,spd:.9,spe:1.1},
+  'いじっぱり':{atk:1.1,def:1,spa:.9,spd:1,spe:1},'やんちゃ':{atk:1.1,def:1,spa:1,spd:.9,spe:1},
+  'ゆうかん':{atk:1.1,def:1,spa:1,spd:1,spe:.9},'さみしがり':{atk:1.1,def:.9,spa:1,spd:1,spe:1},
+  'ずぶとい':{atk:.9,def:1.1,spa:1,spd:1,spe:1},'わんぱく':{atk:1,def:1.1,spa:.9,spd:1,spe:1},
+  'のうてんき':{atk:1,def:1.1,spa:1,spd:.9,spe:1},'のんき':{atk:1,def:1.1,spa:1,spd:1,spe:.9},
+  'ひかえめ':{atk:.9,def:1,spa:1.1,spd:1,spe:1},'おっとり':{atk:1,def:.9,spa:1.1,spd:1,spe:1},
+  'うっかりや':{atk:1,def:1,spa:1.1,spd:.9,spe:1},'れいせい':{atk:1,def:1,spa:1.1,spd:1,spe:.9},
+  'おだやか':{atk:.9,def:1,spa:1,spd:1.1,spe:1},'おとなしい':{atk:1,def:1,spa:.9,spd:1.1,spe:1},
+  'しんちょう':{atk:1,def:1,spa:.9,spd:1.1,spe:1},'なまいき':{atk:1,def:1,spa:1,spd:1.1,spe:.9},
+  'おくびょう':{atk:1,def:1,spa:1,spd:.9,spe:1.1},'せっかち':{atk:1,def:.9,spa:1,spd:1,spe:1.1},
+  'ようき':{atk:1,def:1,spa:.9,spd:1,spe:1.1},'むじゃき':{atk:1,def:1,spa:1,spd:.9,spe:1.1},
 };
 function calcHP(b,iv,ev,lv,champ){
   if(champ) return Math.floor((Math.floor((b*2+iv)*lv/100)+10+lv))+ev;

@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PokeEdge | ポケモン対戦支援ツール</title>
-<meta name="description" content="PokeEdgeは、ポケモン対戦の判断を数字で支える無料ツール集。ダメージ計算・技選択判定・パーティ管理・素早さ比較までまとめて使えます。">
+<meta name="description" content="ポケモン対戦をもっと深く、もっと正確に。ダメージ計算・技選択判定・パーティ管理を無料で。">
 <meta name="keywords" content="ポケモン,ダメージ計算,対戦,構築,努力値,個体値,パーティ,PokeEdge">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="PokeEdge | ポケモン対戦支援ツール">
-<meta property="og:description" content="ダメージ計算・技選択判定・パーティ管理を無料で。ポケモン1239種・技795種対応。">
+<meta property="og:description" content="ダメージ計算・技選択判定・パーティ管理を無料で。ポケモン1200種以上・技520種対応。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://poke-edge.pages.dev/">
 <meta property="og:site_name" content="PokeEdge">
@@ -206,6 +206,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
     <a class="nav-btn" href="move.html">技選択判定</a>
     <a class="nav-btn" href="party.html">パーティ管理</a>
     <a class="nav-btn" href="pokemon.html">ポケモン登録</a>
+    <a class="nav-btn" href="items.html">アイテム</a>
     <a class="nav-btn" href="stats.html">選出率記録</a>
     <a class="nav-btn" href="scope.html">バトルアナライザー</a>
     <a class="nav-btn" href="season.html">使用可能ポケモン</a>
@@ -224,15 +225,15 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-eyebrow">ポケモン対戦支援ツール</div>
+  <div class="hero-eyebrow">Pokemon Battle Assistant</div>
   <h1 class="hero-title">
 POKE-EDGE
   </h1>
   <p class="hero-desc">
-    「この技で倒せるのか」「どの技を打てばいいか」——対戦中に頭の中でやっている判断を、数字で素早く確認できます。Pokémon Championsの準備から実戦中の確認まで、1か所で使える対戦支援ツールです。
+    「この技で倒せるのか」「どの技を打てばいいか」——対戦中に頭の中で計算していることを、正確に、素早く答えます。ポケモン1200種以上・技520種以上のデータを搭載。
   </p>
   <div class="cta-group">
-    <a class="cta-primary" href="calc.html">ダメージ計算を開く →</a>
+    <a class="cta-primary" href="calc.html">ツールを使う →</a>
     <a class="cta-secondary" href="#tools">機能を見る</a>
   </div>
 </div>
@@ -262,14 +263,14 @@ POKE-EDGE
     <a class="tool-card" href="pokemon.html">
       <div class="tool-card-icon">🔴</div>
       <div class="tool-card-name">ポケモン登録</div>
-      <div class="tool-card-desc">ポケモンごとに性格・個体値・努力値・技・持ち物を登録。Champions / 従来作の努力値モードを切替可能。登録データはダメージ計算・技選択判定・バトルアナライザーで自動読み込みされます。現在使える道具一覧への導線もここから確認できます。</div>
+      <div class="tool-card-desc">ポケモンごとに性格・個体値・努力値・技・持ち物を登録。Champions / 従来作の努力値モードを切替可能。登録データはダメージ計算・技判定・アナライザーで自動読み込みされます。</div>
       <span class="tool-card-tag">Champions努力値対応 / 全ツール連携</span>
     </a>
     <a class="tool-card" href="items.html">
       <div class="tool-card-icon">🎒</div>
-      <div class="tool-card-name">道具一覧</div>
+      <div class="tool-card-name">アイテム一覧</div>
       <div class="tool-card-desc">現在使える道具・きのみ・メガストーンを一覧表示。入手方法と効果をまとめて確認できるので、ポケモン登録で持ち物を決める前の確認にも向いています。</div>
-      <span class="tool-card-tag">入手方法つき / 3分類対応</span>
+      <span class="tool-card-tag">入手方法 / 効果を一覧確認</span>
     </a>
     <a class="tool-card" href="stats.html">
       <div class="tool-card-icon">📊</div>
@@ -295,34 +296,6 @@ POKE-EDGE
       <div class="tool-card-desc">内定ポケモンの素早さ実数値を一覧比較。最速・準速・無振りの実数値に加え、スカーフ・追い風・天候特性・ランク補正をワンクリックで反映。自分の素早さを入力すると抜ける/抜けないをハイライト表示。</div>
       <span class="tool-card-tag">スカーフ・追い風・特性補正対応</span>
     </a>
-  </div>
-</div>
-
-
-<!-- はじめて使う方向け -->
-<div class="usage-section">
-  <div class="section-head">はじめて使う方へ</div>
-  <div class="usage-grid">
-    <div class="usage-card">
-      <div class="usage-num">01</div>
-      <div class="usage-title">まずはポケモンを登録</div>
-      <div class="usage-desc">性格・努力値・個体値・技を登録しておくと、ダメージ計算や技選択判定にそのまま呼び出せます。よく使う個体を先に作っておくと、対戦前の確認がかなり楽になります。</div>
-    </div>
-    <div class="usage-card">
-      <div class="usage-num">02</div>
-      <div class="usage-title">迷ったら2つの計算を使い分け</div>
-      <div class="usage-desc">1つの技を詳しく見たい時はダメージ計算、どの技が通るかをまとめて見たい時は技選択判定。目的ごとに切り替えると、対戦中でも詰まりにくいです。</div>
-    </div>
-    <div class="usage-card">
-      <div class="usage-num">03</div>
-      <div class="usage-title">パーティ管理と選出率で振り返る</div>
-      <div class="usage-desc">6匹の並びを保存しつつ、試合ごとの選出や初手も記録できます。感覚で終わりがちな反省を、あとで数字で見返せるようにしておくための導線です。</div>
-    </div>
-    <div class="usage-card">
-      <div class="usage-num">04</div>
-      <div class="usage-title">素早さラインで最後の確認</div>
-      <div class="usage-desc">最速・準速・追い風・スカーフまでまとめて比較できます。大会前や新ルール直後に、抜ける相手と抜けない相手をさっと整理したい時に便利です。</div>
-    </div>
   </div>
 </div>
 
@@ -374,7 +347,7 @@ POKE-EDGE
 
   <!-- ログイン説明 -->
   <div style="margin-bottom:36px;">
-    <div style="font-size:10px;letter-spacing:3px;color:var(--text2);margin-bottom:16px;">保存方法</div>
+    <div style="font-size:10px;letter-spacing:3px;color:var(--text2);margin-bottom:16px;">LOGIN GUIDE</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
 
       <!-- 未ログイン -->
@@ -407,7 +380,7 @@ POKE-EDGE
 
   <!-- 機能別ログイン効果 -->
   <div>
-    <div style="font-size:10px;letter-spacing:3px;color:var(--text2);margin-bottom:16px;">ログインで変わること</div>
+    <div style="font-size:10px;letter-spacing:3px;color:var(--text2);margin-bottom:16px;">FEATURES</div>
     <div style="background:var(--panel);border:1px solid var(--border);overflow:hidden;">
       <table style="width:100%;border-collapse:collapse;font-size:12px;">
         <thead>
@@ -457,7 +430,7 @@ POKE-EDGE
 
 <footer>
   <div class="footer-logo">PokeEdge</div>
-  <div class="footer-text">非公式ファンサイト / 個人運営<br>ポケモン1239種・技795種対応</div>
+  <div class="footer-text">非公式ファンサイト / Unofficial Fan Tool<br>ポケモン1210種・技520種対応</div>
   <div style="font-size:10px;"><a href="policy.html" style="color:var(--text2);text-decoration:none;">プライバシーポリシー / 利用規約</a></div>
 </footer>
 
