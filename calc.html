@@ -761,6 +761,29 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
               </select>
             </div>
           </div>
+
+          <div class="corr-grid" style="margin-top:10px;">
+            <div>
+              <label class="corr-item">ステルスロック</label>
+              <select class="corr-select" id="def-stealth-rock">
+                <option value="off">なし</option>
+                <option value="on">あり</option>
+              </select>
+            </div>
+            <div>
+              <label class="corr-item">まきびし</label>
+              <select class="corr-select" id="def-spikes">
+                <option value="0">なし</option>
+                <option value="1">1層</option>
+                <option value="2">2層</option>
+                <option value="3">3層</option>
+              </select>
+            </div>
+            <div style="grid-column:1 / -1;">
+              <label class="corr-item">場ダメ込みの残HP目安</label>
+              <div id="def-hazard-info" style="background:var(--bg2);border:1px solid var(--border);padding:8px 10px;font-size:11px;color:var(--accent3);min-height:36px;line-height:1.6;">場ダメなし</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -777,6 +800,7 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
         <div>
           <div class="dmg-num" id="dmg-num">—</div>
           <div style="font-size:11px;color:var(--text2);margin-top:4px;" id="dmg-range"></div>
+          <div style="font-size:10px;color:var(--accent3);margin-top:6px;line-height:1.6;" id="hazard-summary"></div>
           <div id="ko-tag"></div>
           <div style="font-size:11px;color:var(--text2);margin-top:4px;" id="dmg-desc"></div>
         </div>
@@ -1234,6 +1258,7 @@ function selectAbility(side,name) {
   const si=el(side+'-ability-search'), hi=el(side+'-ability'), dr=el(side+'-ability-drop'), inf=el(side+'-ability-info');
   if(si) si.value=name; if(hi) hi.value=name; if(dr) dr.style.display='none';
   if(inf) inf.textContent=ab&&ab.effect?ab.effect.slice(0,60)+(ab.effect.length>60?'…':''):'';
+  if(side==='def') updateDefHazardInfo();
 }
 document.addEventListener('click',function(e){
   ['atk','def'].forEach(function(side){
@@ -1331,6 +1356,73 @@ function recalcDef() {
   if(el('def-stat-hp'))  el('def-stat-hp').textContent=hpVal;
   if(el('def-stat-def')) el('def-stat-def').textContent=defVal;
   if(el('def-stat-spd')) el('def-stat-spd').textContent=spdVal;
+  updateDefHazardInfo();
+}
+
+function isGroundedForSpikes(defBase, defAbName=''){
+  const defTypes=defBase?[defBase.type1,defBase.type2].filter(Boolean):[];
+  if(defTypes.includes('ひこう')) return false;
+  if(defAbName==='ふゆう') return false;
+  return true;
+}
+function getHazardInfo(defBase=window._defBase, defStats=window._defStats){
+  const hp=defStats&&defStats.hp?defStats.hp:0;
+  const stealthOn=(el('def-stealth-rock')?.value||'off')==='on';
+  const spikesLayers=parseInt(el('def-spikes')?.value||'0');
+  const defAbName=(el('def-ability')?.value||'').trim();
+  const defTypes=defBase?[defBase.type1,defBase.type2].filter(Boolean):[];
+  const magicGuard=defAbName==='マジックガード';
+  let stealthDamage=0, spikesDamage=0;
+  const notes=[];
+
+  if(hp>0 && stealthOn){
+    if(magicGuard){
+      notes.push('ステルスロック無効（マジックガード）');
+    } else {
+      const rockEff=getTypeEff('いわ',defTypes);
+      if(rockEff<=0){
+        notes.push('ステルスロック無効');
+      } else {
+        stealthDamage=Math.floor(hp*rockEff/8);
+        notes.push('ステルスロック '+stealthDamage);
+      }
+    }
+  }
+  if(hp>0 && spikesLayers>0){
+    if(magicGuard){
+      notes.push('まきびし無効（マジックガード）');
+    } else if(!isGroundedForSpikes(defBase,defAbName)){
+      notes.push('まきびし無効（ひこう・ふゆう）');
+    } else {
+      const frac=spikesLayers===1?(1/8):spikesLayers===2?(1/6):(1/4);
+      spikesDamage=Math.floor(hp*frac);
+      notes.push('まきびし'+spikesLayers+'層 '+spikesDamage);
+    }
+  }
+  const total=Math.min(hp,stealthDamage+spikesDamage);
+  const remaining=Math.max(hp-total,0);
+  return {stealthOn,spikesLayers,stealthDamage,spikesDamage,total,remaining,notes,magicGuard};
+}
+function updateDefHazardInfo(){
+  const hp=window._defStats&&window._defStats.hp?window._defStats.hp:0;
+  const infoEl=el('def-hazard-info');
+  if(!infoEl) return;
+  if(!hp){
+    infoEl.textContent='—';
+    if(el('hp-disp')) el('hp-disp').textContent='—';
+    if(el('hp-fg')) el('hp-fg').style.width='100%';
+    return;
+  }
+  const hz=getHazardInfo();
+  if(hz.total>0){
+    infoEl.textContent='ステルスロック '+hz.stealthDamage+' / まきびし '+hz.spikesDamage+' / 合計 '+hz.total+' / 残HP '+hz.remaining;
+    if(el('hp-disp')) el('hp-disp').textContent=hz.remaining+' / '+hp+'（場ダメ後）';
+    if(el('hp-fg')) el('hp-fg').style.width=Math.max(0,Math.min(100,Math.round(hz.remaining/hp*100)))+'%';
+  } else {
+    infoEl.textContent=hz.notes.length?hz.notes.join(' / '):'場ダメなし';
+    if(el('hp-disp')) el('hp-disp').textContent=hp+' / '+hp;
+    if(el('hp-fg')) el('hp-fg').style.width='100%';
+  }
 }
 
 // ===== 技セット =====
@@ -1449,6 +1541,9 @@ function calcDamage() {
   const atkStat=mcat==='物理'?window._atkStats.atk:window._atkStats.spa;
   let defStat=mcat==='物理'?window._defStats.def:window._defStats.spd;
   const hp=window._defStats.hp;
+  const hazardInfo=getHazardInfo(window._defBase,window._defStats);
+  const remainingHp=hazardInfo.remaining;
+  const hazardJudgeHp=Math.max(1,remainingHp);
   const defTypes=window._defBase?[window._defBase.type1,window._defBase.type2].filter(Boolean):[];
 
   // 天候による防御側ステータス補正
@@ -1629,7 +1724,13 @@ function calcDamage() {
     : `乱数幅 ${mn}〜${mx}（1hit）  相性:×${eff}${stabLabel}${extraInfo}${weatherDefLabel}`;
   el('dmg-bar').style.width=Math.min(pmx,100)+'%';
   el('dmg-pct').textContent=`${pmn}〜${pmx}%`;
-  el('hp-disp').textContent=`${hp} / ${hp}`;
+  updateDefHazardInfo();
+  const hazardSummaryEl=el('hazard-summary');
+  if(hazardSummaryEl){
+    hazardSummaryEl.textContent=hazardInfo.total>0
+      ? `場ダメ込み判定: ステルスロック ${hazardInfo.stealthDamage} + まきびし ${hazardInfo.spikesDamage} = ${hazardInfo.total}（残HP ${remainingHp}/${hp}）`
+      : (hazardInfo.notes.length ? `場ダメ込み判定: ${hazardInfo.notes.join(' / ')}` : '場ダメ込み判定: なし');
+  }
 
   const totalRolls=parentalBondActive?rolls.map((d,i)=>d+(parentalSecondRolls[i]||0)):rolls.slice();
   const critRolls=parentalBondActive
@@ -1647,14 +1748,14 @@ function calcDamage() {
       `<div style="margin-bottom:8px;"><span style="font-size:10px;color:var(--accent3);font-family:'Bebas Neue',monospace;">2hit目: </span><span style="font-size:11px;">${parentalSecondMn}〜${parentalSecondMx}ダメージ（威力0.25倍）</span></div>`+
       totalRolls.map((d,i)=>{
         const pct=Math.round(d/hp*100);
-        const hi=d>=hp;
+        const hi=d>=hazardJudgeHp;
         return `<span style="font-size:10px;padding:2px 5px;background:${i===0||i===15?'var(--border2)':'var(--bg)'};border:1px solid var(--border);color:${hi?'var(--accent2)':'var(--text)'};">${d}(${pct}%)</span>`;
       }).join(' ');
     if(String(alwaysCrit).toUpperCase()==='TRUE'){
       rollsHtml+=`<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);"><div style="font-size:10px;color:var(--accent3);margin-bottom:4px;">⚡ 急所時（合計）</div>`;
       rollsHtml+=critRolls.map((d,i)=>{
         const pct=Math.round(d/hp*100);
-        return `<span style="font-size:10px;padding:2px 5px;background:${i===0||i===15?'var(--border2)':'var(--bg)'};border:1px solid var(--accent3);color:${d>=hp?'var(--accent2)':'var(--accent3)'};">${d}(${pct}%)</span>`;
+        return `<span style="font-size:10px;padding:2px 5px;background:${i===0||i===15?'var(--border2)':'var(--bg)'};border:1px solid var(--accent3);color:${d>=hazardJudgeHp?'var(--accent2)':'var(--accent3)'};">${d}(${pct}%)</span>`;
       }).join(' ')+'</div>';
     }
   } else if(isTripleEscalating){
@@ -1667,40 +1768,45 @@ function calcDamage() {
       const hMin=Math.floor(bm*85/100), hMax=Math.floor(bm);
       cumMin+=hMin; cumMax+=hMax;
       const pMin=Math.round(cumMin/hp*100), pMax=Math.round(cumMax/hp*100);
-      const koMark=cumMax>=hp?'<span style="color:var(--accent2);font-weight:700;"> KO圏</span>':'';
+      const koMark=cumMax>=hazardJudgeHp?'<span style="color:var(--accent2);font-weight:700;"> KO圏</span>':'';
       return `<div style="margin-bottom:4px;"><span style="font-size:10px;color:var(--accent3);font-family:'Bebas Neue',monospace;">${idx+1}hit(威力${hitPow}): </span><span style="font-size:11px;">${hMin}〜${hMax}ダメージ / 累計${cumMin}〜${cumMax}（${pMin}〜${pMax}%）${koMark}</span></div>`;
     }).join('');
   } else if(isMulti){
     rollsHtml=hitPatterns.map(h=>{
       const tMin=dmg1Min*h,tMax=dmg1Max*h;
       const pMin=Math.round(tMin/hp*100),pMax=Math.round(tMax/hp*100);
-      const koMark=tMax>=hp?'<span style="color:var(--accent2);font-weight:700;"> KO圏</span>':'';
+      const koMark=tMax>=hazardJudgeHp?'<span style="color:var(--accent2);font-weight:700;"> KO圏</span>':'';
       return `<div style="margin-bottom:4px;"><span style="font-size:10px;color:var(--accent3);font-family:'Bebas Neue',monospace;">${h}hit: </span><span style="font-size:11px;">${tMin}〜${tMax}ダメージ（${pMin}〜${pMax}%）${koMark}</span></div>`;
     }).join('');
   } else {
     rollsHtml=rolls.map((d,i)=>{
       const pct=Math.round(d/hp*100);
-      const hi=d>=hp,at=pct>=100;
+      const hi=d>=hazardJudgeHp,at=pct>=100;
       return `<span style="font-size:10px;padding:2px 5px;background:${i===0||i===15?'var(--border2)':'var(--bg)'};border:1px solid var(--border);color:${hi?'var(--accent2)':'var(--text)'};">${d}(${pct}%)</span>`;
     }).join(' ');
     if(String(alwaysCrit).toUpperCase()==='TRUE'){
       rollsHtml+=`<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);"><div style="font-size:10px;color:var(--accent3);margin-bottom:4px;">⚡ 急所時（×1.5）</div>`;
       rollsHtml+=critRolls.map((d,i)=>{
         const pct=Math.round(d/hp*100);
-        return `<span style="font-size:10px;padding:2px 5px;background:${i===0||i===15?'var(--border2)':'var(--bg)'};border:1px solid var(--accent3);color:${d>=hp?'var(--accent2)':'var(--accent3)'};">${d}(${pct}%)</span>`;
+        return `<span style="font-size:10px;padding:2px 5px;background:${i===0||i===15?'var(--border2)':'var(--bg)'};border:1px solid var(--accent3);color:${d>=hazardJudgeHp?'var(--accent2)':'var(--accent3)'};">${d}(${pct}%)</span>`;
       }).join(' ')+'</div>';
     }
   }
   el('dmg-rolls').innerHTML=rollsHtml;
 
+  const judgeMn=Math.round(totalMn/hazardJudgeHp*100), judgeMx=Math.round(totalMx/hazardJudgeHp*100);
+  const judgePrefix=hazardInfo.total>0?'場ダメ込みで':'';
   const kt=el('ko-tag');
-  if(pmn>=100)        {kt.innerHTML='<span class="ko-tag ko1">確定1発</span>';el('dmg-desc').textContent='確実に倒せます';}
-  else if(pmx>=100)   {kt.innerHTML='<span class="ko-tag ko2">乱数1発</span>';el('dmg-desc').textContent='乱数次第で1発で倒せます（'+pmx+'%ダメージ）';}
-  else if(pmn*2>=100) {kt.innerHTML='<span class="ko-tag ko1">確定2発</span>';el('dmg-desc').textContent='2回で確実に倒せます';}
-  else if(pmx*2>=100) {kt.innerHTML='<span class="ko-tag ko2">乱数2発</span>';el('dmg-desc').textContent='乱数次第で2発で倒せます';}
-  else if(pmn*3>=100) {kt.innerHTML='<span class="ko-tag ko3">確定3発</span>';el('dmg-desc').textContent='3回で確実に倒せます';}
-  else if(pmx*3>=100) {kt.innerHTML='<span class="ko-tag ko3">乱数3発</span>';el('dmg-desc').textContent='乱数次第で3発で倒せます';}
-  else                {kt.innerHTML='<span class="ko-tag ko3">4発以上</span>';el('dmg-desc').textContent='4回以上必要です';}
+  if(remainingHp<=0){
+    kt.innerHTML='<span class="ko-tag ko1">場ダメでKO</span>';
+    el('dmg-desc').textContent='ステルスロック・まきびしだけで倒れます';
+  } else if(judgeMn>=100)        {kt.innerHTML='<span class="ko-tag ko1">確定1発</span>';el('dmg-desc').textContent=judgePrefix+'確実に倒せます';}
+  else if(judgeMx>=100)   {kt.innerHTML='<span class="ko-tag ko2">乱数1発</span>';el('dmg-desc').textContent=judgePrefix+'乱数次第で1発で倒せます';}
+  else if(judgeMn*2>=100) {kt.innerHTML='<span class="ko-tag ko1">確定2発</span>';el('dmg-desc').textContent=judgePrefix+'2回で確実に倒せます';}
+  else if(judgeMx*2>=100) {kt.innerHTML='<span class="ko-tag ko2">乱数2発</span>';el('dmg-desc').textContent=judgePrefix+'乱数次第で2発で倒せます';}
+  else if(judgeMn*3>=100) {kt.innerHTML='<span class="ko-tag ko3">確定3発</span>';el('dmg-desc').textContent=judgePrefix+'3回で確実に倒せます';}
+  else if(judgeMx*3>=100) {kt.innerHTML='<span class="ko-tag ko3">乱数3発</span>';el('dmg-desc').textContent=judgePrefix+'乱数次第で3発で倒せます';}
+  else                {kt.innerHTML='<span class="ko-tag ko3">4発以上</span>';el('dmg-desc').textContent=judgePrefix+'4回以上必要です';}
 }
 function showResult0(abName){
   el('result-box').classList.add('show');
@@ -1772,30 +1878,36 @@ function calcAddDamage(){
   if(!pow2||!type2){alert('2体目のポケモンと技を選択してください');return;}
   if(!window._atk2Stats){alert('2体目のポケモンを選択してください');return;}
   const hp=window._defStats.hp;
+  const hazardInfo=getHazardInfo(window._defBase,window._defStats);
+  const remainingHp=hazardInfo.remaining;
+  const judgeHp=Math.max(1,remainingHp);
   const r1=calcOneDamage(window._atkStats,window._atkBase,window._defStats,window._defBase,lv1,type1,cat1,hits1,pow1,item1,moveName1,atkAbility1);
   const r1b=pow1b?calcOneDamage(window._atkStats,window._atkBase,window._defStats,window._defBase,lv1,type1b,cat1b,hits1b,pow1b,item1b,moveName1b,atkAbility1):null;
   const r2=calcOneDamage(window._atk2Stats,window._atk2Base,window._defStats,window._defBase,lv2,type2,cat2,hits2,pow2,item2,moveName2,'');
   const totalMn=r1.mn+(r1b?r1b.mn:0)+r2.mn;
   const totalMx=r1.mx+(r1b?r1b.mx:0)+r2.mx;
   const pctMn=Math.round(totalMn/hp*100), pctMx=Math.round(totalMx/hp*100);
+  const judgeMn=Math.round(totalMn/judgeHp*100), judgeMx=Math.round(totalMx/judgeHp*100);
   const bar1w=Math.min(Math.round((r1.mx+(r1b?r1b.mx:0))/hp*100),100);
   const bar2w=Math.min(Math.round(r2.mx/hp*100),100);
   const addBox=el('add-result-box');
   if(addBox){
     addBox.classList.add('show');
     const totalNum=el('add-total-num'); if(totalNum) totalNum.textContent=`${totalMn} 〜 ${totalMx}`;
-    const totalPct=el('add-total-pct'); if(totalPct) totalPct.textContent=`${pctMn}〜${pctMx}%`;
+    const totalPct=el('add-total-pct'); if(totalPct) totalPct.textContent=hazardInfo.total>0?`${pctMn}〜${pctMx}%（場ダメ後残HP ${remainingHp}）`:`${pctMn}〜${pctMx}%`;
     const bar1=el('add-bar-1'); if(bar1) bar1.style.width=bar1w+'%';
     const bar2=el('add-bar-2'); if(bar2) bar2.style.width=bar2w+'%';
     const breakdown=el('add-breakdown');
     if(breakdown) breakdown.innerHTML=
+      (hazardInfo.total>0?`<div>場ダメ: ${hazardInfo.total}（残HP ${remainingHp}/${hp}）</div>`:'')+
       `<div>1体目: ${r1.mn}〜${r1.mx} (${Math.round(r1.mn/hp*100)}〜${Math.round(r1.mx/hp*100)}%)</div>`+
       (r1b?`<div>1体目技2: ${r1b.mn}〜${r1b.mx} (${Math.round(r1b.mn/hp*100)}〜${Math.round(r1b.mx/hp*100)}%)</div>`:'')+
       `<div>2体目: ${r2.mn}〜${r2.mx} (${Math.round(r2.mn/hp*100)}〜${Math.round(r2.mx/hp*100)}%)</div>`;
     const koTag=el('add-ko-tag');
     if(koTag){
-      if(pctMn>=100) koTag.innerHTML='<span class="add-ko-tag add-ko1">確定KO</span>';
-      else if(pctMx>=100) koTag.innerHTML='<span class="add-ko-tag add-ko2">乱数KO</span>';
+      if(remainingHp<=0) koTag.innerHTML='<span class="add-ko-tag add-ko1">場ダメでKO</span>';
+      else if(judgeMn>=100) koTag.innerHTML='<span class="add-ko-tag add-ko1">確定KO</span>';
+      else if(judgeMx>=100) koTag.innerHTML='<span class="add-ko-tag add-ko2">乱数KO</span>';
       else koTag.innerHTML='<span class="add-ko-tag add-ko3">KO圏外</span>';
     }
   }
@@ -1868,6 +1980,9 @@ function setupEvents(){
     const elem=el(id); if(elem) elem.addEventListener('input',recalcDef);
   });
   el('def-nature')?.addEventListener('change',recalcDef);
+  ['def-stealth-rock','def-spikes'].forEach(id=>{
+    const elem=el(id); if(elem) elem.addEventListener('change',updateDefHazardInfo);
+  });
 }
 
 // ===== 初期化 =====
@@ -1883,6 +1998,7 @@ window.onload = async()=>{
   setupMoveSearch('atk2-move-search','atk2-move-drop');
   initSeasonFilter();
   setupEvents();
+  updateDefHazardInfo();
 };
 </script>
 <script>
