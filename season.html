@@ -143,6 +143,10 @@ td{padding:7px 10px;white-space:nowrap;}
 .detail-moves-table td{padding:8px;border-bottom:1px solid var(--border);vertical-align:top;white-space:normal;}
 .detail-moves-table tr:hover td{background:rgba(0,200,240,0.04);}
 .detail-empty{padding:18px;text-align:center;color:var(--text2);font-size:12px;}
+.detail-abilities{display:grid;gap:8px;}
+.detail-ability-item{background:var(--bg);border:1px solid var(--border);padding:10px 12px;}
+.detail-ability-name{font-weight:700;color:var(--accent);font-size:13px;margin-bottom:4px;}
+.detail-ability-effect{font-size:11px;line-height:1.7;color:var(--text2);}
 @media(max-width:900px){.detail-body{grid-template-columns:1fr;}.detail-summary-grid{grid-template-columns:repeat(4,minmax(0,1fr));}.detail-tools input{max-width:none;}.detail-modal{max-height:calc(100vh - 16px);} }
 @media(max-width:640px){.detail-head{padding:14px;}.detail-title{font-size:20px;}.detail-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr));}.detail-body{padding:12px;}.detail-moves-table{min-width:620px;}}
 footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18px 20px;margin-top:36px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
@@ -236,6 +240,10 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
           <div class="detail-type-wrap" id="detail-types"></div>
         </div>
         <div class="detail-card">
+          <div class="detail-card-title">特性</div>
+          <div class="detail-abilities" id="detail-abilities"></div>
+        </div>
+        <div class="detail-card">
           <div class="detail-card-title">使用可能シーズン</div>
           <div class="detail-season-tags" id="detail-seasons"></div>
         </div>
@@ -272,6 +280,8 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 var POKE_DATA = [];
 var POKE_BY_NAME = {};
 var POKE_MOVES_BY_NAME = {};
+var ABILITIES_BY_NAME = {};
+var ABILITY_EFFECTS_BY_NAME = {};
 var SEASON_DATA = {seasons:[]};
 let currentSeason = '';
 let sortKey = 'no';
@@ -402,6 +412,18 @@ function normalizePokemonMovesData(raw) {
   return {};
 }
 
+function normalizeAbilitiesData(raw) {
+  return raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+}
+
+function normalizeAbilityEffectsData(raw) {
+  if(!Array.isArray(raw)) return {};
+  return raw.reduce((acc, item) => {
+    if(item && item.name) acc[item.name] = item;
+    return acc;
+  }, {});
+}
+
 function openPokemonDetail(name) {
   const pokemon = POKE_BY_NAME[name];
   if(!pokemon) return;
@@ -421,6 +443,11 @@ function openPokemonDetail(name) {
   ].map(item => `<div class="detail-summary-item"><b>${escapeHtml(item.value)}</b><span>${escapeHtml(item.label)}</span></div>`).join('');
 
   document.getElementById('detail-types').innerHTML = [pokemon.type1, pokemon.type2].filter(Boolean).map(type => `<span class="tp tp-${type}">${escapeHtml(type)}</span>`).join('') || '<span class="detail-season-tag">タイプ未登録</span>' ;
+  const abilities = Array.isArray(ABILITIES_BY_NAME[name]) ? ABILITIES_BY_NAME[name] : [];
+  document.getElementById('detail-abilities').innerHTML = abilities.length ? abilities.map(ability => {
+    const effect = ABILITY_EFFECTS_BY_NAME[ability] && ABILITY_EFFECTS_BY_NAME[ability].effect ? ABILITY_EFFECTS_BY_NAME[ability].effect : '';
+    return `<div class="detail-ability-item"><div class="detail-ability-name">${escapeHtml(ability)}</div><div class="detail-ability-effect">${escapeHtml(effect || '効果説明なし')}</div></div>`;
+  }).join('') : '<div class="detail-empty">特性データがありません</div>';
   document.getElementById('detail-seasons').innerHTML = seasons.length ? seasons.map(s => `<span class="detail-season-tag">${escapeHtml(s)}</span>`).join('') : '<span class="detail-season-tag">対象シーズンなし</span>';
 
   const stats = [
@@ -477,10 +504,12 @@ document.querySelector('thead th').classList.add('sort-asc');
 window.onload = async () => {
   await initAuth();
   try {
-    const [pd, sd, md] = await Promise.all([
+    const [pd, sd, md, ad, aed] = await Promise.all([
       fetch('pokemon.json?v='+Date.now()).then(r=>r.json()),
       fetch('season.json?v='+Date.now()).then(r=>r.json()).catch(()=>({seasons:[]})),
       fetch('pokemon_moves.json?v='+Date.now()).then(r=>r.ok ? r.json() : null).catch(()=>null),
+      fetch('abilities.json?v='+Date.now()).then(r=>r.ok ? r.json() : {}).catch(()=>({})),
+      fetch('abilities_data.json?v='+Date.now()).then(r=>r.ok ? r.json() : []).catch(()=>[]),
     ]);
     POKE_DATA = Array.isArray(pd) ? pd : [];
     POKE_DATA.forEach(p => {
@@ -489,6 +518,8 @@ window.onload = async () => {
     });
     SEASON_DATA = sd || {seasons:[]};
     POKE_MOVES_BY_NAME = normalizePokemonMovesData(md);
+    ABILITIES_BY_NAME = normalizeAbilitiesData(ad);
+    ABILITY_EFFECTS_BY_NAME = normalizeAbilityEffectsData(aed);
   } catch(e) {
     console.error('データ読み込みエラー:', e);
     alert('データの読み込みに失敗しました。');
