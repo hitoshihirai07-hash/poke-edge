@@ -662,6 +662,7 @@ function generateJSON(type) {
       const powerKey = data.headers.find(h => h === '威力') || '';
       const accuracyKey = data.headers.find(h => h === '命中') || '';
       const ppKey = data.headers.find(h => h === '技の回数' || h === 'PP') || '';
+      const hitsKey = data.headers.find(h => h === '技のヒット数' || h === 'ヒット数' || h === 'hits') || '';
       const descKey = data.headers.find(h => h === '技の説明' || h === '説明') || '';
       const updatedKey = data.headers.find(h => h === '更新日' || h === 'updatedAt') || '';
       const missing = [];
@@ -690,6 +691,7 @@ function generateJSON(type) {
           power: normalizeMoveCell(r[powerKey]),
           accuracy: normalizeMoveCell(r[accuracyKey]),
           pp: normalizeMoveCell(r[ppKey]),
+          hits: normalizeMoveCell(r[hitsKey]),
           description: (r[descKey]||'').trim(),
         });
         if(!grouped[pokemonName].updatedAt && updatedKey) grouped[pokemonName].updatedAt = (r[updatedKey]||'').trim();
@@ -701,7 +703,7 @@ function generateJSON(type) {
         moveRowCount,
         pokemon: grouped,
       };
-      log.innerHTML = `<span class="ok">✅ ${json.pokemonCount}件のポケモン別技データを生成しました（技行数: ${moveRowCount}件）</span>`;
+      log.innerHTML = `<span class="ok">✅ ${json.pokemonCount}件のポケモン別技データを生成しました（技行数: ${moveRowCount}件 / ヒット数対応）</span>`;
     }
 
     else if(type==='season') {

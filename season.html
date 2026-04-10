@@ -249,11 +249,11 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
           <div class="detail-card-title">技一覧</div>
           <div class="detail-tools">
             <div class="detail-meta-line" id="detail-move-meta"></div>
-            <input type="text" id="detail-move-search" placeholder="技名・タイプ・説明で絞り込み">
+            <input type="text" id="detail-move-search" placeholder="技名・タイプ・ヒット数・説明で絞り込み">
           </div>
           <div class="detail-moves-wrap">
             <table class="detail-moves-table">
-              <thead><tr><th>技</th><th>タイプ</th><th>分類</th><th>威力</th><th>命中</th><th>回数</th><th>説明</th></tr></thead>
+              <thead><tr><th>技</th><th>タイプ</th><th>分類</th><th>威力</th><th>命中</th><th>PP</th><th>ヒット数</th><th>説明</th></tr></thead>
               <tbody id="detail-moves-body"></tbody>
             </table>
           </div>
@@ -448,10 +448,10 @@ function renderDetailMoves() {
   const detail = POKE_MOVES_BY_NAME[currentDetailName] || { moves: [] };
   const moves = Array.isArray(detail.moves) ? detail.moves : [];
   const filtered = !query ? moves : moves.filter(m => {
-    return [m.name, m.type, m.category, m.description].filter(Boolean).join(' ').includes(query);
+    return [m.name, m.type, m.category, m.pp, m.hits, m.description].filter(Boolean).join(' ').includes(query);
   });
   if(!filtered.length) {
-    body.innerHTML = `<tr><td colspan="7" class="detail-empty">${moves.length ? '条件に合う技がありません' : '技データがありません'}</td></tr>`;
+    body.innerHTML = `<tr><td colspan="8" class="detail-empty">${moves.length ? '条件に合う技がありません' : '技データがありません'}</td></tr>`;
     return;
   }
   body.innerHTML = filtered.map(m => `<tr>
@@ -461,6 +461,7 @@ function renderDetailMoves() {
     <td>${escapeHtml(m.power || '—')}</td>
     <td>${escapeHtml(m.accuracy || '—')}</td>
     <td>${escapeHtml(m.pp || '—')}</td>
+    <td>${escapeHtml(m.hits || '—')}</td>
     <td>${escapeHtml(m.description || '—')}</td>
   </tr>`).join('');
 }
