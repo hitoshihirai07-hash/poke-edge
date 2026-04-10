@@ -106,6 +106,45 @@ td{padding:7px 10px;white-space:nowrap;}
 .tp-いわ{background:#4e342e;color:#fff;}.tp-ゴースト{background:#4a148c;color:#fff;}.tp-ドラゴン{background:#4527a0;color:#fff;}
 .tp-あく{background:#212121;color:#fff;}.tp-はがね{background:#455a64;color:#fff;}.tp-フェアリー{background:#880e4f;color:#fff;}
 .empty{text-align:center;padding:60px;color:var(--text2);font-size:13px;}
+.td-name{font-weight:700;}
+.name-open-btn{background:none;border:none;color:var(--text);font:inherit;font-weight:700;cursor:pointer;padding:0;text-align:left;}
+.name-open-btn:hover{color:var(--accent);}
+.detail-hint{font-size:11px;color:var(--text2);}
+.detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.72);display:none;align-items:center;justify-content:center;z-index:160;padding:14px;}
+.detail-overlay.show{display:flex;}
+.detail-modal{width:min(1120px,100%);max-height:calc(100vh - 28px);background:var(--panel);border:1px solid var(--border2);box-shadow:0 24px 60px rgba(0,0,0,0.35);display:flex;flex-direction:column;overflow:hidden;}
+.detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:16px 18px;border-bottom:1px solid var(--border);background:rgba(0,200,240,0.04);}
+.detail-title{font-size:24px;font-weight:700;line-height:1.2;}
+.detail-sub{margin-top:6px;color:var(--text2);font-size:12px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.detail-close{background:transparent;border:1px solid var(--border);color:var(--text2);padding:6px 12px;font-size:12px;cursor:pointer;}
+.detail-close:hover{border-color:var(--accent);color:var(--accent);}
+.detail-body{padding:16px;overflow:auto;display:grid;grid-template-columns:320px minmax(0,1fr);gap:16px;}
+.detail-side,.detail-main{display:flex;flex-direction:column;gap:12px;}
+.detail-card{background:var(--bg2);border:1px solid var(--border);padding:14px;}
+.detail-card-title{font-size:10px;color:var(--text2);letter-spacing:2px;margin-bottom:10px;}
+.detail-summary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+.detail-summary-item{background:var(--bg);border:1px solid var(--border);padding:10px 12px;}
+.detail-summary-item b{display:block;font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--accent);letter-spacing:1px;}
+.detail-summary-item span{display:block;font-size:10px;color:var(--text2);letter-spacing:1px;}
+.detail-season-tags,.detail-type-wrap{display:flex;gap:6px;flex-wrap:wrap;}
+.detail-season-tag{display:inline-block;padding:3px 8px;border:1px solid var(--border);font-size:10px;color:var(--text2);}
+.detail-stats{display:grid;gap:8px;}
+.detail-stat-row{display:grid;grid-template-columns:44px 34px 1fr;gap:8px;align-items:center;font-size:11px;}
+.detail-stat-row b{font-family:'JetBrains Mono',monospace;color:var(--text);text-align:right;}
+.detail-stat-bar{height:6px;background:var(--bg);border-radius:999px;overflow:hidden;}
+.detail-stat-bar span{display:block;height:100%;border-radius:999px;}
+.detail-tools{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px;}
+.detail-tools input{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:7px 10px;font-family:'Noto Sans JP',sans-serif;font-size:12px;outline:none;min-width:220px;max-width:320px;width:100%;}
+.detail-tools input:focus{border-color:var(--accent);}
+.detail-meta-line{font-size:11px;color:var(--text2);}
+.detail-moves-wrap{overflow:auto;border:1px solid var(--border);}
+.detail-moves-table{width:100%;border-collapse:collapse;font-size:12px;min-width:720px;}
+.detail-moves-table th{position:sticky;top:0;background:var(--bg);color:var(--text2);padding:8px;border-bottom:1px solid var(--border);text-align:left;font-size:10px;letter-spacing:1px;font-weight:400;}
+.detail-moves-table td{padding:8px;border-bottom:1px solid var(--border);vertical-align:top;white-space:normal;}
+.detail-moves-table tr:hover td{background:rgba(0,200,240,0.04);}
+.detail-empty{padding:18px;text-align:center;color:var(--text2);font-size:12px;}
+@media(max-width:900px){.detail-body{grid-template-columns:1fr;}.detail-summary-grid{grid-template-columns:repeat(4,minmax(0,1fr));}.detail-tools input{max-width:none;}.detail-modal{max-height:calc(100vh - 16px);} }
+@media(max-width:640px){.detail-head{padding:14px;}.detail-title{font-size:20px;}.detail-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr));}.detail-body{padding:12px;}.detail-moves-table{min-width:620px;}}
 footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18px 20px;margin-top:36px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
 .footer-logo{font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--text2);letter-spacing:4px;}
 
@@ -151,6 +190,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
   <div class="stats-bar">
     <div class="stat-item"><b id="stat-total">0</b>件表示</div>
     <div class="stat-item"><b id="stat-nintei">0</b>件使用可能</div>
+    <div class="detail-hint">名前クリックで詳細表示</div>
   </div>
 
   <!-- テーブル -->
@@ -176,6 +216,53 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
   </div>
 </div>
 
+<div class="detail-overlay" id="detail-overlay">
+  <div class="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-name">
+    <div class="detail-head">
+      <div>
+        <div class="detail-title" id="detail-name">ポケモン詳細</div>
+        <div class="detail-sub" id="detail-sub"></div>
+      </div>
+      <button class="detail-close" type="button" id="detail-close">閉じる</button>
+    </div>
+    <div class="detail-body">
+      <div class="detail-side">
+        <div class="detail-card">
+          <div class="detail-card-title">基本情報</div>
+          <div class="detail-summary-grid" id="detail-summary"></div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-card-title">タイプ</div>
+          <div class="detail-type-wrap" id="detail-types"></div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-card-title">使用可能シーズン</div>
+          <div class="detail-season-tags" id="detail-seasons"></div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-card-title">種族値</div>
+          <div class="detail-stats" id="detail-stats"></div>
+        </div>
+      </div>
+      <div class="detail-main">
+        <div class="detail-card">
+          <div class="detail-card-title">技一覧</div>
+          <div class="detail-tools">
+            <div class="detail-meta-line" id="detail-move-meta"></div>
+            <input type="text" id="detail-move-search" placeholder="技名・タイプ・説明で絞り込み">
+          </div>
+          <div class="detail-moves-wrap">
+            <table class="detail-moves-table">
+              <thead><tr><th>技</th><th>タイプ</th><th>分類</th><th>威力</th><th>命中</th><th>回数</th><th>説明</th></tr></thead>
+              <tbody id="detail-moves-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <footer>
   <div class="footer-logo">PokeEdge</div>
   <div style="font-size:10px;"><a href="policy.html" style="color:var(--text2);text-decoration:none;">プライバシーポリシー / 利用規約</a></div>
@@ -183,18 +270,25 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 
 <script>
 var POKE_DATA = [];
-
-// 合計を追加
-POKE_DATA.forEach(p => { p.total = (p.hp||0)+(p.atk||0)+(p.def||0)+(p.spa||0)+(p.spd||0)+(p.spe||0); });
-
+var POKE_BY_NAME = {};
+var POKE_MOVES_BY_NAME = {};
+var SEASON_DATA = {seasons:[]};
 let currentSeason = '';
 let sortKey = 'no';
-let sortDir = 1; // 1=昇順, -1=降順
+let sortDir = 1;
+let currentDetailName = '';
 
 const STAT_MAX = {hp:255,atk:190,def:250,spa:194,spd:250,spe:200,total:1125};
 const STAT_COLORS = {hp:'#e53935',atk:'#fb8c00',def:'#fdd835',spa:'#1e88e5',spd:'#00acc1',spe:'#8e24aa',total:'var(--accent3)'};
 
-var SEASON_DATA = {seasons:[]};
+function escapeHtml(value) {
+  return String(value == null ? '' : value)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
 
 function isNintei(name) {
   return SEASON_DATA.seasons.some(s => (SEASON_DATA[s]||[]).includes(name));
@@ -202,6 +296,9 @@ function isNintei(name) {
 function inSeason(name, season) {
   if(!season) return true;
   return (SEASON_DATA[season]||[]).includes(name);
+}
+function seasonsForName(name) {
+  return SEASON_DATA.seasons.filter(s => (SEASON_DATA[s]||[]).includes(name));
 }
 
 function setSeason(btn, season) {
@@ -214,14 +311,23 @@ function setSeason(btn, season) {
 function sortBy(key) {
   if(sortKey === key) { sortDir *= -1; }
   else { sortKey = key; sortDir = 1; }
-  // ヘッダーのクラス更新
   document.querySelectorAll('thead th').forEach(th => {
     th.classList.remove('sort-asc','sort-desc');
-    if(th.getAttribute('onclick') === `sortBy('${key}')`) {
-      th.classList.add(sortDir===1?'sort-asc':'sort-desc');
-    }
+    if(th.getAttribute('onclick') === `sortBy('${key}')`) th.classList.add(sortDir===1 ? 'sort-asc' : 'sort-desc');
   });
   render();
+}
+
+function statCellHtml(p, key) {
+  const val = p[key]||0;
+  const pct = Math.min(100, Math.round(val / STAT_MAX[key] * 100));
+  const color = STAT_COLORS[key]||'var(--text)';
+  return `<td class="td-stat">
+    <div class="stat-bar-wrap">
+      <span style="min-width:28px;text-align:right;">${val}</span>
+      <div class="stat-bar-bg"><div class="stat-bar-fg" style="width:${pct}%;background:${color};"></div></div>
+    </div>
+  </td>`;
 }
 
 function render() {
@@ -232,7 +338,6 @@ function render() {
     return true;
   });
 
-  // ソート
   filtered.sort((a,b) => {
     let va = sortKey==='no' ? parseInt(a.no)||0 : (a[sortKey]||0);
     let vb = sortKey==='no' ? parseInt(b.no)||0 : (b[sortKey]||0);
@@ -240,10 +345,9 @@ function render() {
     return sortDir * (va - vb);
   });
 
-  // 統計更新
   const totalNintei = POKE_DATA.filter(p => isNintei(p.name)).length;
-  document.getElementById('stat-total').textContent   = filtered.length;
-  document.getElementById('stat-nintei').textContent  = totalNintei;
+  document.getElementById('stat-total').textContent = filtered.length;
+  document.getElementById('stat-nintei').textContent = totalNintei;
 
   if(!filtered.length) {
     document.getElementById('poke-tbody').innerHTML = '<tr><td colspan="11" class="empty">該当するポケモンがいません</td></tr>';
@@ -252,32 +356,19 @@ function render() {
 
   const rows = filtered.map(p => {
     const nintei = isNintei(p.name);
-    const t1 = p.type1 ? `<span class="tp tp-${p.type1}">${p.type1}</span>` : '';
-    const t2 = p.type2 ? `<span class="tp tp-${p.type2}">${p.type2}</span>` : '';
+    const t1 = p.type1 ? `<span class="tp tp-${p.type1}">${escapeHtml(p.type1)}</span>` : '';
+    const t2 = p.type2 ? `<span class="tp tp-${p.type2}">${escapeHtml(p.type2)}</span>` : '';
     const badge = nintei ? '<span class="badge-ok">✓</span>' : '';
-
-    function statCell(key) {
-      const val = p[key]||0;
-      const pct = Math.min(100, Math.round(val / STAT_MAX[key] * 100));
-      const color = STAT_COLORS[key]||'var(--text)';
-      return `<td class="td-stat">
-        <div class="stat-bar-wrap">
-          <span style="min-width:28px;text-align:right;">${val}</span>
-          <div class="stat-bar-bg"><div class="stat-bar-fg" style="width:${pct}%;background:${color};"></div></div>
-        </div>
-      </td>`;
-    }
-
     return `<tr class="${nintei?'is-nintei':''}">
       <td class="td-no">#${String(p.no||'').padStart(4,'0')}</td>
-      <td class="td-name">${p.name}</td>
+      <td class="td-name"><button class="name-open-btn js-open-detail" type="button" data-name="${escapeHtml(p.name)}">${escapeHtml(p.name)}</button></td>
       <td>${t1}${t2}</td>
-      ${statCell('hp')}
-      ${statCell('atk')}
-      ${statCell('def')}
-      ${statCell('spa')}
-      ${statCell('spd')}
-      ${statCell('spe')}
+      ${statCellHtml(p,'hp')}
+      ${statCellHtml(p,'atk')}
+      ${statCellHtml(p,'def')}
+      ${statCellHtml(p,'spa')}
+      ${statCellHtml(p,'spd')}
+      ${statCellHtml(p,'spe')}
       <td class="td-total">${p.total}</td>
       <td class="td-badge">${badge}</td>
     </tr>`;
@@ -299,19 +390,104 @@ function buildSeasonBtns() {
   });
 }
 
+function normalizePokemonMovesData(raw) {
+  if(!raw) return {};
+  if(raw.pokemon && typeof raw.pokemon === 'object') return raw.pokemon;
+  if(Array.isArray(raw)) {
+    return raw.reduce((acc, item) => {
+      if(item && item.name) acc[item.name] = item;
+      return acc;
+    }, {});
+  }
+  return {};
+}
+
+function openPokemonDetail(name) {
+  const pokemon = POKE_BY_NAME[name];
+  if(!pokemon) return;
+  currentDetailName = name;
+  const detail = POKE_MOVES_BY_NAME[name] || { moves: [], updatedAt: '' };
+  const seasons = seasonsForName(name);
+  const moveCount = Array.isArray(detail.moves) ? detail.moves.length : 0;
+
+  document.getElementById('detail-name').textContent = name;
+  document.getElementById('detail-sub').innerHTML = `No.${escapeHtml(pokemon.no || '—')} / 合計 ${escapeHtml(pokemon.total || 0)} / 技 ${escapeHtml(moveCount)}`;
+
+  document.getElementById('detail-summary').innerHTML = [
+    {label:'No', value:pokemon.no || '—'},
+    {label:'合計', value:pokemon.total || 0},
+    {label:'重さ', value:(pokemon.weight || 0) ? `${pokemon.weight}` : '—'},
+    {label:'技数', value:moveCount}
+  ].map(item => `<div class="detail-summary-item"><b>${escapeHtml(item.value)}</b><span>${escapeHtml(item.label)}</span></div>`).join('');
+
+  document.getElementById('detail-types').innerHTML = [pokemon.type1, pokemon.type2].filter(Boolean).map(type => `<span class="tp tp-${type}">${escapeHtml(type)}</span>`).join('') || '<span class="detail-season-tag">タイプ未登録</span>' ;
+  document.getElementById('detail-seasons').innerHTML = seasons.length ? seasons.map(s => `<span class="detail-season-tag">${escapeHtml(s)}</span>`).join('') : '<span class="detail-season-tag">対象シーズンなし</span>';
+
+  const stats = [
+    ['HP','hp'], ['攻撃','atk'], ['防御','def'], ['特攻','spa'], ['特防','spd'], ['素早','spe']
+  ];
+  document.getElementById('detail-stats').innerHTML = stats.map(([label,key]) => {
+    const val = pokemon[key] || 0;
+    const pct = Math.min(100, Math.round(val / STAT_MAX[key] * 100));
+    const color = STAT_COLORS[key] || 'var(--accent)';
+    return `<div class="detail-stat-row"><span>${label}</span><b>${val}</b><div class="detail-stat-bar"><span style="width:${pct}%;background:${color};"></span></div></div>`;
+  }).join('');
+
+  const updatedAt = detail.updatedAt ? ` / 更新: ${detail.updatedAt}` : '';
+  document.getElementById('detail-move-meta').textContent = moveCount ? `${moveCount}件の技${updatedAt}` : `技データ未登録${updatedAt}`;
+  document.getElementById('detail-move-search').value = '';
+  renderDetailMoves();
+
+  document.getElementById('detail-overlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function renderDetailMoves() {
+  const body = document.getElementById('detail-moves-body');
+  const query = (document.getElementById('detail-move-search').value || '').trim();
+  const detail = POKE_MOVES_BY_NAME[currentDetailName] || { moves: [] };
+  const moves = Array.isArray(detail.moves) ? detail.moves : [];
+  const filtered = !query ? moves : moves.filter(m => {
+    return [m.name, m.type, m.category, m.description].filter(Boolean).join(' ').includes(query);
+  });
+  if(!filtered.length) {
+    body.innerHTML = `<tr><td colspan="7" class="detail-empty">${moves.length ? '条件に合う技がありません' : '技データがありません'}</td></tr>`;
+    return;
+  }
+  body.innerHTML = filtered.map(m => `<tr>
+    <td>${escapeHtml(m.name || '—')}</td>
+    <td>${m.type ? `<span class="tp tp-${m.type}">${escapeHtml(m.type)}</span>` : '—'}</td>
+    <td>${escapeHtml(m.category || '—')}</td>
+    <td>${escapeHtml(m.power || '—')}</td>
+    <td>${escapeHtml(m.accuracy || '—')}</td>
+    <td>${escapeHtml(m.pp || '—')}</td>
+    <td>${escapeHtml(m.description || '—')}</td>
+  </tr>`).join('');
+}
+
+function closePokemonDetail() {
+  document.getElementById('detail-overlay').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
 // 初期ソートクラスをNoに設定
 document.querySelector('thead th').classList.add('sort-asc');
 
 window.onload = async () => {
   await initAuth();
   try {
-    const [pd, sd] = await Promise.all([
+    const [pd, sd, md] = await Promise.all([
       fetch('pokemon.json?v='+Date.now()).then(r=>r.json()),
       fetch('season.json?v='+Date.now()).then(r=>r.json()).catch(()=>({seasons:[]})),
+      fetch('pokemon_moves.json?v='+Date.now()).then(r=>r.ok ? r.json() : null).catch(()=>null),
     ]);
-    POKE_DATA.push(...pd);
-    POKE_DATA.forEach(p => { p.total=(p.hp||0)+(p.atk||0)+(p.def||0)+(p.spa||0)+(p.spd||0)+(p.spe||0); });
-    SEASON_DATA = sd;
+    POKE_DATA = Array.isArray(pd) ? pd : [];
+    POKE_DATA.forEach(p => {
+      p.total = (p.hp||0)+(p.atk||0)+(p.def||0)+(p.spa||0)+(p.spd||0)+(p.spe||0);
+      POKE_BY_NAME[p.name] = p;
+    });
+    SEASON_DATA = sd || {seasons:[]};
+    POKE_MOVES_BY_NAME = normalizePokemonMovesData(md);
   } catch(e) {
     console.error('データ読み込みエラー:', e);
     alert('データの読み込みに失敗しました。');
@@ -319,6 +495,26 @@ window.onload = async () => {
   buildSeasonBtns();
   render();
 };
+
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('.js-open-detail');
+  if(btn) {
+    openPokemonDetail(btn.dataset.name || '');
+    return;
+  }
+  const overlay = document.getElementById('detail-overlay');
+  if(overlay && e.target === overlay) closePokemonDetail();
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  const closeBtn = document.getElementById('detail-close');
+  const moveSearch = document.getElementById('detail-move-search');
+  if(closeBtn) closeBtn.addEventListener('click', closePokemonDetail);
+  if(moveSearch) moveSearch.addEventListener('input', renderDetailMoves);
+  document.addEventListener('keydown', function(ev) {
+    if(ev.key === 'Escape') closePokemonDetail();
+  });
+});
 </script>
 
 <script>

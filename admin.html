@@ -39,7 +39,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(7,9,15,0.96);backdrop-f
 .main{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:24px 16px;}
 
 /* ステータス */
-.status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+.status-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:20px;}
 @media(max-width:900px){.status-grid{grid-template-columns:1fr;}}
 .status-card{background:var(--panel);border:1px solid var(--border);padding:16px;text-align:center;}
 .status-val{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--accent);}
@@ -192,6 +192,11 @@ input[type=file]{display:none;}
       <div class="status-lbl">belongings.json（道具数）</div>
       <div class="status-date" id="s-belongings-d">未取得</div>
     </div>
+    <div class="status-card">
+      <div class="status-val" id="s-pmove">—</div>
+      <div class="status-lbl">pokemon_moves.json（ポケモン数）</div>
+      <div class="status-date" id="s-pmove-d">未取得</div>
+    </div>
   </div>
   <div style="text-align:right;margin-bottom:20px;">
     <button class="btn btn-gen" onclick="checkStatus()" style="font-size:13px;padding:8px 18px;">🔍 現在のJSON状態を確認</button>
@@ -269,6 +274,44 @@ input[type=file]{display:none;}
       <button class="btn btn-dl"  id="btn-move-dl"  onclick="downloadJSON('move')" disabled>💾 moves.json ダウンロード</button>
     </div>
     <div class="log" id="log-move">CSVを読み込んでください</div>
+  </div>
+
+  <!-- pokemon_moves.csv → pokemon_moves.json -->
+  <div class="section">
+    <div class="sec-title">ポケモン別技データ更新</div>
+    <div class="sec-file">pokemon_moves.csv → pokemon_moves.json</div>
+    <div class="sec-cols">
+      必須カラム：<span>ポケモン名</span>・<span>技名前</span><br>
+      <span style="font-size:10px;color:var(--text3);">任意カラム：No・タイプ・分類・威力・命中・技の回数・技の説明・更新日</span>
+    </div>
+    <div class="steps">
+      <div class="step"><span class="step-n">1</span><span>pokemon_moves.csv をドロップ or クリックして選択</span></div>
+      <div class="step"><span class="step-n">2</span><span>プレビューを確認して「JSON生成」をクリック</span></div>
+      <div class="step"><span class="step-n">3</span><span>ダウンロードした pokemon_moves.json をCloudflare Pagesにアップロード</span></div>
+    </div>
+    <div class="drop-zone" id="dz-pmove" onclick="document.getElementById('f-pmove').click()"
+      ondragover="onDragOver(event,'dz-pmove')" ondragleave="onDragLeave('dz-pmove')" ondrop="onDrop(event,'pmove')">
+      <div class="drop-icon">🧠</div>
+      <div class="drop-text">pokemon_moves.csv をここにドロップ</div>
+      <div class="drop-sub">またはクリックしてファイルを選択</div>
+    </div>
+    <input type="file" id="f-pmove" accept=".csv" onchange="loadFile(event,'pmove')">
+    <div class="preview" id="prev-pmove">
+      <div class="preview-head">
+        <div class="prev-stat"><div class="prev-val" id="prev-pmove-n">0</div><div class="prev-lbl">件数</div></div>
+        <div class="prev-stat"><div class="prev-val" id="prev-pmove-c">0</div><div class="prev-lbl">カラム数</div></div>
+        <div class="prev-stat" style="flex:1;text-align:left;padding-left:16px;">
+          <div class="prev-lbl" style="margin-bottom:4px;">カラム名</div>
+          <div id="prev-pmove-cols" style="font-size:10px;color:var(--text3);"></div>
+        </div>
+      </div>
+      <table class="preview-table" id="prev-pmove-table"><thead></thead><tbody></tbody></table>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gen" id="btn-pmove-gen" onclick="generateJSON('pmove')" disabled>⚡ JSON生成</button>
+      <button class="btn btn-dl"  id="btn-pmove-dl"  onclick="downloadJSON('pmove')" disabled>💾 pokemon_moves.json ダウンロード</button>
+    </div>
+    <div class="log" id="log-pmove">CSVを読み込んでください</div>
   </div>
 
   <!-- 特性CSVについて -->
@@ -462,6 +505,7 @@ input[type=file]{display:none;}
 const state = {
   poke:   { csv: null, json: null },
   move:   { csv: null, json: null },
+  pmove:  { csv: null, json: null },
   ab:     { csv: null, json: null },
   season:  { csv: null, json: null },
   ab_data: { csv: null, json: null },
@@ -497,6 +541,17 @@ function splitCSVLine(line) {
   }
   result.push(cur);
   return result;
+}
+
+function normalizeMoveCell(value) {
+  const raw = (value==null ? '' : String(value)).trim();
+  if(!raw || raw.toLowerCase() === 'nan') return '';
+  if(raw === '-') return '-';
+  if(/^-?\d+(?:\.0+)?$/.test(raw)) {
+    const num = Number(raw);
+    if(!Number.isNaN(num)) return num === 0 ? '' : String(num);
+  }
+  return raw;
 }
 
 // ===== ドロップ =====
@@ -598,6 +653,57 @@ function generateJSON(type) {
       log.innerHTML = `<span class="ok">✅ ${json.length}件の技データを生成しました（カテゴリ: ${cats.join('・')}）</span>`;
     }
 
+    else if(type==='pmove') {
+      const pokemonKey = data.headers.find(h => h === 'ポケモン名' || h === '名前') || '';
+      const moveNameKey = data.headers.find(h => h === '技名前' || h === '技名') || '';
+      const noKey = data.headers.find(h => h === 'No' || h === 'no') || '';
+      const typeKey = data.headers.find(h => h === 'タイプ') || '';
+      const categoryKey = data.headers.find(h => h === '分類') || '';
+      const powerKey = data.headers.find(h => h === '威力') || '';
+      const accuracyKey = data.headers.find(h => h === '命中') || '';
+      const ppKey = data.headers.find(h => h === '技の回数' || h === 'PP') || '';
+      const descKey = data.headers.find(h => h === '技の説明' || h === '説明') || '';
+      const updatedKey = data.headers.find(h => h === '更新日' || h === 'updatedAt') || '';
+      const missing = [];
+      if(!pokemonKey) missing.push('ポケモン名');
+      if(!moveNameKey) missing.push('技名前');
+      if(missing.length) { log.innerHTML=`<span class="err">❌ 必須カラムが不足: ${missing.join(', ')}</span>`; return; }
+
+      const grouped = {};
+      let moveRowCount = 0;
+      data.rows.forEach(r => {
+        const pokemonName = (r[pokemonKey]||'').trim();
+        const moveName = (r[moveNameKey]||'').trim();
+        if(!pokemonName || !moveName) return;
+        if(!grouped[pokemonName]) {
+          grouped[pokemonName] = {
+            no: (r[noKey]||'').trim(),
+            name: pokemonName,
+            updatedAt: (r[updatedKey]||'').trim(),
+            moves: [],
+          };
+        }
+        grouped[pokemonName].moves.push({
+          name: moveName,
+          type: (r[typeKey]||'').trim(),
+          category: (r[categoryKey]||'').trim(),
+          power: normalizeMoveCell(r[powerKey]),
+          accuracy: normalizeMoveCell(r[accuracyKey]),
+          pp: normalizeMoveCell(r[ppKey]),
+          description: (r[descKey]||'').trim(),
+        });
+        if(!grouped[pokemonName].updatedAt && updatedKey) grouped[pokemonName].updatedAt = (r[updatedKey]||'').trim();
+        moveRowCount++;
+      });
+
+      json = {
+        pokemonCount: Object.keys(grouped).length,
+        moveRowCount,
+        pokemon: grouped,
+      };
+      log.innerHTML = `<span class="ok">✅ ${json.pokemonCount}件のポケモン別技データを生成しました（技行数: ${moveRowCount}件）</span>`;
+    }
+
     else if(type==='season') {
       const skip = new Set(['No','名前','タイプ1','タイプ2']);
       const seasonCols = data.headers.filter(h => !skip.has(h));
@@ -666,7 +772,7 @@ function generateJSON(type) {
 function downloadJSON(type) {
   const json = state[type].json;
   if(!json) return;
-  const names = { poke:'pokemon', move:'moves', ab:'abilities', season:'season', ab_data:'abilities_data', belongings:'belongings' };
+  const names = { poke:'pokemon', move:'moves', pmove:'pokemon_moves', ab:'abilities', season:'season', ab_data:'abilities_data', belongings:'belongings' };
   const filename = names[type]+'.json';
   const blob = new Blob([JSON.stringify(json, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
@@ -683,13 +789,14 @@ async function checkStatus() {
     {key:'poke', file:'pokemon.json', valId:'s-poke', dateId:'s-poke-d'},
     {key:'move', file:'moves.json',   valId:'s-move', dateId:'s-move-d'},
     {key:'belongings', file:'belongings.json', valId:'s-belongings', dateId:'s-belongings-d'},
+    {key:'pmove', file:'pokemon_moves.json', valId:'s-pmove', dateId:'s-pmove-d', getCount(data){ return data && data.pokemonCount ? data.pokemonCount : Object.keys((data && data.pokemon) || {}).length; }},
   ];
   for(const f of files) {
     try {
       const res = await fetch(f.file+'?v='+Date.now());
       if(!res.ok) throw new Error(res.status);
       const data = await res.json();
-      const count = Array.isArray(data) ? data.length : Object.keys(data).length;
+      const count = typeof f.getCount === 'function' ? f.getCount(data) : (Array.isArray(data) ? data.length : Object.keys(data).length);
       document.getElementById(f.valId).textContent = count.toLocaleString();
       document.getElementById(f.dateId).textContent = '取得成功';
     } catch(e) {
