@@ -371,16 +371,15 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
   <div class="header-sep"></div>
   <div class="header-sub">パーティ管理</div>
   <div class="header-nav" id="main-nav">
-    <a class="nav-btn" href="index.html">トップ</a>
+    <a class="nav-btn" href="index.html">TOP</a>
     <a class="nav-btn" href="calc.html">ダメージ計算</a>
     <a class="nav-btn" href="move.html">技選択判定</a>
     <a class="nav-btn active" href="party.html">パーティ管理</a>
     <a class="nav-btn" href="pokemon.html">ポケモン登録</a>
-    <a class="nav-btn" href="items.html">アイテム</a>
-    <a class="nav-btn" href="stats.html">選出率記録</a>
-    <a class="nav-btn" href="scope.html">バトルアナライザー</a>
-    <a class="nav-btn" href="season.html">使用可能ポケモン</a>
-    <a class="nav-btn" href="speed.html">素早さライン</a>
+    <a class="nav-btn" href="stats.html">選出率</a>
+    <a class="nav-btn" href="scope.html">アナライザー</a>
+    <a class="nav-btn" href="season.html">使用可能</a>
+    <a class="nav-btn" href="speed.html">素早さ</a>
     <a class="nav-btn" href="blog.html">記事</a>
     <a class="nav-btn" href="policy.html">サイト情報</a>
   </div>
@@ -403,6 +402,7 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
       <a href="pokemon.html" style="margin-left:auto;padding:6px 14px;border:1px solid var(--accent);color:var(--accent);font-size:11px;text-decoration:none;letter-spacing:1px;transition:all 0.18s;" onmouseover="this.style.background='rgba(0,200,240,0.07)'" onmouseout="this.style.background='transparent'">＋ ポケモンを登録</a>
       <button class="party-save-btn" onclick="savePartyLocal()">💾 保存</button>
       <button class="party-action-btn" onclick="showSavedParties()">📂 読込</button>
+      <button class="party-action-btn primary" onclick="exportPartyImage()">📷 構築画像を保存</button>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;">
@@ -1875,6 +1875,278 @@ if(urlParty){
 }
 
 
+
+
+function exportPartyImage() {
+  pe_save();
+  if(!party.length) {
+    alert('パーティにポケモンを追加してください');
+    return;
+  }
+
+  const title = 'PokeEdge PARTY';
+  const canvas = document.createElement('canvas');
+  const width = 1400;
+  const cardCols = 2;
+  const cardW = 620;
+  const cardH = 300;
+  const gapX = 40;
+  const gapY = 34;
+  const marginX = 60;
+  const startY = 190;
+  const rows = 3;
+  const footerH = 72;
+  const height = startY + rows * cardH + (rows - 1) * gapY + footerH;
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+
+  const bgGrad = ctx.createLinearGradient(0, 0, width, height);
+  bgGrad.addColorStop(0, '#08111f');
+  bgGrad.addColorStop(1, '#0b1830');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, width, height);
+
+  drawGlow(ctx, 180, 120, 280, 'rgba(0,200,240,0.12)');
+  drawGlow(ctx, width - 180, height - 220, 320, 'rgba(255,48,96,0.10)');
+
+  ctx.strokeStyle = 'rgba(0,200,240,0.08)';
+  ctx.lineWidth = 1;
+  for(let x=0; x<width; x+=52){
+    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,height); ctx.stroke();
+  }
+  for(let y=0; y<height; y+=52){
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(width,y); ctx.stroke();
+  }
+
+  ctx.fillStyle = '#00c8f0';
+  ctx.font = "700 52px 'Noto Sans JP', sans-serif";
+  ctx.fillText(title, marginX, 78);
+  ctx.fillStyle = '#d8e8ff';
+  ctx.font = "400 22px 'Noto Sans JP', sans-serif";
+  ctx.fillText('パーティ管理で作成した構築を1枚にまとめた投稿用画像', marginX, 116);
+  ctx.fillStyle = '#7a90b0';
+  ctx.font = "400 18px 'Noto Sans JP', sans-serif";
+  ctx.fillText(`${party.filter(Boolean).length}匹編成`, marginX, 148);
+
+  for(let i=0; i<6; i++) {
+    const col = i % cardCols;
+    const row = Math.floor(i / cardCols);
+    const x = marginX + col * (cardW + gapX);
+    const y = startY + row * (cardH + gapY);
+    drawPartyCard(ctx, x, y, cardW, cardH, party[i], i);
+  }
+
+  ctx.fillStyle = 'rgba(216,232,255,0.75)';
+  ctx.font = "400 18px 'Noto Sans JP', sans-serif";
+  ctx.fillText('https://poke-edge.pages.dev/', marginX, height - 28);
+  ctx.textAlign = 'right';
+  ctx.fillText('PokeEdge', width - marginX, height - 28);
+  ctx.textAlign = 'left';
+
+  const link = document.createElement('a');
+  const date = new Date();
+  const ymd = `${date.getFullYear()}${String(date.getMonth()+1).padStart(2,'0')}${String(date.getDate()).padStart(2,'0')}`;
+  link.download = `pokeedge-party-${ymd}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+function drawPartyCard(ctx, x, y, w, h, member, idx) {
+  roundRect(ctx, x, y, w, h, 26, 'rgba(15,20,35,0.96)', 'rgba(36,51,86,1)', 2);
+
+  ctx.fillStyle = 'rgba(0,200,240,0.16)';
+  roundRect(ctx, x + 18, y + 16, 56, 40, 16, 'rgba(0,200,240,0.16)', null, 0);
+  ctx.fillStyle = '#00c8f0';
+  ctx.font = "700 24px 'Noto Sans JP', sans-serif";
+  ctx.fillText(`#${idx + 1}`, x + 32, y + 44);
+
+  if(!member) {
+    ctx.fillStyle = '#7a90b0';
+    ctx.font = "700 30px 'Noto Sans JP', sans-serif";
+    ctx.fillText('空きスロット', x + 110, y + 48);
+    ctx.font = "400 18px 'Noto Sans JP', sans-serif";
+    ctx.fillStyle = '#4a6080';
+    ctx.fillText('パーティにポケモンを追加すると画像に反映されます', x + 32, y + 108);
+    ctx.setLineDash([10,8]);
+    ctx.strokeStyle = 'rgba(74,96,128,0.55)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x + 32, y + 130, w - 64, h - 170);
+    ctx.setLineDash([]);
+    return;
+  }
+
+  const p = member.poke || {};
+  const name = (p.name || 'ポケモン').toString();
+  drawFitText(ctx, name, x + 110, y + 48, w - 250, 34, 22, '#d8e8ff');
+
+  const typeY = y + 78;
+  let pillX = x + 110;
+  if(p.type1) pillX = drawTypePill(ctx, pillX, typeY, p.type1) + 8;
+  if(p.type2) drawTypePill(ctx, pillX, typeY, p.type2);
+
+  const meta = [`Lv${member.lv || 50}`, member.nature || '—', member.item || '持ち物なし'];
+  ctx.fillStyle = '#a9c0de';
+  ctx.font = "400 18px 'Noto Sans JP', sans-serif";
+  ctx.fillText(meta.join(' / '), x + 32, y + 122);
+
+  ctx.fillStyle = '#7a90b0';
+  ctx.font = "400 16px 'Noto Sans JP', sans-serif";
+  ctx.fillText(`努力値 ${formatEvSummary(member.ev)}`, x + 32, y + 152);
+  ctx.fillText(`個体値 ${member.iv ?? 31}`, x + 32, y + 178);
+
+  const stats = getMemberRealStats(member);
+  ctx.fillStyle = '#d8e8ff';
+  ctx.font = "700 17px 'Noto Sans JP', sans-serif";
+  ctx.fillText(`実数値  ${stats.hp}-${stats.atk}-${stats.def}-${stats.spa}-${stats.spd}-${stats.spe}`, x + 32, y + 208);
+
+  const moveBoxY = y + 224;
+  const moveW = (w - 80) / 2;
+  const moveH = 28;
+  const moves = Array.isArray(member.moves) ? member.moves.slice(0,4) : [];
+  for(let i=0; i<4; i++) {
+    const col = i % 2;
+    const row = Math.floor(i / 2);
+    const mx = x + 32 + col * (moveW + 16);
+    const my = moveBoxY + row * (moveH + 10);
+    drawMoveRow(ctx, mx, my, moveW, moveH, moves[i]);
+  }
+
+  const memo = (member.memo || '').trim();
+  if(memo) {
+    const memoY = y + h - 42;
+    ctx.fillStyle = '#7a90b0';
+    ctx.font = "400 15px 'Noto Sans JP', sans-serif";
+    const lines = wrapCanvasText(ctx, `メモ: ${memo}`, w - 64);
+    for(let i=0; i<Math.min(lines.length, 2); i++) {
+      ctx.fillText(lines[i], x + 32, memoY + i * 18);
+    }
+  }
+}
+
+function getMemberRealStats(member) {
+  const p = member.poke || {};
+  const lv = parseInt(member.lv) || 50;
+  const iv = parseInt(member.iv) || 31;
+  const ev = member.ev || {};
+  const nat = PERSONALITIES[member.nature] || {atk:1, def:1, spa:1, spd:1, spe:1};
+  return {
+    hp:  calcHP(parseInt(p.hp)  || 0, iv, parseInt(ev.hp)  || 0, lv),
+    atk: calcStat(parseInt(p.atk) || 0, iv, parseInt(ev.atk) || 0, lv, nat.atk || 1),
+    def: calcStat(parseInt(p.def) || 0, iv, parseInt(ev.def) || 0, lv, nat.def || 1),
+    spa: calcStat(parseInt(p.spa) || 0, iv, parseInt(ev.spa) || 0, lv, nat.spa || 1),
+    spd: calcStat(parseInt(p.spd) || 0, iv, parseInt(ev.spd) || 0, lv, nat.spd || 1),
+    spe: calcStat(parseInt(p.spe) || 0, iv, parseInt(ev.spe) || 0, lv, nat.spe || 1)
+  };
+}
+
+function formatEvSummary(ev) {
+  const map = [['hp','H'],['atk','A'],['def','B'],['spa','C'],['spd','D'],['spe','S']];
+  const parts = map
+    .map(([k,label]) => [label, parseInt((ev||{})[k]) || 0])
+    .filter(([,v]) => v > 0)
+    .map(([label,v]) => `${label}${v}`);
+  return parts.length ? parts.join(' / ') : '無振り';
+}
+
+function drawMoveRow(ctx, x, y, w, h, move) {
+  roundRect(ctx, x, y, w, h, 12, 'rgba(8,17,31,0.75)', 'rgba(36,51,86,0.9)', 1.5);
+  if(!move) {
+    ctx.fillStyle = '#4a6080';
+    ctx.font = "400 15px 'Noto Sans JP', sans-serif";
+    ctx.fillText('未設定', x + 12, y + 19);
+    return;
+  }
+  const pillRight = drawTypePill(ctx, x + w - 84, y + 6, move.type || '—', 70, 18, 13);
+  ctx.fillStyle = '#d8e8ff';
+  ctx.font = "400 15px 'Noto Sans JP', sans-serif";
+  const text = truncateToWidth(ctx, move.name || '技', w - 108);
+  ctx.fillText(text, x + 12, y + 19);
+}
+
+function drawTypePill(ctx, x, y, type, fixedW, h, fontSize) {
+  const color = TYPE_COLORS[type] || '#51637e';
+  const width = fixedW || Math.max(56, ctx.measureText(String(type)).width + 28);
+  const height = h || 22;
+  roundRect(ctx, x, y, width, height, 11, color, null, 0);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = `700 ${fontSize || 14}px 'Noto Sans JP', sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(String(type), x + width / 2, y + height / 2 + 0.5);
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+  return x + width;
+}
+
+function roundRect(ctx, x, y, w, h, r, fill, stroke, lineWidth) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+  if(fill) { ctx.fillStyle = fill; ctx.fill(); }
+  if(stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lineWidth || 1; ctx.stroke(); }
+}
+
+function drawGlow(ctx, x, y, radius, color) {
+  const g = ctx.createRadialGradient(x, y, 0, x, y, radius);
+  g.addColorStop(0, color);
+  g.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawFitText(ctx, text, x, y, maxWidth, startFont, minFont, color) {
+  let size = startFont;
+  while(size > minFont) {
+    ctx.font = `700 ${size}px 'Noto Sans JP', sans-serif`;
+    if(ctx.measureText(text).width <= maxWidth) break;
+    size -= 1;
+  }
+  ctx.fillStyle = color;
+  ctx.fillText(text, x, y);
+}
+
+function wrapCanvasText(ctx, text, maxWidth) {
+  const chars = String(text).split('');
+  const lines = [];
+  let line = '';
+  chars.forEach(ch => {
+    const test = line + ch;
+    if(ctx.measureText(test).width > maxWidth && line) {
+      lines.push(line);
+      line = ch;
+    } else {
+      line = test;
+    }
+  });
+  if(line) lines.push(line);
+  return lines;
+}
+
+function truncateToWidth(ctx, text, maxWidth) {
+  let out = String(text || '');
+  if(ctx.measureText(out).width <= maxWidth) return out;
+  while(out.length > 1 && ctx.measureText(out + '…').width > maxWidth) {
+    out = out.slice(0, -1);
+  }
+  return out + '…';
+}
+
+const TYPE_COLORS = {
+  'ノーマル':'#919AA2','ほのお':'#FF9741','みず':'#3692DC','でんき':'#FBD100','くさ':'#38BF4B','こおり':'#4CD1C0',
+  'かくとう':'#E0306A','どく':'#B567CE','じめん':'#E87236','ひこう':'#89AAE3','エスパー':'#FF6675','むし':'#83C300',
+  'いわ':'#C8B686','ゴースト':'#4C6AB2','ドラゴン':'#006FC9','あく':'#5B5466','はがね':'#5A8EA2','フェアリー':'#FB89EB',
+  '炎':'#FF9741','水':'#3692DC','電気':'#FBD100','草':'#38BF4B','氷':'#4CD1C0','格闘':'#E0306A','毒':'#B567CE',
+  '地面':'#E87236','飛行':'#89AAE3','岩':'#C8B686','悪':'#5B5466','鋼':'#5A8EA2'
+};
+
+window.exportPartyImage = exportPartyImage;
 
 document.addEventListener('DOMContentLoaded',()=>{ renderRegPokeList(); renderPartySlotList(); });
 };
