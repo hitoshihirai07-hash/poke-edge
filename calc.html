@@ -493,6 +493,17 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
         </div>
 
         <div class="corr-section" style="margin-top:8px;">
+          <div class="corr-section-title">攻撃側 残HP（きしかいせい / じたばた用）</div>
+          <div class="slider-row">
+            <div class="slider-header"><span class="slider-label">残HP%</span><span class="slider-val" id="atk-current-hp-pct-disp">100</span></div>
+            <div class="slider-inputs">
+              <input type="range" id="atk-current-hp-pct-range" min="0" max="100" step="0.1" value="100">
+              <input type="number" id="atk-current-hp-pct" min="0" max="100" step="0.1" value="100">
+            </div>
+          </div>
+        </div>
+
+        <div class="corr-section" style="margin-top:8px;">
           <div class="corr-section-title">攻撃ランク補正</div>
           <div style="display:flex;align-items:center;gap:8px;">
             <span style="font-size:10px;color:var(--text2);flex-shrink:0;">ランク</span>
@@ -670,6 +681,15 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
           </div>
         </div>
 
+        <label>努力値（こうげき・イカサマ用）</label>
+        <div class="slider-row">
+          <div class="slider-header"><span class="slider-label">努力値</span><span class="slider-val" id="def-ev-atk-disp">0</span></div>
+          <div class="slider-inputs">
+            <input type="range" id="def-ev-atk-range" min="0" max="252" step="4" value="0">
+            <input type="number" id="def-ev-atk" min="0" max="252" value="0">
+          </div>
+        </div>
+
         <label>努力値（ぼうぎょ）</label>
         <div class="slider-row">
           <div class="slider-header"><span class="slider-label">努力値</span><span class="slider-val" id="def-ev-def-disp">0</span></div>
@@ -695,6 +715,11 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
             <span class="real-stat-note"></span>
           </div>
           <div class="real-stat-row">
+            <span class="real-stat-label">こうげき</span>
+            <span class="real-stat-val" id="def-stat-atk">—</span>
+            <span class="real-stat-note">イカサマで参照</span>
+          </div>
+          <div class="real-stat-row">
             <span class="real-stat-label">ぼうぎょ</span>
             <span class="real-stat-val" id="def-stat-def">—</span>
             <span class="real-stat-note">物理技で参照</span>
@@ -707,13 +732,20 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
         </div>
 
         <div class="corr-section" style="margin-top:8px;">
-          <div class="corr-section-title">防御ランク補正</div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span style="font-size:10px;color:var(--text2);flex-shrink:0;">ランク</span>
+          <div class="corr-section-title">防御側 ランク補正</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <span style="font-size:10px;color:var(--text2);flex-shrink:0;">防御/特防</span>
             <input type="range" id="def-rank" min="-6" max="6" value="0" step="1"
               style="flex:1;accent-color:var(--accent2);"
               oninput="document.getElementById('def-rank-disp').textContent=this.value<0?this.value:this.value>0?'+'+this.value:'±0'">
             <span id="def-rank-disp" style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent2);width:28px;text-align:right;">±0</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:10px;color:var(--text2);flex-shrink:0;">攻撃（イカサマ）</span>
+            <input type="range" id="def-atk-rank" min="-6" max="6" value="0" step="1"
+              style="flex:1;accent-color:var(--accent2);"
+              oninput="document.getElementById('def-atk-rank-disp').textContent=this.value<0?this.value:this.value>0?'+'+this.value:'±0'">
+            <span id="def-atk-rank-disp" style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent2);width:28px;text-align:right;">±0</span>
           </div>
         </div>
 
@@ -1122,6 +1154,39 @@ function parseHits(raw) {
   }
   const n=parseInt(s)||1; return {min:n,max:n};
 }
+function clampNumber(v,min,max){
+  const n=Number(v);
+  if(!Number.isFinite(n)) return min;
+  return Math.max(min, Math.min(max, n));
+}
+function getLowHpMovePower(hpPct){
+  const pct=clampNumber(hpPct,0,100);
+  const ratio=Math.floor(64 * pct / 100);
+  if(ratio<=1) return 200;
+  if(ratio<=5) return 150;
+  if(ratio<=12) return 100;
+  if(ratio<=21) return 80;
+  if(ratio<=42) return 40;
+  return 20;
+}
+function getAuraModifier(moveType, atkAbilityName='', defAbilityName=''){
+  const fairyAura = atkAbilityName==='フェアリーオーラ' || defAbilityName==='フェアリーオーラ';
+  const darkAura = atkAbilityName==='ダークオーラ' || defAbilityName==='ダークオーラ';
+  const auraBreak = atkAbilityName==='オーラブレイク' || defAbilityName==='オーラブレイク';
+  if(moveType==='フェアリー' && fairyAura){
+    return {mult:auraBreak ? (3072/4096) : (5448/4096), info:auraBreak ? 'フェアリーオーラ→オーラブレイクで×0.75' : 'フェアリーオーラ×1.33'};
+  }
+  if(moveType==='あく' && darkAura){
+    return {mult:auraBreak ? (3072/4096) : (5448/4096), info:auraBreak ? 'ダークオーラ→オーラブレイクで×0.75' : 'ダークオーラ×1.33'};
+  }
+  return {mult:1, info:''};
+}
+function getEffectiveAtkTypes(base, abilityName, moveType, moveName=''){
+  if(['へんげんじざい','リベロ'].includes(abilityName) && moveType && moveName!=='わるあがき'){
+    return [moveType];
+  }
+  return base ? [base.type1, base.type2].filter(Boolean) : [];
+}
 
 const PARENTAL_BOND_SPREAD_MOVES = new Set([
   'じしん','じならし','なみのり','だくりゅう','ねっぷう','ふんか','しおふき','いわなだれ','こごえるかぜ','マジカルシャイン',
@@ -1285,7 +1350,7 @@ function onAtkModeChange() {
 }
 function onDefModeChange() {
   const champ=isDefChampions(), max=champ?32:252, step=champ?1:4;
-  ['def-ev-hp','def-ev-def','def-ev-spd'].forEach(id=>{
+  ['def-ev-hp','def-ev-atk','def-ev-def','def-ev-spd'].forEach(id=>{
     const r=el(id+'-range'), n=el(id);
     if(r){r.max=max;r.step=step;if(parseInt(r.value)>max)r.value=0;}
     if(n){n.max=max;if(parseInt(n.value)>max)n.value=0;}
@@ -1351,15 +1416,18 @@ function recalcDef() {
   const lv=parseInt(el('def-lv').value)||50;
   const iv=parseInt(el('def-iv').value)||31;
   const evH=parseInt(el('def-ev-hp').value)||0;
+  const evA=parseInt(el('def-ev-atk').value)||0;
   const evD=parseInt(el('def-ev-def').value)||0;
   const evS=parseInt(el('def-ev-spd').value)||0;
   const nat=PERSONALITIES[el('def-nature').value]||PERSONALITIES['がんばりや'];
   const champ=isDefChampions();
   const hpVal=calcHP(p.hp,iv,evH,lv,champ);
+  const atkVal=calcStat(p.atk,iv,evA,lv,nat.atk||1,champ);
   const defVal=calcStat(p.def,iv,evD,lv,nat.def||1,champ);
   const spdVal=calcStat(p.spd,iv,evS,lv,nat.spd||1,champ);
-  window._defStats={hp:hpVal,def:defVal,spd:spdVal};
+  window._defStats={hp:hpVal,atk:atkVal,def:defVal,spd:spdVal};
   if(el('def-stat-hp'))  el('def-stat-hp').textContent=hpVal;
+  if(el('def-stat-atk')) el('def-stat-atk').textContent=atkVal;
   if(el('def-stat-def')) el('def-stat-def').textContent=defVal;
   if(el('def-stat-spd')) el('def-stat-spd').textContent=spdVal;
   updateDefHazardInfo();
@@ -1476,6 +1544,8 @@ function calcDamage() {
   let skinInfo='';
   let specialMoveInfo='';
   let abilityExtraInfo='';
+  const isFoulPlay = moveName==='イカサマ' && mcat==='物理';
+  const isLowHpMove = moveName==='きしかいせい' || moveName==='じたばた';
 
   // おはかまいり: 基本威力50 + 倒された味方の数 × 50
   if(moveName==='おはかまいり') {
@@ -1509,6 +1579,11 @@ function calcDamage() {
     power=getWeightPower(moveName,atkW,defW);
     weightInfo='体重依存: '+defW+'kg → 威力'+power;
     if(!power){alert('体重依存技の計算に失敗しました');return;}
+  }
+  if(isLowHpMove) {
+    const hpPct=clampNumber(el('atk-current-hp-pct')?.value||100,0,100);
+    power=getLowHpMovePower(hpPct);
+    specialMoveInfo=(moveName+': 残HP'+hpPct+'% → 威力'+power);
   }
   if(!power){alert('この技はダメージ技ではありません（変化技）');return;}
 
@@ -1545,7 +1620,11 @@ function calcDamage() {
   }
 
   const lv=parseInt(el('atk-lv').value)||50;
-  const atkStat=mcat==='物理'?window._atkStats.atk:window._atkStats.spa;
+  let atkStat=mcat==='物理'?window._atkStats.atk:window._atkStats.spa;
+  if(isFoulPlay){
+    atkStat=window._defStats.atk||atkStat;
+    specialMoveInfo = [specialMoveInfo, 'イカサマ: 相手のこうげきを参照'].filter(Boolean).join(' / ');
+  }
   let defStat=mcat==='物理'?window._defStats.def:window._defStats.spd;
   const hp=window._defStats.hp;
   const hazardInfo=getHazardInfo(window._defBase,window._defStats);
@@ -1564,7 +1643,10 @@ function calcDamage() {
     weatherDefLabel=' [砂嵐:いわ特防×1.5]';
   }
   const eff=getTypeEff(mtype,defTypes);
-  const atkTypes=window._atkBase?[window._atkBase.type1,window._atkBase.type2].filter(Boolean):[];
+  const atkTypes=getEffectiveAtkTypes(window._atkBase, atkAbNamePre, mtype, moveName);
+  if(['へんげんじざい','リベロ'].includes(atkAbNamePre) && mtype && moveName!=='わるあがき'){
+    abilityExtraInfo = [abilityExtraInfo, atkAbNamePre+'→'+mtype+'タイプ化'].filter(Boolean).join(' / ');
+  }
   const stab=atkTypes.includes(mtype)?1.5:1;
   const stabLabel=stab>1?' STAB×1.5':'';
 
@@ -1596,6 +1678,11 @@ function calcDamage() {
   if(atkOther==='1.33_inazuma'&&mtype==='でんき') powerMult*=1.33;
   if(atkOther==='1.3_grass'&&mtype==='くさ') powerMult*=1.3;
   if(atkOther==='1.3_psycho'&&mtype==='エスパー') powerMult*=1.3;
+  const aura = getAuraModifier(mtype, atkAbNamePre, el('def-ability')?.value||'');
+  if(aura.mult!==1){
+    powerMult*=aura.mult;
+    abilityExtraInfo = [abilityExtraInfo, aura.info].filter(Boolean).join(' / ');
+  }
 
   let atkStatMult=1;
   if(['もらいび','もうか','げきりゅう','しんりょく','むしのしらせ'].includes(atkAbName)){
@@ -1616,7 +1703,7 @@ function calcDamage() {
     const fainted=Math.min(5, Math.max(0, parseInt(el('atk-fainted')?.value||'0')||0));
     const supremeMult=1 + 0.1 * fainted;
     dmgMult*=supremeMult;
-    abilityExtraInfo='そうだいしょう: 倒れた味方'+fainted+'体→×'+supremeMult.toFixed(1);
+    abilityExtraInfo=[abilityExtraInfo,'そうだいしょう: 倒れた味方'+fainted+'体→×'+supremeMult.toFixed(1)].filter(Boolean).join(' / ');
   }
   if(atkBurn==='0.5'&&mcat==='物理') dmgMult*=0.5;
 
@@ -1659,7 +1746,8 @@ function calcDamage() {
 
   // ランク
   const RANK=[2/8,2/7,2/6,2/5,2/4,2/3,1,3/2,4/2,5/2,6/2,7/2,8/2];
-  const atkRank=RANK[(parseInt(el('atk-rank').value)||0)+6];
+  const atkRankVal = isFoulPlay ? (parseInt(el('def-atk-rank').value)||0) : (parseInt(el('atk-rank').value)||0);
+  const atkRank=RANK[atkRankVal+6];
   const defRank=RANK[(parseInt(el('def-rank').value)||0)+6];
   const effAtk=Math.floor(atkStat*atkStatMult*atkRank);
   const effDef=Math.floor(defStat*defStatMult*defRank);
@@ -1926,13 +2014,22 @@ function calcAddDamage(){
   }
 }
 function calcOneDamage(atkSt,atkBase,defSt,defBase,lv,mtype,mcat,hits,power,itemKey,moveName='',abilityName=''){
-  const atkStat=mcat==='物理'?atkSt.atk:atkSt.spa;
+  const hitsInfo=parseHits(hits);
+  const isFoulPlay = moveName==='イカサマ' && mcat==='物理';
+  const isLowHpMove = moveName==='きしかいせい' || moveName==='じたばた';
+  if(isLowHpMove){
+    const hpPct=clampNumber(el('atk-current-hp-pct')?.value||100,0,100);
+    power=getLowHpMovePower(hpPct);
+  }
+  let atkStat=mcat==='物理'?atkSt.atk:atkSt.spa;
+  if(isFoulPlay){ atkStat=defSt.atk||atkStat; }
   const defStat=mcat==='物理'?defSt.def:defSt.spd;
   const defTypes=defBase?[defBase.type1,defBase.type2].filter(Boolean):[];
   const eff=getTypeEff(mtype,defTypes);
-  const atkTypes=atkBase?[atkBase.type1,atkBase.type2].filter(Boolean):[];
+  const atkTypes=getEffectiveAtkTypes(atkBase, abilityName, mtype, moveName);
   const stab=atkTypes.includes(mtype)?1.5:1;
-  const hitsInfo=parseHits(hits);
+  const aura = getAuraModifier(mtype, abilityName, el('def-ability')?.value||'');
+  let hitsPower=Math.max(1, Math.floor((power||0) * aura.mult));
   let itemMult=1;
   if(itemKey==='hachimaki'&&mcat==='物理') itemMult=1.5;
   else if(itemKey==='megane'&&mcat==='特殊') itemMult=1.5;
@@ -1944,10 +2041,10 @@ function calcOneDamage(atkSt,atkBase,defSt,defBase,lv,mtype,mcat,hits,power,item
     abilityDmgMult*=1 + 0.1 * fainted;
   }
 
-  const firstHit = calcBaseDamageRolls(lv, power, atkStat, defStat, stab, eff, itemMult, abilityDmgMult, 1);
+  const firstHit = calcBaseDamageRolls(lv, hitsPower, atkStat, defStat, stab, eff, itemMult, abilityDmgMult, 1);
   const parentalBondActive = abilityName==='おやこあい' && !isParentalBondBlocked(moveName, hitsInfo);
   if(parentalBondActive){
-    const secondPower = Math.max(1, Math.floor((power||0) * 0.25));
+    const secondPower = Math.max(1, Math.floor(hitsPower * 0.25));
     const secondHit = calcBaseDamageRolls(lv, secondPower, atkStat, defStat, stab, eff, itemMult, abilityDmgMult, 1);
     return {
       mn:(firstHit.mn + secondHit.mn) * hitsInfo.min,
@@ -1956,6 +2053,7 @@ function calcOneDamage(atkSt,atkBase,defSt,defBase,lv,mtype,mcat,hits,power,item
   }
   return {mn:firstHit.mn*hitsInfo.min,mx:firstHit.mx*hitsInfo.max};
 }
+
 function getTypeColor(type){
   const map={
     'ノーマル':'#9e9e9e','ほのお':'#c62828','炎':'#c62828','みず':'#1565c0','水':'#1565c0','でんき':'#f9a825','電気':'#f9a825',
@@ -2280,8 +2378,10 @@ function setupEvents(){
   [['atk-iv-range','atk-iv','atk-iv-disp'],
    ['atk-ev-atk-range','atk-ev-atk','atk-ev-atk-disp'],
    ['atk-ev-spa-range','atk-ev-spa','atk-ev-spa-disp'],
+   ['atk-current-hp-pct-range','atk-current-hp-pct','atk-current-hp-pct-disp'],
    ['def-iv-range','def-iv','def-iv-disp'],
    ['def-ev-hp-range','def-ev-hp','def-ev-hp-disp'],
+   ['def-ev-atk-range','def-ev-atk','def-ev-atk-disp'],
    ['def-ev-def-range','def-ev-def','def-ev-def-disp'],
    ['def-ev-spd-range','def-ev-spd','def-ev-spd-disp']].forEach(([r,n,d])=>{
     const rangeEl=el(r), numEl=el(n);
@@ -2294,7 +2394,7 @@ function setupEvents(){
   });
   el('atk-nature')?.addEventListener('change',recalcAtk);
   // 防御側再計算トリガー
-  ['def-lv','def-iv','def-iv-range','def-ev-hp','def-ev-hp-range','def-ev-def','def-ev-def-range','def-ev-spd','def-ev-spd-range'].forEach(id=>{
+  ['def-lv','def-iv','def-iv-range','def-ev-hp','def-ev-hp-range','def-ev-atk','def-ev-atk-range','def-ev-def','def-ev-def-range','def-ev-spd','def-ev-spd-range'].forEach(id=>{
     const elem=el(id); if(elem) elem.addEventListener('input',recalcDef);
   });
   el('def-nature')?.addEventListener('change',recalcDef);
