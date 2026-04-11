@@ -1228,6 +1228,27 @@ function renderBaseStats(side,p) {
 
 // ===== 特性バッジ =====
 function getAbilityByName(name){ return ABILITIES_DATA.find(a=>a.name===name)||null; }
+const ABILITY_MOVE_LIST_CACHE={};
+function getAbilityMoveNameSet(abilityName){
+  if(ABILITY_MOVE_LIST_CACHE[abilityName]) return ABILITY_MOVE_LIST_CACHE[abilityName];
+  const ab=getAbilityByName(abilityName);
+  const set=new Set();
+  if(ab&&ab.effect){
+    for(const match of ab.effect.matchAll(/『([^』]+)』/g)){
+      const token=(match[1]||'').trim();
+      if(!token) continue;
+      if(token.includes('タイプ')) continue;
+      if(['ひんし','すなあらし'].includes(token)) continue;
+      set.add(token);
+    }
+  }
+  ABILITY_MOVE_LIST_CACHE[abilityName]=set;
+  return set;
+}
+function abilityHasListedMove(abilityName,moveName){
+  if(!abilityName||!moveName) return false;
+  return getAbilityMoveNameSet(abilityName).has(moveName);
+}
 function renderAbilityBadges(side,pokeName) {
   const abs=ABILITY_MAP[pokeName]||[], el2=el(side+'-abilities');
   if(!el2) return;
@@ -1482,7 +1503,7 @@ function calcDamage() {
   let weightInfo='';
   let skinInfo='';
   let specialMoveInfo='';
-  let abilityExtraInfo='';
+  const abilityExtraInfo=[];
 
   // おはかまいり: 基本威力50 + 倒された味方の数 × 50
   if(moveName==='おはかまいり') {
@@ -1572,8 +1593,16 @@ function calcDamage() {
   }
   const eff=getTypeEff(mtype,defTypes);
   const atkTypes=window._atkBase?[window._atkBase.type1,window._atkBase.type2].filter(Boolean):[];
-  const stab=atkTypes.includes(mtype)?1.5:1;
-  const stabLabel=stab>1?' STAB×1.5':'';
+  if(['へんげんじざい','リベロ'].includes(atkAbNamePre)&&mtype&&!atkTypes.includes(mtype)){
+    atkTypes.push(mtype);
+    abilityExtraInfo.push(atkAbNamePre+': '+mtype+'タイプ化');
+  }
+  let stab=atkTypes.includes(mtype)?1.5:1;
+  if(stab>1&&atkAbNamePre==='てきおうりょく'){
+    stab=2.0;
+    abilityExtraInfo.push('てきおうりょく: STAB×2.0');
+  }
+  const stabLabel=stab>1?(' STAB×'+stab.toFixed(stab===Math.round(stab)?0:1)):'';
 
   // 持ち物
   const itemKey=el('atk-item').value;
@@ -1587,12 +1616,66 @@ function calcDamage() {
   else if(itemKey==='hone') itemMult=2.0;
 
   // 攻撃側補正
-  const atkAbName=el('atk-ability').value||'';
+  const atkAbName=atkAbNamePre;
   const atkAbData=getAbilityByName(atkAbName);
   const atkAlly=el('atk-ally-ability').value||'1';
   const atkOther=el('atk-other').value||'1';
   const atkBurn=el('atk-burn').value||'1';
   let powerMult=1;
+  // 特性による技・威力補正（最新対応分）
+  if(atkAbName==='てつのこぶし'&&abilityHasListedMove('てつのこぶし',moveName)){
+    powerMult*=1.2;
+    abilityExtraInfo.push('てつのこぶし: パンチ技×1.2');
+  }
+  if(atkAbName==='すてみ'&&abilityHasListedMove('すてみ',moveName)){
+    powerMult*=1.2;
+    abilityExtraInfo.push('すてみ: 対象技×1.2');
+  }
+  if(atkAbName==='がんじょうあご'&&abilityHasListedMove('がんじょうあご',moveName)){
+    powerMult*=1.5;
+    abilityExtraInfo.push('がんじょうあご: かみつき技×1.5');
+  }
+  if(atkAbName==='きれあじ'&&abilityHasListedMove('きれあじ',moveName)){
+    powerMult*=1.5;
+    abilityExtraInfo.push('きれあじ: 切る技×1.5');
+  }
+  if(atkAbName==='メガランチャー'&&abilityHasListedMove('メガランチャー',moveName)){
+    powerMult*=1.5;
+    abilityExtraInfo.push('メガランチャー: 波動技×1.5');
+  }
+  if(atkAbName==='パンクロック'&&abilityHasListedMove('パンクロック',moveName)){
+    powerMult*=1.3;
+    abilityExtraInfo.push('パンクロック: 音技×1.3');
+  }
+  if(atkAbName==='いわはこび'&&mtype==='いわ'){
+    powerMult*=1.5;
+    abilityExtraInfo.push('いわはこび: いわ技×1.5');
+  }
+  if(atkAbName==='りゅうのあぎと'&&mtype==='ドラゴン'){
+    powerMult*=1.5;
+    abilityExtraInfo.push('りゅうのあぎと: ドラゴン技×1.5');
+  }
+  if(atkAbName==='はがねつかい'&&mtype==='はがね'){
+    powerMult*=1.5;
+    abilityExtraInfo.push('はがねつかい: はがね技×1.5');
+  }
+  if(atkAbName==='トランジスタ'&&mtype==='でんき'){
+    powerMult*=1.3;
+    abilityExtraInfo.push('トランジスタ: でんき技×1.3');
+  }
+  const hasFairyAura=(atkAbName==='フェアリーオーラ'||(el('def-ability').value||'')==='フェアリーオーラ');
+  const hasDarkAura=(atkAbName==='ダークオーラ'||(el('def-ability').value||'')==='ダークオーラ');
+  const hasAuraBreak=(atkAbName==='オーラブレイク'||(el('def-ability').value||'')==='オーラブレイク');
+  if(mtype==='フェアリー'&&hasFairyAura){
+    const auraMult=hasAuraBreak?0.75:(4/3);
+    powerMult*=auraMult;
+    abilityExtraInfo.push((hasAuraBreak?'オーラブレイク':'フェアリーオーラ')+': フェアリー技×'+auraMult.toFixed(2));
+  }
+  if(mtype==='あく'&&hasDarkAura){
+    const auraMult=hasAuraBreak?0.75:(4/3);
+    powerMult*=auraMult;
+    abilityExtraInfo.push((hasAuraBreak?'オーラブレイク':'ダークオーラ')+': あく技×'+auraMult.toFixed(2));
+  }
   if(atkAbData&&atkAbData.atkPowerUp){
     const up=atkAbData.atkPowerUp;
     const typeOk=!up.type||up.type===mtype;
@@ -1611,21 +1694,27 @@ function calcDamage() {
   }
   if(['クォークチャージ','こだいかっせい'].includes(atkAbName)) atkStatMult*=1.3;
   if(['ちからもち','ヨガパワー'].includes(atkAbName)&&mcat==='物理') atkStatMult*=2;
+  if(atkAbName==='ごりむちゅう'&&mcat==='物理'){ atkStatMult*=1.5; abilityExtraInfo.push('ごりむちゅう: こうげき×1.5'); }
+  if(atkAbName==='はりきり'&&mcat==='物理'){ atkStatMult*=1.5; abilityExtraInfo.push('はりきり: こうげき×1.5'); }
+  let ignoreBurnPenalty=false;
+  if(atkAbName==='こんじょう'&&mcat==='物理'&&atkBurn==='0.5'){ atkStatMult*=1.5; ignoreBurnPenalty=true; abilityExtraInfo.push('こんじょう: こうげき×1.5 / やけど補正無視'); }
+  if(atkAbName==='サンパワー'&&mcat==='特殊'&&weather==='sunny'){ atkStatMult*=1.5; abilityExtraInfo.push('サンパワー: とくこう×1.5'); }
+  if(atkAbName==='ねつぼうそう'&&mcat==='特殊'&&atkBurn==='0.5'){ atkStatMult*=1.5; abilityExtraInfo.push('ねつぼうそう: とくこう×1.5'); }
+  if(atkAbName==='すなのちから'&&weather==='sand'&&['じめん','いわ','はがね'].includes(mtype)){ powerMult*=1.3; abilityExtraInfo.push('すなのちから: 対象タイプ技×1.3'); }
   if(atkAlly==='1.3_battery'&&mcat==='特殊') atkStatMult*=1.3;
   if(atkAlly==='1.5_steel'&&mtype==='はがね') atkStatMult*=1.5;
 
   let dmgMult=1;
   if(atkAbName==='スナイパー') dmgMult*=1.5;
-  if(atkAbName==='すてみ') dmgMult*=1.2;
   if(atkAbName==='ちからずく') dmgMult*=1.3;
   if(atkAbName==='いろめがね'&&eff<1) dmgMult*=2;
   if(atkAbName==='そうだいしょう'){
     const fainted=Math.min(5, Math.max(0, parseInt(el('atk-fainted')?.value||'0')||0));
     const supremeMult=1 + 0.1 * fainted;
     dmgMult*=supremeMult;
-    abilityExtraInfo='そうだいしょう: 倒れた味方'+fainted+'体→×'+supremeMult.toFixed(1);
+    abilityExtraInfo.push('そうだいしょう: 倒れた味方'+fainted+'体→×'+supremeMult.toFixed(1));
   }
-  if(atkBurn==='0.5'&&mcat==='物理') dmgMult*=0.5;
+  if(atkBurn==='0.5'&&mcat==='物理'&&!ignoreBurnPenalty) dmgMult*=0.5;
 
   const parentalBondBlocked = atkAbName==='おやこあい' && isParentalBondBlocked(moveName, hitsInfo, notes);
   const parentalBondActive = atkAbName==='おやこあい' && !parentalBondBlocked;
@@ -1655,6 +1744,10 @@ function calcDamage() {
     const dm=defAbData.defDmgMult;
     const arr=Array.isArray(dm)?dm:[dm];
     arr.forEach(d=>{if(!d.type||d.type===mtype) dmgMult*=d.mult;});
+  }
+  if(defAbName==='パンクロック'&&abilityHasListedMove('パンクロック',moveName)){
+    dmgMult*=0.5;
+    abilityExtraInfo.push('相手パンクロック: 音技半減');
   }
   if(defItem==='def_1.5_kiseki') defStatMult*=1.5;
   if(defItem==='def_2_metaba'&&mcat==='物理') defStatMult*=2;
@@ -1738,7 +1831,7 @@ function calcDamage() {
       : hitsInfo.min!==hitsInfo.max
         ? `${dmg1Min*hitsInfo.min} 〜 ${dmg1Max*hitsInfo.max}`
         : `${mn} 〜 ${mx}`;
-  const extraInfo = [weightInfo, skinInfo, weatherInfo, specialMoveInfo, abilityExtraInfo, parentalBondInfo].filter(Boolean).map(s=>' ('+s+')').join('');
+  const extraInfo = [weightInfo, skinInfo, weatherInfo, specialMoveInfo, abilityExtraInfo.join(' / '), parentalBondInfo].filter(Boolean).map(s=>' ('+s+')').join('');
   el('dmg-range').textContent=parentalBondActive
     ? `乱数幅 ${mn}〜${mx}（1hit目） / ${parentalSecondMn}〜${parentalSecondMx}（2hit目）  相性:×${eff}${stabLabel}${extraInfo}${weatherDefLabel}`
     : `乱数幅 ${mn}〜${mx}（1hit）  相性:×${eff}${stabLabel}${extraInfo}${weatherDefLabel}`;
