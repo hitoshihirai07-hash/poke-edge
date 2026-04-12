@@ -653,6 +653,22 @@ document.addEventListener('DOMContentLoaded',function(){
     return Array.from(new Set((arr || []).filter(Boolean)));
   }
 
+  function formatRankingDate(value) {
+    if(!value) return '';
+    const d = new Date(value);
+    if(!isNaN(d.getTime())) {
+      return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    }
+    return String(value).replace('T',' ').replace(/([+-]\d\d:\d\d)$/,'');
+  }
+
+  function inferBaseRankingNames(name) {
+    if(!name || !String(name).startsWith('メガ')) return [];
+    let base = String(name).replace(/^メガ/, '');
+    base = base.replace(/[XY]$/, '');
+    return uniq([base]);
+  }
+
   function resolveSiteNames(name) {
     if(GROUP_NAME_TO_SITE_NAMES[name]) return GROUP_NAME_TO_SITE_NAMES[name].slice();
     return [ALIAS_TO_SITE_NAME[name] || name];
@@ -670,9 +686,24 @@ document.addEventListener('DOMContentLoaded',function(){
 
   function resolveRankingRowsForName(name) {
     const lookup = resolveRankingLookupNames(name);
+    const baseLookups = inferBaseRankingNames(name);
+    function collect(sourceRows) {
+      const seen = new Set();
+      const out = [];
+      (sourceRows || []).forEach(row => {
+        const key = [row.battleType,row.rank,row.name].join('::');
+        const matchSelf = lookup.includes(row.name) || lookup.includes(row.siteName);
+        const matchBase = !matchSelf && (baseLookups.includes(row.name) || baseLookups.includes(row.siteName));
+        if((matchSelf || matchBase) && !seen.has(key)) {
+          seen.add(key);
+          out.push(Object.assign({}, row, {rankingSource: matchBase ? 'base' : 'self'}));
+        }
+      });
+      return out;
+    }
     return {
-      single: (SINGLE_RANKINGS.rows || []).filter(row => lookup.includes(row.name) || lookup.includes(row.siteName)),
-      double: (DOUBLE_RANKINGS.rows || []).filter(row => lookup.includes(row.name) || lookup.includes(row.siteName))
+      single: collect(SINGLE_RANKINGS.rows),
+      double: collect(DOUBLE_RANKINGS.rows)
     };
   }
 
@@ -822,8 +853,8 @@ document.addEventListener('DOMContentLoaded',function(){
 
     const data = currentRankingBattle === 'double' ? DOUBLE_RANKINGS : SINGLE_RANKINGS;
     const rows = rankingRowsForCurrentView();
-    const updated = data.updatedAt || '未取得';
-    meta.textContent = `${currentRankingBattle === 'double' ? 'ダブル' : 'シングル'} / 更新日 ${updated} / ${rows.length}件`;
+    const updated = formatRankingDate(data.updatedAt) || '未取得';
+    meta.textContent = `${currentRankingBattle === 'double' ? 'ダブル' : 'シングル'} / 更新日: ${updated} / ${rows.length}件`;
 
     if(!rows.length) {
       tbody.innerHTML = '<tr><td colspan="8" class="detail-empty">順位データがありません</td></tr>';
@@ -839,7 +870,7 @@ document.addEventListener('DOMContentLoaded',function(){
         <td><div class="rank-cell-block">${(row.abilities || []).map(v => `<span>${escapeHtml(v)}</span>`).join('') || '<span>—</span>'}</div></td>
         <td><div class="rank-cell-block">${(row.natures || []).map(v => `<span>${escapeHtml(v)}</span>`).join('') || '<span>—</span>'}</div></td>
         <td><div class="rank-cell-block">${(row.spreads || []).map(v => `<span>${escapeHtml(v)}</span>`).join('') || '<span>—</span>'}</div></td>
-        <td>${escapeHtml(row.updatedAt || '—')}</td>
+        <td>${escapeHtml(formatRankingDate(row.updatedAt) || '—')}</td>
       </tr>
     `).join('');
   }
@@ -858,7 +889,8 @@ document.addEventListener('DOMContentLoaded',function(){
       <div class="detail-ranking-box">
         <h5>${escapeHtml(group.title)}</h5>
         ${group.rows.map(row => `
-          <div class="detail-ranking-line"><b>${escapeHtml(row.rank)}位</b>${escapeHtml(row.name || '')}</div>
+          <div class="detail-ranking-line"><b>${escapeHtml(row.rank)}位</b>${escapeHtml(row.name || '')}${row.rankingSource === 'base' ? ' <span style="color:var(--accent3)">（元ポケモン順位）</span>' : ''}</div>
+          <div class="detail-ranking-line">更新日: ${escapeHtml(formatRankingDate(row.updatedAt) || '—')}</div>
           <div class="detail-ranking-line">技: ${escapeHtml((row.moves || []).slice(0,3).join(' / ') || '—')}</div>
           <div class="detail-ranking-line">持ち物: ${escapeHtml((row.items || []).slice(0,3).join(' / ') || '—')}</div>
           <div class="detail-ranking-line">特性: ${escapeHtml((row.abilities || []).slice(0,3).join(' / ') || '—')}</div>
@@ -972,8 +1004,8 @@ document.addEventListener('DOMContentLoaded',function(){
     const rankingUpdates = uniq(
       ctx.rankings.single.concat(ctx.rankings.double).map(row => row.updatedAt).filter(Boolean)
     );
-    const updatedAt = rankingUpdates[0] || '';
-    document.getElementById('detail-move-meta').textContent = ctx.moves.length ? `${ctx.moves.length}件の技${updatedAt ? ` / 順位更新: ${updatedAt}` : ''}` : `技データ未登録${updatedAt ? ` / 順位更新: ${updatedAt}` : ''}`;
+    const updatedAt = formatRankingDate(rankingUpdates[0] || '');
+    document.getElementById('detail-move-meta').textContent = ctx.moves.length ? `${ctx.moves.length}件の技${updatedAt ? ` / 更新日: ${updatedAt}` : ''}` : `技データ未登録${updatedAt ? ` / 更新日: ${updatedAt}` : ''}`;
     document.getElementById('detail-move-search').value = '';
     renderDetailMovesPatched();
 
