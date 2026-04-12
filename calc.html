@@ -509,6 +509,15 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
           </div>
         </div>
 
+        <label>努力値（ぼうぎょ）</label>
+        <div class="slider-row">
+          <div class="slider-header"><span class="slider-label">努力値</span><span class="slider-val" id="atk-ev-def-disp">0</span></div>
+          <div class="slider-inputs">
+            <input type="range" id="atk-ev-def-range" min="0" max="252" step="4" value="0">
+            <input type="number" id="atk-ev-def" min="0" max="252" value="0">
+          </div>
+        </div>
+
         <label>努力値（とくこう）</label>
         <div class="slider-row">
           <div class="slider-header"><span class="slider-label">努力値</span><span class="slider-val" id="atk-ev-spa-disp">0</span></div>
@@ -1685,15 +1694,20 @@ function initDefPoke(p) {
 // ===== 実数値再計算 =====
 function recalcAtk() {
   const p=window._atkBase; if(!p) return;
-  const lv=parseInt(el('atk-lv').value)||50;
-  const iv=parseInt(el('atk-iv').value)||31;
-  const evA=parseInt(el('atk-ev-atk').value)||0;
-  const evD=parseInt(el('atk-ev-def').value)||0;
-  const evS=parseInt(el('atk-ev-spa').value)||0;
-  const nat=PERSONALITIES[el('atk-nature').value]||PERSONALITIES['がんばりや'];
+  const getNum=(id,fallback=0)=>{
+    const node=el(id);
+    return node ? (parseInt(node.value)||0) : fallback;
+  };
+  const lv=getNum('atk-lv',50)||50;
+  const iv=getNum('atk-iv',31);
+  const evA=getNum('atk-ev-atk',0);
+  const evD=getNum('atk-ev-def',0);
+  const evS=getNum('atk-ev-spa',0);
+  const natureNode=el('atk-nature');
+  const nat=PERSONALITIES[natureNode?natureNode.value:'がんばりや']||PERSONALITIES['がんばりや'];
   const champ=isAtkChampions();
   const atkVal=calcStat(p.atk,iv,evA,lv,nat.atk,champ);
-  const defVal=calcStat(p.def,iv,evD,lv,nat.def,champ);
+  const defVal=calcStat(p.def,iv,evD,lv,nat.def||1,champ);
   const spaVal=calcStat(p.spa,iv,evS,lv,nat.spa,champ);
   window._atkStats={atk:atkVal,def:defVal,spa:spaVal};
   if(el('atk-stat-atk')) el('atk-stat-atk').textContent=atkVal;
