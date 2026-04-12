@@ -153,6 +153,35 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 .footer-logo{font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--text2);letter-spacing:4px;}
 
 /* ===== ライトモード ===== */
+
+/* ===== 順位確認追加 ===== */
+.view-tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+.view-tab{padding:8px 14px;border:1px solid var(--border);background:var(--panel);color:var(--text2);font-family:'Noto Sans JP',sans-serif;font-size:12px;cursor:pointer;transition:all .15s;}
+.view-tab.active,.view-tab:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,200,240,0.08);}
+.rank-panel{display:none;}
+.rank-panel.show{display:block;}
+.rank-subtabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+.rank-subtab{padding:6px 12px;border:1px solid var(--border);background:var(--panel);color:var(--text2);font-size:11px;cursor:pointer;}
+.rank-subtab.active,.rank-subtab:hover{border-color:var(--accent3);color:var(--accent3);background:rgba(255,200,0,0.08);}
+.rank-meta{font-size:11px;color:var(--text2);margin-bottom:10px;}
+.rank-wrap{overflow:auto;border:1px solid var(--border);}
+.rank-table{width:100%;border-collapse:collapse;font-size:12px;min-width:980px;}
+.rank-table th{position:sticky;top:0;background:var(--bg2);color:var(--text2);padding:8px;border-bottom:1px solid var(--border);text-align:left;font-size:10px;letter-spacing:1px;font-weight:400;}
+.rank-table td{padding:8px;border-bottom:1px solid var(--border);vertical-align:top;white-space:normal;line-height:1.7;}
+.rank-table tr:hover td{background:rgba(255,200,0,0.04);}
+.rank-cell-block{display:grid;gap:4px;}
+.rank-badge{display:inline-flex;align-items:center;justify-content:center;min-width:34px;padding:2px 8px;border:1px solid var(--border);font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--accent3);}
+.detail-note{font-size:11px;color:var(--text2);margin-top:6px;line-height:1.7;}
+.detail-ranking-grid{display:grid;gap:10px;}
+.detail-ranking-box{border:1px solid var(--border);background:var(--bg);padding:10px 12px;}
+.detail-ranking-box h5{margin:0 0 8px;font-size:12px;color:var(--accent3);letter-spacing:1px;}
+.detail-ranking-line{font-size:11px;color:var(--text);line-height:1.8;margin-bottom:4px;}
+.detail-ranking-line b{color:var(--accent);margin-right:6px;}
+.detail-form-grid{display:grid;gap:10px;}
+.detail-form-card{border:1px solid var(--border);background:var(--bg);padding:10px 12px;}
+.detail-form-card-title{font-size:12px;color:var(--accent3);margin-bottom:8px;font-weight:700;}
+@media(max-width:900px){.rank-table{min-width:820px;}}
+
 </style>
 </head>
 <body>
@@ -585,5 +614,405 @@ document.addEventListener('DOMContentLoaded',function(){
   document.querySelectorAll('.nav-btn').forEach(function(btn){btn.addEventListener('click',function(){if(window.innerWidth<=768)closeNav();});});
 });
 </script>
+
+<script>
+(function(){
+  const ALIAS_TO_SITE_NAME = {
+    'ウォッシュロトム':'ロトム水',
+    'ヒートロトム':'ロトム炎',
+    'フロストロトム':'ロトム氷',
+    'スピンロトム':'ロトム飛',
+    'カットロトム':'ロトム草',
+    'イダイトウ(オス)':'イダイトウ♂',
+    'イダイトウ(メス)':'イダイトウ♀',
+    'フラエッテ(えいえんのはな)':'フラエッテえいえん'
+  };
+  const GROUP_NAME_TO_SITE_NAMES = {
+    'ギルガルド':['ギルガルド盾','ギルガルド剣']
+  };
+  const SITE_NAME_TO_RANKING_NAMES = {
+    'ロトム水':['ウォッシュロトム'],
+    'ロトム炎':['ヒートロトム'],
+    'ロトム氷':['フロストロトム'],
+    'ロトム飛':['スピンロトム'],
+    'ロトム草':['カットロトム'],
+    'イダイトウ♂':['イダイトウ(オス)'],
+    'イダイトウ♀':['イダイトウ(メス)'],
+    'フラエッテえいえん':['フラエッテ(えいえんのはな)'],
+    'ギルガルド盾':['ギルガルド'],
+    'ギルガルド剣':['ギルガルド']
+  };
+
+  let SINGLE_RANKINGS = {rows:[], updatedAt:''};
+  let DOUBLE_RANKINGS = {rows:[], updatedAt:''};
+  let currentViewMode = 'list';
+  let currentRankingBattle = 'single';
+  let currentDetailMoves = [];
+
+  function uniq(arr) {
+    return Array.from(new Set((arr || []).filter(Boolean)));
+  }
+
+  function resolveSiteNames(name) {
+    if(GROUP_NAME_TO_SITE_NAMES[name]) return GROUP_NAME_TO_SITE_NAMES[name].slice();
+    return [ALIAS_TO_SITE_NAME[name] || name];
+  }
+
+  function resolveRankingLookupNames(name) {
+    const names = [name];
+    const siteNames = resolveSiteNames(name);
+    siteNames.forEach(siteName => {
+      names.push(siteName);
+      (SITE_NAME_TO_RANKING_NAMES[siteName] || []).forEach(n => names.push(n));
+    });
+    return uniq(names);
+  }
+
+  function resolveRankingRowsForName(name) {
+    const lookup = resolveRankingLookupNames(name);
+    return {
+      single: (SINGLE_RANKINGS.rows || []).filter(row => lookup.includes(row.name) || lookup.includes(row.siteName)),
+      double: (DOUBLE_RANKINGS.rows || []).filter(row => lookup.includes(row.name) || lookup.includes(row.siteName))
+    };
+  }
+
+  function collectDetailContext(name) {
+    const requestedName = name || '';
+    const siteNames = resolveSiteNames(requestedName).filter(n => POKE_BY_NAME[n]);
+    const fallbackName = POKE_BY_NAME[requestedName] ? requestedName : '';
+    const finalSiteNames = siteNames.length ? siteNames : (fallbackName ? [fallbackName] : []);
+    const records = finalSiteNames.map(n => POKE_BY_NAME[n]).filter(Boolean);
+    const primary = records[0] || null;
+
+    const moveMap = {};
+    finalSiteNames.forEach(siteName => {
+      const detail = POKE_MOVES_BY_NAME[siteName];
+      const moves = detail && Array.isArray(detail.moves) ? detail.moves : [];
+      moves.forEach(m => {
+        if(m && m.name && !moveMap[m.name]) moveMap[m.name] = m;
+      });
+    });
+
+    const abilityNames = uniq(finalSiteNames.flatMap(siteName => Array.isArray(ABILITIES_BY_NAME[siteName]) ? ABILITIES_BY_NAME[siteName] : []));
+    const seasons = uniq(finalSiteNames.flatMap(siteName => seasonsForName(siteName)));
+
+    return {
+      requestedName,
+      displayName: requestedName || (primary ? primary.name : ''),
+      siteNames: finalSiteNames,
+      records,
+      primary,
+      moves: Object.values(moveMap),
+      abilities: abilityNames,
+      seasons,
+      rankings: resolveRankingRowsForName(requestedName || (primary ? primary.name : '')),
+      hasMultipleForms: records.length > 1
+    };
+  }
+
+  function ensureSeasonViews() {
+    const main = document.querySelector('.main');
+    if(!main || document.getElementById('view-tabs')) return;
+
+    const filterBar = main.querySelector('.filter-bar');
+    const statsBar = main.querySelector('.stats-bar');
+    const tableWrap = main.querySelector('.table-wrap');
+    if(!filterBar || !statsBar || !tableWrap) return;
+
+    const tabs = document.createElement('div');
+    tabs.className = 'view-tabs';
+    tabs.id = 'view-tabs';
+    tabs.innerHTML = `
+      <button class="view-tab active" type="button" data-view="list">使用可能ポケモン</button>
+      <button class="view-tab" type="button" data-view="ranking">順位確認</button>
+    `;
+    filterBar.insertAdjacentElement('afterend', tabs);
+
+    const listWrap = document.createElement('div');
+    listWrap.id = 'season-list-view';
+    statsBar.parentNode.insertBefore(listWrap, statsBar);
+    listWrap.appendChild(statsBar);
+    listWrap.appendChild(tableWrap);
+
+    const rankWrap = document.createElement('div');
+    rankWrap.id = 'season-ranking-view';
+    rankWrap.className = 'rank-panel';
+    rankWrap.innerHTML = `
+      <div class="rank-subtabs">
+        <button class="rank-subtab active" type="button" data-battle="single">シングル</button>
+        <button class="rank-subtab" type="button" data-battle="double">ダブル</button>
+      </div>
+      <div class="rank-meta" id="rank-meta">順位データを読み込み中...</div>
+      <div class="rank-wrap">
+        <table class="rank-table">
+          <thead>
+            <tr>
+              <th>順位</th>
+              <th>ポケモン</th>
+              <th>技</th>
+              <th>持ち物</th>
+              <th>特性</th>
+              <th>性格</th>
+              <th>調整</th>
+              <th>更新日</th>
+            </tr>
+          </thead>
+          <tbody id="rank-tbody"></tbody>
+        </table>
+      </div>
+    `;
+    listWrap.insertAdjacentElement('afterend', rankWrap);
+
+    tabs.addEventListener('click', function(e) {
+      const btn = e.target.closest('.view-tab');
+      if(!btn) return;
+      setViewMode(btn.dataset.view || 'list');
+    });
+    rankWrap.addEventListener('click', function(e) {
+      const btn = e.target.closest('.rank-subtab');
+      if(!btn) return;
+      currentRankingBattle = btn.dataset.battle || 'single';
+      rankWrap.querySelectorAll('.rank-subtab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderRankings();
+    });
+  }
+
+  function ensureDetailRankingBox() {
+    const detailMain = document.querySelector('.detail-main');
+    if(!detailMain || document.getElementById('detail-ranking-box')) return;
+    const card = document.createElement('div');
+    card.className = 'detail-card';
+    card.id = 'detail-ranking-box';
+    card.innerHTML = `
+      <div class="detail-card-title">順位情報</div>
+      <div id="detail-ranking-summary" class="detail-ranking-grid"><div class="detail-empty">順位データがありません</div></div>
+    `;
+    detailMain.insertBefore(card, detailMain.firstElementChild);
+  }
+
+  function setViewMode(mode) {
+    currentViewMode = mode === 'ranking' ? 'ranking' : 'list';
+    const listView = document.getElementById('season-list-view');
+    const rankView = document.getElementById('season-ranking-view');
+    document.querySelectorAll('.view-tab').forEach(btn => btn.classList.toggle('active', btn.dataset.view === currentViewMode));
+    if(listView) listView.style.display = currentViewMode === 'list' ? '' : 'none';
+    if(rankView) rankView.classList.toggle('show', currentViewMode === 'ranking');
+    if(currentViewMode === 'ranking') renderRankings();
+  }
+
+  function rankingRowsForCurrentView() {
+    const source = currentRankingBattle === 'double' ? (DOUBLE_RANKINGS.rows || []) : (SINGLE_RANKINGS.rows || []);
+    const q = (document.getElementById('name-search')?.value || '').trim();
+    return source.filter(row => {
+      const siteNames = resolveSiteNames(row.name);
+      if(currentSeason && !siteNames.some(n => inSeason(n, currentSeason))) return false;
+      if(q) {
+        const hay = [row.name, row.siteName].concat(siteNames).join(' ');
+        if(!hay.includes(q)) return false;
+      }
+      return true;
+    }).sort((a,b) => (a.rank || 0) - (b.rank || 0));
+  }
+
+  function renderRankings() {
+    const tbody = document.getElementById('rank-tbody');
+    const meta = document.getElementById('rank-meta');
+    if(!tbody || !meta) return;
+
+    const data = currentRankingBattle === 'double' ? DOUBLE_RANKINGS : SINGLE_RANKINGS;
+    const rows = rankingRowsForCurrentView();
+    const updated = data.updatedAt || '未取得';
+    meta.textContent = `${currentRankingBattle === 'double' ? 'ダブル' : 'シングル'} / 更新日 ${updated} / ${rows.length}件`;
+
+    if(!rows.length) {
+      tbody.innerHTML = '<tr><td colspan="8" class="detail-empty">順位データがありません</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = rows.map(row => `
+      <tr>
+        <td><span class="rank-badge">${escapeHtml(row.rank || '—')}</span></td>
+        <td><button class="name-open-btn js-open-detail" type="button" data-name="${escapeHtml(row.name || '')}">${escapeHtml(row.name || '—')}</button></td>
+        <td><div class="rank-cell-block">${(row.moves || []).map(v => `<span>${escapeHtml(v)}</span>`).join('') || '<span>—</span>'}</div></td>
+        <td><div class="rank-cell-block">${(row.items || []).map(v => `<span>${escapeHtml(v)}</span>`).join('') || '<span>—</span>'}</div></td>
+        <td><div class="rank-cell-block">${(row.abilities || []).map(v => `<span>${escapeHtml(v)}</span>`).join('') || '<span>—</span>'}</div></td>
+        <td><div class="rank-cell-block">${(row.natures || []).map(v => `<span>${escapeHtml(v)}</span>`).join('') || '<span>—</span>'}</div></td>
+        <td><div class="rank-cell-block">${(row.spreads || []).map(v => `<span>${escapeHtml(v)}</span>`).join('') || '<span>—</span>'}</div></td>
+        <td>${escapeHtml(row.updatedAt || '—')}</td>
+      </tr>
+    `).join('');
+  }
+
+  function renderDetailRanking(rankings) {
+    const box = document.getElementById('detail-ranking-summary');
+    if(!box) return;
+    const groups = [];
+    if(rankings.single.length) groups.push({title:'シングル順位', rows:rankings.single});
+    if(rankings.double.length) groups.push({title:'ダブル順位', rows:rankings.double});
+    if(!groups.length) {
+      box.innerHTML = '<div class="detail-empty">順位データがありません</div>';
+      return;
+    }
+    box.innerHTML = groups.map(group => `
+      <div class="detail-ranking-box">
+        <h5>${escapeHtml(group.title)}</h5>
+        ${group.rows.map(row => `
+          <div class="detail-ranking-line"><b>${escapeHtml(row.rank)}位</b>${escapeHtml(row.name || '')}</div>
+          <div class="detail-ranking-line">技: ${escapeHtml((row.moves || []).slice(0,3).join(' / ') || '—')}</div>
+          <div class="detail-ranking-line">持ち物: ${escapeHtml((row.items || []).slice(0,3).join(' / ') || '—')}</div>
+          <div class="detail-ranking-line">特性: ${escapeHtml((row.abilities || []).slice(0,3).join(' / ') || '—')}</div>
+          <div class="detail-ranking-line">性格: ${escapeHtml((row.natures || []).slice(0,3).join(' / ') || '—')}</div>
+          <div class="detail-ranking-line">調整: ${escapeHtml((row.spreads || []).slice(0,3).join(' / ') || '—')}</div>
+        `).join('')}
+      </div>
+    `).join('');
+  }
+
+  function renderDetailStats(records) {
+    if(!records.length) {
+      return '<div class="detail-empty">種族値データがありません</div>';
+    }
+    const stats = [['HP','hp'],['攻撃','atk'],['防御','def'],['特攻','spa'],['特防','spd'],['素早','spe']];
+    if(records.length === 1) {
+      const pokemon = records[0];
+      return stats.map(([label,key]) => {
+        const val = pokemon[key] || 0;
+        const pct = Math.min(100, Math.round(val / STAT_MAX[key] * 100));
+        const color = STAT_COLORS[key] || 'var(--accent)';
+        return `<div class="detail-stat-row"><span>${label}</span><b>${val}</b><div class="detail-stat-bar"><span style="width:${pct}%;background:${color};"></span></div></div>`;
+      }).join('');
+    }
+    return `<div class="detail-form-grid">${
+      records.map(pokemon => `
+        <div class="detail-form-card">
+          <div class="detail-form-card-title">${escapeHtml(pokemon.name)}</div>
+          ${stats.map(([label,key]) => {
+            const val = pokemon[key] || 0;
+            const pct = Math.min(100, Math.round(val / STAT_MAX[key] * 100));
+            const color = STAT_COLORS[key] || 'var(--accent)';
+            return `<div class="detail-stat-row"><span>${label}</span><b>${val}</b><div class="detail-stat-bar"><span style="width:${pct}%;background:${color};"></span></div></div>`;
+          }).join('')}
+        </div>
+      `).join('')
+    }</div>`;
+  }
+
+  function renderAbilities(abilityNames) {
+    if(!abilityNames.length) return '<div class="detail-empty">特性データがありません</div>';
+    return abilityNames.map(ability => {
+      const effect = ABILITY_EFFECTS_BY_NAME[ability] && ABILITY_EFFECTS_BY_NAME[ability].effect ? ABILITY_EFFECTS_BY_NAME[ability].effect : '';
+      return `<div class="detail-ability-item"><div class="detail-ability-name">${escapeHtml(ability)}</div><div class="detail-ability-effect">${escapeHtml(effect || '効果説明なし')}</div></div>`;
+    }).join('');
+  }
+
+  function renderDetailMovesPatched() {
+    const body = document.getElementById('detail-moves-body');
+    const query = (document.getElementById('detail-move-search').value || '').trim();
+    const moves = Array.isArray(currentDetailMoves) ? currentDetailMoves : [];
+    const filtered = !query ? moves : moves.filter(m => {
+      return [m.name, m.type, m.category, m.pp, m.hits, m.description].filter(Boolean).join(' ').includes(query);
+    });
+    if(!filtered.length) {
+      body.innerHTML = `<tr><td colspan="8" class="detail-empty">${moves.length ? '条件に合う技がありません' : '技データがありません'}</td></tr>`;
+      return;
+    }
+    body.innerHTML = filtered.map(m => `<tr>
+      <td>${escapeHtml(m.name || '—')}</td>
+      <td>${m.type ? `<span class="tp tp-${m.type}">${escapeHtml(m.type)}</span>` : '—'}</td>
+      <td>${escapeHtml(m.category || '—')}</td>
+      <td>${escapeHtml(m.power || '—')}</td>
+      <td>${escapeHtml(m.accuracy || '—')}</td>
+      <td>${escapeHtml(m.pp || '—')}</td>
+      <td>${escapeHtml(m.hits || '—')}</td>
+      <td>${escapeHtml(m.description || '—')}</td>
+    </tr>`).join('');
+  }
+
+  const originalOpenPokemonDetail = window.openPokemonDetail;
+  window.renderDetailMoves = renderDetailMovesPatched;
+  window.openPokemonDetail = function(name) {
+    ensureDetailRankingBox();
+    const ctx = collectDetailContext(name);
+    if(!ctx.records.length) {
+      if(typeof originalOpenPokemonDetail === 'function') return originalOpenPokemonDetail(name);
+      return;
+    }
+    const primary = ctx.primary || ctx.records[0];
+    currentDetailName = primary.name;
+    currentDetailMoves = ctx.moves;
+
+    const rankingNameNote = ctx.siteNames.length > 1
+      ? `フォーム: ${ctx.siteNames.join(' / ')}`
+      : ((ctx.displayName !== primary.name) ? `サイト表記: ${primary.name}` : '');
+
+    document.getElementById('detail-name').textContent = ctx.displayName;
+    document.getElementById('detail-sub').innerHTML = [
+      `No.${escapeHtml(primary.no || '—')}`,
+      `合計 ${escapeHtml(primary.total || 0)}`,
+      `技 ${escapeHtml(ctx.moves.length)}`,
+      rankingNameNote ? escapeHtml(rankingNameNote) : ''
+    ].filter(Boolean).join(' / ');
+
+    document.getElementById('detail-summary').innerHTML = [
+      {label:'No', value:primary.no || '—'},
+      {label:'合計', value:primary.total || 0},
+      {label:'重さ', value:(primary.weight || 0) ? `${primary.weight}` : '—'},
+      {label:'技数', value:ctx.moves.length}
+    ].map(item => `<div class="detail-summary-item"><b>${escapeHtml(item.value)}</b><span>${escapeHtml(item.label)}</span></div>`).join('');
+
+    const types = uniq(ctx.records.flatMap(p => [p.type1, p.type2]).filter(Boolean));
+    document.getElementById('detail-types').innerHTML = types.length ? types.map(type => `<span class="tp tp-${type}">${escapeHtml(type)}</span>`).join('') : '<span class="detail-season-tag">タイプ未登録</span>';
+    document.getElementById('detail-abilities').innerHTML = renderAbilities(ctx.abilities);
+    document.getElementById('detail-seasons').innerHTML = ctx.seasons.length ? ctx.seasons.map(s => `<span class="detail-season-tag">${escapeHtml(s)}</span>`).join('') : '<span class="detail-season-tag">対象シーズンなし</span>';
+    document.getElementById('detail-stats').innerHTML = renderDetailStats(ctx.records);
+
+    renderDetailRanking(ctx.rankings);
+
+    const rankingUpdates = uniq(
+      ctx.rankings.single.concat(ctx.rankings.double).map(row => row.updatedAt).filter(Boolean)
+    );
+    const updatedAt = rankingUpdates[0] || '';
+    document.getElementById('detail-move-meta').textContent = ctx.moves.length ? `${ctx.moves.length}件の技${updatedAt ? ` / 順位更新: ${updatedAt}` : ''}` : `技データ未登録${updatedAt ? ` / 順位更新: ${updatedAt}` : ''}`;
+    document.getElementById('detail-move-search').value = '';
+    renderDetailMovesPatched();
+
+    document.getElementById('detail-overlay').classList.add('show');
+    document.body.style.overflow = 'hidden';
+  };
+
+  const originalRender = window.render;
+  window.render = function() {
+    if(typeof originalRender === 'function') originalRender();
+    renderRankings();
+  };
+
+  async function loadRankingJson() {
+    try {
+      const [singleRes, doubleRes] = await Promise.all([
+        fetch('season_ranking_single.json?v=' + Date.now()).then(r => r.ok ? r.json() : {rows:[], updatedAt:''}).catch(() => ({rows:[], updatedAt:''})),
+        fetch('season_ranking_double.json?v=' + Date.now()).then(r => r.ok ? r.json() : {rows:[], updatedAt:''}).catch(() => ({rows:[], updatedAt:''}))
+      ]);
+      SINGLE_RANKINGS = singleRes && Array.isArray(singleRes.rows) ? singleRes : {rows:[], updatedAt:''};
+      DOUBLE_RANKINGS = doubleRes && Array.isArray(doubleRes.rows) ? doubleRes : {rows:[], updatedAt:''};
+    } catch(e) {
+      SINGLE_RANKINGS = {rows:[], updatedAt:''};
+      DOUBLE_RANKINGS = {rows:[], updatedAt:''};
+    }
+    renderRankings();
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    ensureSeasonViews();
+    ensureDetailRankingBox();
+  });
+  window.addEventListener('load', function() {
+    ensureSeasonViews();
+    ensureDetailRankingBox();
+    loadRankingJson();
+  });
+})();
+</script>
+
 </body>
 </html>
