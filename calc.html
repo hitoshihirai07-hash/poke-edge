@@ -132,6 +132,9 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 .nav-btn:hover{border-color:var(--accent);color:var(--accent);}
 .nav-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(0,200,240,0.07);}
 
+  background:radial-gradient(ellipse 50% 35% at 10% 5%,rgba(0,200,240,0.06) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 25% at 90% 90%,rgba(255,48,96,0.04) 0%,transparent 60%),
+.logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:6px;color:var(--accent);text-shadow:0 0 20px rgba(0,200,240,0.4);flex-shrink:0;}
 .gen-selector{display:flex;gap:3px;margin-left:auto;}
 .gen-btn{background:transparent;border:1px solid var(--border);color:var(--text2);padding:4px 11px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;font-size:11px;letter-spacing:1px;transition:all 0.18s;white-space:nowrap;position:relative;}
 .gen-btn:hover{border-color:var(--accent);color:var(--accent);}
@@ -265,8 +268,7 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;margin:4p
 .party-slot-list{display:flex;flex-direction:column;gap:6px;}
 .party-slot-btn{
   padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;
-  transition:all 0.18s;position:relative;border:1px solid var(--border);
-}
+  transition:all 0.18s;position:relative;
 .party-slot-btn:hover,.party-slot-btn.active{border-color:var(--accent);}
 .party-slot-btn.active{background:rgba(0,200,240,0.06);}
 .party-slot-btn.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);}
@@ -324,7 +326,7 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;margin:4p
 .add-breakdown{font-size:11px;color:var(--text3);margin-top:8px;line-height:2;}
 .add-ko-tag{display:inline-block;padding:2px 9px;font-size:10px;font-weight:700;letter-spacing:2px;margin-top:6px;}
 .add-ko1{background:var(--accent2);color:#fff;}.add-ko2{background:var(--accent3);color:#000;}.add-ko3{background:var(--text2);color:#fff;}
-footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18px 20px;margin-top:36px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18px 20px;margin-top:36px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
 /* アクティブタブ不要なので非表示 */
 .tabs{ display:none; }
 
@@ -440,9 +442,6 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 <div class="search-wrap">
           <input class="search-input" id="atk-search" type="text" placeholder="名前を入力..." autocomplete="off">
           <div class="dropdown" id="atk-drop"></div>
-        </div>
-        <div class="quick-action-row">
-          <button type="button" class="quick-action-btn" onclick="openPokemonPicker('atk')">一覧から選ぶ</button>
         </div>
         <div class="poke-card" id="atk-card">
           <div class="poke-no" id="atk-no"></div>
@@ -1147,29 +1146,62 @@ let moveIndex = [];
 let _dataLoaded = false;
 let _pickerSide = 'atk';
 
-function normalizePokemonEntry(raw, idx){
+
+async function fetchTextWithRetry(url, retries=2){
+  let lastErr = null;
+  for(let i=0;i<=retries;i++){
+    try{
+      const res = await fetch(url + (url.includes('?') ? '&' : '?') + 'v=' + Date.now() + '_' + i, {cache:'no-store'});
+      if(!res.ok) throw new Error('fetch_failed');
+      let txt = await res.text();
+      txt = String(txt||'').replace(/^\uFEFF/, '').trim();
+      if(!txt) throw new Error('empty_response');
+      return txt;
+    }catch(err){
+      lastErr = err;
+      await new Promise(r=>setTimeout(r, 120 * (i+1)));
+    }
+  }
+  throw lastErr || new Error('fetch_failed');
+}
+function parseMaybeJson(txt){
+  try{ return JSON.parse(txt); }catch(_e){}
+  const trimmed = String(txt||'').trim().replace(/;\s*$/, '');
+  const startArr = trimmed.indexOf('[');
+  const endArr = trimmed.lastIndexOf(']');
+  if(startArr >= 0 && endArr > startArr){
+    try{ return JSON.parse(trimmed.slice(startArr, endArr + 1)); }catch(_e){}
+  }
+  const startObj = trimmed.indexOf('{');
+  const endObj = trimmed.lastIndexOf('}');
+  if(startObj >= 0 && endObj > startObj){
+    try{ return JSON.parse(trimmed.slice(startObj, endObj + 1)); }catch(_e){}
+  }
+  throw new Error('invalid_json');
+}
+async function fetchJsonFlexible(url, fallback, required=false){
+  try{
+    const txt = await fetchTextWithRetry(url, required ? 3 : 1);
+    return parseMaybeJson(txt);
+  }catch(err){
+    if(required) throw err;
+    return fallback;
+  }
+}
+function normalizePokemonEntry(raw, idx=0){
   if(!raw || typeof raw !== 'object') return null;
-  const baseStats = raw.baseStats || raw.base_stats || raw.stats || {};
-  const types = Array.isArray(raw.types) ? raw.types : [];
   const out = {
-    no: Number(raw.no ?? raw.number ?? raw.id ?? raw.dex ?? raw.dexNo ?? raw['図鑑番号'] ?? (idx+1)) || (idx+1),
-    name: String(
-      raw.name ?? raw.display_name ?? raw.displayName ?? raw.pokemon_name ?? raw.pokemonName ??
-      raw.jp ?? raw.ja ?? raw.label ?? raw.title ?? raw['名前'] ?? raw['ポケモン名'] ?? ''
-    ).trim(),
-    type1: String(
-      raw.type1 ?? raw.type_1 ?? raw.primaryType ?? raw.primary_type ?? raw['タイプ1'] ?? types[0] ?? ''
-    ).trim(),
-    type2: String(
-      raw.type2 ?? raw.type_2 ?? raw.secondaryType ?? raw.secondary_type ?? raw['タイプ2'] ?? types[1] ?? ''
-    ).trim(),
-    hp: Number(raw.hp ?? raw.HP ?? raw['HP'] ?? baseStats.hp ?? baseStats.HP ?? baseStats.h ?? 0) || 0,
-    atk: Number(raw.atk ?? raw.attack ?? raw['攻撃'] ?? baseStats.atk ?? baseStats.attack ?? baseStats.a ?? 0) || 0,
-    def: Number(raw.def ?? raw.defense ?? raw['防御'] ?? baseStats.def ?? baseStats.defense ?? baseStats.b ?? 0) || 0,
-    spa: Number(raw.spa ?? raw.spAtk ?? raw.specialAttack ?? raw['特攻'] ?? baseStats.spa ?? baseStats.spAtk ?? baseStats.specialAttack ?? baseStats.c ?? 0) || 0,
-    spd: Number(raw.spd ?? raw.spDef ?? raw.specialDefense ?? raw['特防'] ?? baseStats.spd ?? baseStats.spDef ?? baseStats.specialDefense ?? baseStats.d ?? 0) || 0,
-    spe: Number(raw.spe ?? raw.speed ?? raw['素早さ'] ?? raw['素早'] ?? baseStats.spe ?? baseStats.speed ?? baseStats.s ?? 0) || 0,
-    weight: Number(raw.weight ?? raw.weightkg ?? raw.weight_kg ?? raw['体重'] ?? 0) || 0,
+    no: Number(raw.no ?? raw.id ?? raw.dex ?? raw.national_no ?? raw['図鑑番号'] ?? raw['No'] ?? idx + 1) || (idx + 1),
+    name: String(raw.name ?? raw.display_name ?? raw.pokemon_name ?? raw['名前'] ?? raw['ポケモン'] ?? raw['ポケモン名'] ?? '').trim(),
+    type1: String(raw.type1 ?? raw.primary_type ?? raw['タイプ1'] ?? raw['タイプ'] ?? '').trim(),
+    type2: String(raw.type2 ?? raw.secondary_type ?? raw['タイプ2'] ?? '').trim(),
+    hp: Number(raw.hp ?? raw.HP ?? raw.base_hp ?? raw['HP'] ?? raw['hp'] ?? 0) || 0,
+    atk: Number(raw.atk ?? raw.attack ?? raw.base_atk ?? raw['攻撃'] ?? raw['こうげき'] ?? 0) || 0,
+    def: Number(raw.def ?? raw.defense ?? raw.base_def ?? raw['防御'] ?? raw['ぼうぎょ'] ?? 0) || 0,
+    spa: Number(raw.spa ?? raw.sp_atk ?? raw.special_attack ?? raw.base_spa ?? raw['特攻'] ?? raw['とくこう'] ?? 0) || 0,
+    spd: Number(raw.spd ?? raw.sp_def ?? raw.special_defense ?? raw.base_spd ?? raw['特防'] ?? raw['とくぼう'] ?? 0) || 0,
+    spe: Number(raw.spe ?? raw.speed ?? raw.base_spe ?? raw['素早'] ?? raw['すばやさ'] ?? 0) || 0,
+    weight: Number(raw.weight ?? raw.weight_kg ?? raw['体重'] ?? 0) || 0,
   };
   if(!out.name) return null;
   return out;
@@ -1182,12 +1214,9 @@ function normalizePokemonDataset(raw){
   else if(raw && Array.isArray(raw.items)) list = raw.items;
   else if(raw && typeof raw === 'object'){
     const vals = Object.values(raw);
-    if(vals.length && vals.every(v=>v && typeof v === 'object' && !Array.isArray(v))){
-      list = vals;
-    }
+    if(vals.length && vals.every(v=>v && typeof v === 'object' && !Array.isArray(v))) list = vals;
   }
-  const normalized = list.map((row, idx)=>normalizePokemonEntry(row, idx)).filter(Boolean);
-  return normalized;
+  return list.map((row, idx)=>normalizePokemonEntry(row, idx)).filter(Boolean);
 }
 function normalizeMoveEntry(raw){
   if(!raw || typeof raw !== 'object') return null;
@@ -1211,6 +1240,19 @@ function normalizeMovesDataset(raw){
   else if(raw && Array.isArray(raw.items)) list = raw.items;
   return list.map(normalizeMoveEntry).filter(Boolean);
 }
+function normalizeAbilityMap(raw){
+  if(raw && typeof raw === 'object' && !Array.isArray(raw)) return raw;
+  return {};
+}
+function normalizeSeasonData(raw){
+  if(raw && typeof raw === 'object' && !Array.isArray(raw)) return raw;
+  return {seasons:[]};
+}
+function normalizePokemonMoves(raw){
+  if(raw && raw.pokemon && typeof raw.pokemon === 'object') return raw.pokemon;
+  if(raw && typeof raw === 'object' && !Array.isArray(raw)) return raw;
+  return {};
+}
 function setSearchError(message){
   const msg = message || 'データを読み込めませんでした。時間をおいて再読み込みしてください。';
   ['atk-drop','def-drop','atk2-drop'].forEach(id=>{
@@ -1220,66 +1262,56 @@ function setSearchError(message){
     node.classList.add('show');
   });
   const picker = el('poke-picker-list');
-  if(picker){
-    picker.innerHTML = `<div class="quick-note" style="color:var(--accent2);">${msg}</div>`;
-  }
+  if(picker) picker.innerHTML = `<div class="quick-note" style="color:var(--accent2);">${msg}</div>`;
+}
+function clearSearchError(){
+  ['atk-drop','def-drop','atk2-drop'].forEach(id=>{
+    const node = el(id);
+    if(node && node.textContent.includes('データを読み込めませんでした')){
+      node.innerHTML='';
+      node.classList.remove('show');
+    }
+  });
 }
 function bindPokemonSearchFinalize(inputId){
   const inp = el(inputId);
   if(!inp) return;
   const finalize = ()=>{
-    const q = (inp.value||'').trim();
+    const q = (inp.value || '').trim();
     if(!q) return;
-    const exact = pokeIndex.find(p=>String(p.name||'').trim() === q);
+    const exact = pokeIndex.find(p => String(p.name || '').trim() === q);
     if(!exact) return;
     if(inputId==='atk-search') initAtkPoke(exact);
     else if(inputId==='def-search') initDefPoke(exact);
     else if(inputId==='atk2-search') initAtk2(exact);
   };
-  inp.addEventListener('keydown', e=>{
-    if(e.key === 'Enter'){
-      e.preventDefault();
-      finalize();
-      el(inputId.replace('search','drop'))?.classList.remove('show');
-    }
-  });
-  inp.addEventListener('blur', ()=>setTimeout(finalize, 120));
+  inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); finalize(); } });
+  inp.addEventListener('blur', finalize);
 }
 async function loadGameData() {
   if(_dataLoaded) return;
-  const stamp = Date.now();
-  try{
-    const [pd,md,ad,sd,pm] = await Promise.all([
-      fetch('pokemon.json?v='+stamp).then(async r=>{ if(!r.ok) throw new Error('pokemon'); return r.json(); }),
-      fetch('moves.json?v='+stamp).then(async r=>{ if(!r.ok) throw new Error('moves'); return r.json(); }),
-      fetch('abilities.json?v='+stamp).then(r=>r.ok ? r.json() : {}).catch(()=>({})),
-      fetch('season.json?v='+stamp).then(r=>r.ok ? r.json() : {seasons:[]}).catch(()=>({seasons:[]})),
-      fetch('pokemon_moves.json?v='+stamp).then(r=>r.ok ? r.json() : {pokemon:{}}).catch(()=>({pokemon:{}})),
-    ]);
-    POKEMON_DATA = normalizePokemonDataset(pd);
-    MOVES_DATA = normalizeMovesDataset(md);
-    ABILITY_MAP = ad && typeof ad === 'object' ? ad : {};
-    SEASON_DATA = sd && typeof sd === 'object' ? sd : {seasons:[]};
-    POKEMON_MOVES = (pm && pm.pokemon && typeof pm.pokemon === 'object') ? pm.pokemon : {};
-    if(!POKEMON_DATA.length) throw new Error('pokemon-empty');
-    if(!MOVES_DATA.length) throw new Error('moves-empty');
-    pokeIndex = POKEMON_DATA.map((p,i)=>Object.assign({_i:i},p));
-    moveIndex = MOVES_DATA.map((m,i)=>Object.assign({_i:i},m));
-    _dataLoaded = true;
-  } catch(err){
-    console.error('loadGameData failed', err);
-    POKEMON_DATA = [];
-    MOVES_DATA = [];
-    pokeIndex = [];
-    moveIndex = [];
-    setSearchError('データを読み込めませんでした。時間をおいて再読み込みしてください。');
-    throw err;
-  }
+  const [pd,md,ad,sd,pm] = await Promise.all([
+    fetchJsonFlexible('pokemon.json', [], true),
+    fetchJsonFlexible('moves.json', [], true),
+    fetchJsonFlexible('abilities.json', {}, false),
+    fetchJsonFlexible('season.json', {seasons:[]}, false),
+    fetchJsonFlexible('pokemon_moves.json', {pokemon:{}}, false),
+  ]);
+  POKEMON_DATA = normalizePokemonDataset(pd);
+  MOVES_DATA = normalizeMovesDataset(md);
+  ABILITY_MAP = normalizeAbilityMap(ad);
+  SEASON_DATA = normalizeSeasonData(sd);
+  POKEMON_MOVES = normalizePokemonMoves(pm);
+  if(!POKEMON_DATA.length || !MOVES_DATA.length) throw new Error('data_empty');
+  pokeIndex = POKEMON_DATA.map((p,i)=>Object.assign({_i:i},p));
+  moveIndex = MOVES_DATA.map((m,i)=>Object.assign({_i:i},m));
+  _dataLoaded = true;
+  clearSearchError();
 }
 
 async function loadAbilitiesData() {
-  try { ABILITIES_DATA = await fetch('abilities_data.json?v='+Date.now()).then(r=>r.json()); }
-  catch(e) { console.warn('abilities_data.json読み込み失敗'); }
+  try { ABILITIES_DATA = await fetchJsonFlexible('abilities_data.json', [], false); }
+  catch(e) { console.warn('abilities data skipped'); }
 }
 
 // ===== 性格 =====
@@ -1536,13 +1568,12 @@ function renderPokemonPickerList(){
   const list = el('poke-picker-list');
   if(!list) return;
   const q = (el('poke-picker-search')?.value||'').trim();
-  let items = getSeasonFilteredPokes().filter(p=>p && p.name);
-  if(q) items = items.filter(p=>String(p.name).includes(q));
+  let items = getSeasonFilteredPokes();
+  if(q) items = items.filter(p=>p.name.includes(q));
   list.innerHTML = items.slice(0,400).map(p=>{
-    const safeName=String(p.name).replace(/"/g,'&quot;');
     const t1 = p.type1?`<span class="type-pill tp-${p.type1}">${p.type1}</span>`:'';
     const t2 = p.type2?`<span class="type-pill tp-${p.type2}">${p.type2}</span>`:'';
-    return `<button type="button" class="picker-item" onclick="selectPickerPokemon(&quot;${safeName}&quot;)"><div class="picker-item-no">#${String(p.no).padStart(3,'0')}</div><div class="picker-item-name">${p.name}</div><div class="drop-types">${t1}${t2}</div></button>`;
+    return `<button type="button" class="picker-item" onclick="selectPickerPokemon(${JSON.stringify(p.name).replace(/\"/g,'&quot;')})"><div class="picker-item-no">#${String(p.no).padStart(3,'0')}</div><div class="picker-item-name">${p.name}</div><div class="drop-types">${t1}${t2}</div></button>`;
   }).join('') || '<div class="quick-note">該当するポケモンがありません。</div>';
 }
 function openPokemonPicker(side){
@@ -1559,7 +1590,7 @@ function closePokemonPicker(){
   el('poke-picker-modal')?.classList.remove('show');
 }
 function selectPickerPokemon(name){
-  const p = pokeIndex.find(x=>String(x.name||'')===String(name||''));
+  const p = pokeIndex.find(x=>x.name===name);
   if(!p) return;
   if(_pickerSide==='atk'){
     el('atk-search').value = name;
@@ -1615,24 +1646,22 @@ function getSeasonFilteredPokes() {
   return pokeIndex.filter(p=>SEASON_DATA[season].includes(p.name));
 }
 function setupSearch(inputId,dropId,onSelect) {
-  const inp=el(inputId), drop=el(dropId); if(!inp||!drop) return;
+  const inp=el(inputId), drop=el(dropId); if(!inp || !drop) return;
   let timer;
   inp.addEventListener('input',()=>{
-    clearTimeout(timer);
-    const q=(inp.value||'').trim();
-    if(!q){ drop.classList.remove('show'); return; }
+    clearTimeout(timer); const q=inp.value.trim();
+    if(!q){drop.classList.remove('show');drop.innerHTML='';return;}
     timer=setTimeout(()=>{
-      const pool = getSeasonFilteredPokes().filter(p=>p && p.name);
-      const res = pool.filter(p=>String(p.name).includes(q)).slice(0,12);
+      const res=getSeasonFilteredPokes().filter(p=>String(p.name||'').includes(q)).slice(0,12);
       if(!res.length){
-        drop.innerHTML = `<div class="drop-item" style="cursor:default;color:var(--text2);">候補がありません</div>`;
+        drop.innerHTML='<div class="drop-item" style="cursor:default;color:var(--text2);">候補がありません</div>';
         drop.classList.add('show');
         return;
       }
       drop.innerHTML=res.map(p=>{
-        const safeName=String(p.name).replace(/'/g,"\'");
         const t1=p.type1?`<span class="type-pill tp-${p.type1}">${p.type1}</span>`:'';
         const t2=p.type2?`<span class="type-pill tp-${p.type2}">${p.type2}</span>`:'';
+        const safeName=String(p.name||'').replace(/'/g,"\'");
         return `<div class="drop-item" onclick="searchDropSelect('${inputId}','${dropId}','${safeName}')"><span class="drop-name">${p.name}</span><span class="drop-types">${t1}${t2}</span></div>`;
       }).join('');
       drop.classList.add('show');
@@ -1647,22 +1676,26 @@ function setupSearch(inputId,dropId,onSelect) {
 function searchDropSelect(inputId,dropId,name) {
   const inp=el(inputId), drop=el(dropId);
   inp.value=name; drop.classList.remove('show');
-  const p=pokeIndex.find(x=>String(x.name||'')===String(name||'')); if(!p) return;
+  const p=pokeIndex.find(x=>x.name===name); if(!p) return;
   if(inp._onSelect){inp._onSelect(p);return;}
   if(inputId==='atk-search') initAtkPoke(p);
   else if(inputId==='def-search') initDefPoke(p);
   else if(inputId==='atk2-search') initAtk2(p);
 }
 function setupMoveSearch(inputId,dropId,onSelect) {
-  const inp=el(inputId), drop=el(dropId); if(!inp) return;
+  const inp=el(inputId), drop=el(dropId); if(!inp || !drop) return;
   let timer;
   inp.addEventListener('input',()=>{
     clearTimeout(timer); const q=inp.value.trim();
-    if(!q){drop.classList.remove('show');return;}
+    if(!q){drop.classList.remove('show');drop.innerHTML='';return;}
     timer=setTimeout(()=>{
-      const res=moveIndex.filter(m=>m.name.includes(q)&&(m.power>0||m.notes==='体重依存')).slice(0,12);
-      if(!res.length){drop.classList.remove('show');return;}
-      drop.innerHTML=res.map(m=>`<div class="drop-item" onclick="moveDrop('${inputId}','${dropId}','${m.name}')">${m.name} <span style="font-size:10px;color:var(--text2);">[${m.type}/${m.category}] ${m.notes==='体重依存'?'体重依存':'威力'+m.power}</span></div>`).join('');
+      const res=moveIndex.filter(m=>String(m.name||'').includes(q)&&(m.power>0||m.notes==='体重依存')).slice(0,12);
+      if(!res.length){
+        drop.innerHTML='<div class="drop-item" style="cursor:default;color:var(--text2);">候補がありません</div>';
+        drop.classList.add('show');
+        return;
+      }
+      drop.innerHTML=res.map(m=>`<div class="drop-item" onclick="moveDrop('${inputId}','${dropId}','${String(m.name||'').replace(/'/g,"\'")}')">${m.name} <span style="font-size:10px;color:var(--text2);">[${m.type}/${m.category}] ${m.notes==='体重依存'?'体重依存':'威力'+m.power}</span></div>`).join('');
       drop.classList.add('show');
     },150);
   });
@@ -2936,14 +2969,8 @@ function setupEvents(){
 
 // ===== 初期化 =====
 window.onload = async()=>{
-  try{
-    await loadGameData();
-  }catch(e){
-    console.error(e);
-  }
-  if(typeof initAuth === 'function'){
-    try{ await initAuth(); }catch(e){ console.warn('auth init skipped', e); }
-  }
+  await loadGameData();
+  await initAuth();
   await loadAbilitiesData();
   setupSearch('atk-search','atk-drop');
   setupSearch('def-search','def-drop');
