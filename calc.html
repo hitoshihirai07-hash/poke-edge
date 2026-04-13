@@ -132,9 +132,6 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 .nav-btn:hover{border-color:var(--accent);color:var(--accent);}
 .nav-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(0,200,240,0.07);}
 
-  background:radial-gradient(ellipse 50% 35% at 10% 5%,rgba(0,200,240,0.06) 0%,transparent 60%),
-    radial-gradient(ellipse 40% 25% at 90% 90%,rgba(255,48,96,0.04) 0%,transparent 60%),
-.logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:6px;color:var(--accent);text-shadow:0 0 20px rgba(0,200,240,0.4);flex-shrink:0;}
 .gen-selector{display:flex;gap:3px;margin-left:auto;}
 .gen-btn{background:transparent;border:1px solid var(--border);color:var(--text2);padding:4px 11px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;font-size:11px;letter-spacing:1px;transition:all 0.18s;white-space:nowrap;position:relative;}
 .gen-btn:hover{border-color:var(--accent);color:var(--accent);}
@@ -268,7 +265,8 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;margin:4p
 .party-slot-list{display:flex;flex-direction:column;gap:6px;}
 .party-slot-btn{
   padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;
-  transition:all 0.18s;position:relative;
+  transition:all 0.18s;position:relative;border:1px solid var(--border);
+}
 .party-slot-btn:hover,.party-slot-btn.active{border-color:var(--accent);}
 .party-slot-btn.active{background:rgba(0,200,240,0.06);}
 .party-slot-btn.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);}
@@ -326,7 +324,7 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;margin:4p
 .add-breakdown{font-size:11px;color:var(--text3);margin-top:8px;line-height:2;}
 .add-ko-tag{display:inline-block;padding:2px 9px;font-size:10px;font-weight:700;letter-spacing:2px;margin-top:6px;}
 .add-ko1{background:var(--accent2);color:#fff;}.add-ko2{background:var(--accent3);color:#000;}.add-ko3{background:var(--text2);color:#fff;}
-footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18px 20px;margin-top:36px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18px 20px;margin-top:36px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
 /* アクティブタブ不要なので非表示 */
 .tabs{ display:none; }
 
@@ -442,6 +440,9 @@ footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top
 <div class="search-wrap">
           <input class="search-input" id="atk-search" type="text" placeholder="名前を入力..." autocomplete="off">
           <div class="dropdown" id="atk-drop"></div>
+        </div>
+        <div class="quick-action-row">
+          <button type="button" class="quick-action-btn" onclick="openPokemonPicker('atk')">一覧から選ぶ</button>
         </div>
         <div class="poke-card" id="atk-card">
           <div class="poke-no" id="atk-no"></div>
@@ -1146,96 +1147,134 @@ let moveIndex = [];
 let _dataLoaded = false;
 let _pickerSide = 'atk';
 
-function firstDefined(obj, keys, fallback=''){
-  for(const key of keys){
-    if(obj && obj[key] !== undefined && obj[key] !== null && obj[key] !== '') return obj[key];
+function normalizePokemonEntry(raw, idx){
+  if(!raw || typeof raw !== 'object') return null;
+  const baseStats = raw.baseStats || raw.base_stats || raw.stats || {};
+  const types = Array.isArray(raw.types) ? raw.types : [];
+  const out = {
+    no: Number(raw.no ?? raw.number ?? raw.id ?? raw.dex ?? raw.dexNo ?? raw['図鑑番号'] ?? (idx+1)) || (idx+1),
+    name: String(
+      raw.name ?? raw.display_name ?? raw.displayName ?? raw.pokemon_name ?? raw.pokemonName ??
+      raw.jp ?? raw.ja ?? raw.label ?? raw.title ?? raw['名前'] ?? raw['ポケモン名'] ?? ''
+    ).trim(),
+    type1: String(
+      raw.type1 ?? raw.type_1 ?? raw.primaryType ?? raw.primary_type ?? raw['タイプ1'] ?? types[0] ?? ''
+    ).trim(),
+    type2: String(
+      raw.type2 ?? raw.type_2 ?? raw.secondaryType ?? raw.secondary_type ?? raw['タイプ2'] ?? types[1] ?? ''
+    ).trim(),
+    hp: Number(raw.hp ?? raw.HP ?? raw['HP'] ?? baseStats.hp ?? baseStats.HP ?? baseStats.h ?? 0) || 0,
+    atk: Number(raw.atk ?? raw.attack ?? raw['攻撃'] ?? baseStats.atk ?? baseStats.attack ?? baseStats.a ?? 0) || 0,
+    def: Number(raw.def ?? raw.defense ?? raw['防御'] ?? baseStats.def ?? baseStats.defense ?? baseStats.b ?? 0) || 0,
+    spa: Number(raw.spa ?? raw.spAtk ?? raw.specialAttack ?? raw['特攻'] ?? baseStats.spa ?? baseStats.spAtk ?? baseStats.specialAttack ?? baseStats.c ?? 0) || 0,
+    spd: Number(raw.spd ?? raw.spDef ?? raw.specialDefense ?? raw['特防'] ?? baseStats.spd ?? baseStats.spDef ?? baseStats.specialDefense ?? baseStats.d ?? 0) || 0,
+    spe: Number(raw.spe ?? raw.speed ?? raw['素早さ'] ?? raw['素早'] ?? baseStats.spe ?? baseStats.speed ?? baseStats.s ?? 0) || 0,
+    weight: Number(raw.weight ?? raw.weightkg ?? raw.weight_kg ?? raw['体重'] ?? 0) || 0,
+  };
+  if(!out.name) return null;
+  return out;
+}
+function normalizePokemonDataset(raw){
+  let list = [];
+  if(Array.isArray(raw)) list = raw;
+  else if(raw && Array.isArray(raw.pokemon)) list = raw.pokemon;
+  else if(raw && Array.isArray(raw.data)) list = raw.data;
+  else if(raw && Array.isArray(raw.items)) list = raw.items;
+  else if(raw && typeof raw === 'object'){
+    const vals = Object.values(raw);
+    if(vals.length && vals.every(v=>v && typeof v === 'object' && !Array.isArray(v))){
+      list = vals;
+    }
   }
-  return fallback;
+  const normalized = list.map((row, idx)=>normalizePokemonEntry(row, idx)).filter(Boolean);
+  return normalized;
 }
-function normalizePokemonEntry(raw, idx=0){
-  const name = String(firstDefined(raw,['name','display_name','displayName','pokemon_name','ポケモン','ポケモン名','名称'],'')).trim();
-  const no = parseInt(firstDefined(raw,['no','number','dex','national_no','全国図鑑No','図鑑番号'], idx+1)) || (idx+1);
-  const type1 = String(firstDefined(raw,['type1','type_1','type','タイプ1','タイプ'],'')).trim();
-  const type2 = String(firstDefined(raw,['type2','type_2','タイプ2'],'')).trim();
-  return {
-    ...raw,
-    name,
-    no,
-    type1,
-    type2,
-    hp: parseInt(firstDefined(raw,['hp','HP'])) || 0,
-    atk: parseInt(firstDefined(raw,['atk','attack','攻撃'])) || 0,
-    def: parseInt(firstDefined(raw,['def','defense','防御'])) || 0,
-    spa: parseInt(firstDefined(raw,['spa','sp_atk','special_attack','特攻'])) || 0,
-    spd: parseInt(firstDefined(raw,['spd','sp_def','special_defense','特防'])) || 0,
-    spe: parseInt(firstDefined(raw,['spe','speed','素早さ','素早'])) || 0,
-    weight: parseFloat(firstDefined(raw,['weight','weight_kg','体重'],0)) || 0,
+function normalizeMoveEntry(raw){
+  if(!raw || typeof raw !== 'object') return null;
+  const out = {
+    name: String(raw.name ?? raw.display_name ?? raw.move_name ?? raw['名前'] ?? '').trim(),
+    type: String(raw.type ?? raw.move_type ?? raw['タイプ'] ?? '').trim(),
+    category: String(raw.category ?? raw.cat ?? raw['分類'] ?? raw['カテゴリー'] ?? '').trim(),
+    power: Number(raw.power ?? raw.basePower ?? raw['威力'] ?? 0) || 0,
+    hits: String(raw.hits ?? raw.hitCount ?? raw['回数'] ?? '1').trim(),
+    notes: String(raw.notes ?? raw.note ?? raw.description ?? raw['説明'] ?? '').trim(),
+    alwaysCrit: String(raw.alwaysCrit ?? raw.always_crit ?? raw['急所固定'] ?? '').trim(),
   };
+  if(!out.name) return null;
+  return out;
 }
-function normalizeMoveEntry(raw, idx=0){
-  return {
-    ...raw,
-    name: String(firstDefined(raw,['name','move_name','技','技名'], '')).trim(),
-    type: String(firstDefined(raw,['type','タイプ'], '')).trim(),
-    category: String(firstDefined(raw,['category','cat','分類'], '')).trim(),
-    power: parseInt(firstDefined(raw,['power','威力'],0)) || 0,
-    hits: String(firstDefined(raw,['hits','回数'], '1')).trim() || '1',
-    notes: String(firstDefined(raw,['notes','note','description','説明'], '')).trim(),
-    alwaysCrit: String(firstDefined(raw,['alwaysCrit','always_crit','急所'], '')).trim(),
-    _i: idx,
-  };
+function normalizeMovesDataset(raw){
+  let list = [];
+  if(Array.isArray(raw)) list = raw;
+  else if(raw && Array.isArray(raw.moves)) list = raw.moves;
+  else if(raw && Array.isArray(raw.data)) list = raw.data;
+  else if(raw && Array.isArray(raw.items)) list = raw.items;
+  return list.map(normalizeMoveEntry).filter(Boolean);
 }
-function normalizeSeasonData(raw){
-  if(!raw || typeof raw !== 'object') return {seasons:[]};
-  if(Array.isArray(raw.seasons)) return raw;
-  const seasons = Object.keys(raw).filter(k=>Array.isArray(raw[k]));
-  return { ...raw, seasons };
-}
-function findPokemonByName(name){
-  const q = String(name||'').trim();
-  if(!q) return null;
-  return pokeIndex.find(p=>String(p.name||'').trim()===q) || null;
-}
-function selectPokemonByInput(inputId){
-  const inp = el(inputId);
-  if(!inp) return false;
-  const p = findPokemonByName(inp.value);
-  if(!p) return false;
-  if(inputId==='atk-search') initAtkPoke(p);
-  else if(inputId==='def-search') initDefPoke(p);
-  else if(inputId==='atk2-search') initAtk2(p);
-  return true;
-}
-function showPokemonLoadError(err){
-  console.error(err);
-  const msg = 'ポケモンデータの読み込みに失敗しました。pokemon.json の列名またはJSON形式を確認してください。';
+function setSearchError(message){
+  const msg = message || 'データを読み込めませんでした。時間をおいて再読み込みしてください。';
   ['atk-drop','def-drop','atk2-drop'].forEach(id=>{
-    const drop = el(id);
-    if(!drop) return;
-    drop.innerHTML = `<div class="drop-item" style="cursor:default;color:var(--accent2);">${msg}</div>`;
-    drop.classList.add('show');
+    const node = el(id);
+    if(!node) return;
+    node.innerHTML = `<div class="drop-item" style="cursor:default;color:var(--accent2);line-height:1.8;">${msg}</div>`;
+    node.classList.add('show');
   });
+  const picker = el('poke-picker-list');
+  if(picker){
+    picker.innerHTML = `<div class="quick-note" style="color:var(--accent2);">${msg}</div>`;
+  }
 }
-
+function bindPokemonSearchFinalize(inputId){
+  const inp = el(inputId);
+  if(!inp) return;
+  const finalize = ()=>{
+    const q = (inp.value||'').trim();
+    if(!q) return;
+    const exact = pokeIndex.find(p=>String(p.name||'').trim() === q);
+    if(!exact) return;
+    if(inputId==='atk-search') initAtkPoke(exact);
+    else if(inputId==='def-search') initDefPoke(exact);
+    else if(inputId==='atk2-search') initAtk2(exact);
+  };
+  inp.addEventListener('keydown', e=>{
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      finalize();
+      el(inputId.replace('search','drop'))?.classList.remove('show');
+    }
+  });
+  inp.addEventListener('blur', ()=>setTimeout(finalize, 120));
+}
 async function loadGameData() {
   if(_dataLoaded) return;
-  const [pdRaw,mdRaw,adRaw,sdRaw,pmRaw] = await Promise.all([
-    fetch('pokemon.json?v='+Date.now()).then(r=>{ if(!r.ok) throw new Error('pokemon.json '+r.status); return r.json(); }),
-    fetch('moves.json?v='+Date.now()).then(r=>{ if(!r.ok) throw new Error('moves.json '+r.status); return r.json(); }),
-    fetch('abilities.json?v='+Date.now()).then(r=>r.json()).catch(()=>({})),
-    fetch('season.json?v='+Date.now()).then(r=>r.json()).catch(()=>({seasons:[]})),
-    fetch('pokemon_moves.json?v='+Date.now()).then(r=>r.json()).catch(()=>({pokemon:{}})),
-  ]);
-  const rawPokemon = Array.isArray(pdRaw) ? pdRaw : (Array.isArray(pdRaw?.pokemon) ? pdRaw.pokemon : (Array.isArray(pdRaw?.data) ? pdRaw.data : []));
-  const rawMoves = Array.isArray(mdRaw) ? mdRaw : (Array.isArray(mdRaw?.moves) ? mdRaw.moves : (Array.isArray(mdRaw?.data) ? mdRaw.data : []));
-  POKEMON_DATA = rawPokemon.map((p,i)=>normalizePokemonEntry(p,i)).filter(p=>p.name);
-  MOVES_DATA = rawMoves.map((m,i)=>normalizeMoveEntry(m,i)).filter(m=>m.name);
-  ABILITY_MAP = adRaw || {};
-  SEASON_DATA = normalizeSeasonData(sdRaw);
-  POKEMON_MOVES = (pmRaw&&pmRaw.pokemon)||{};
-  pokeIndex = POKEMON_DATA.map((p,i)=>Object.assign({_i:i},p));
-  moveIndex  = MOVES_DATA.map((m,i)=>Object.assign({_i:i},m));
-  _dataLoaded = true;
+  const stamp = Date.now();
+  try{
+    const [pd,md,ad,sd,pm] = await Promise.all([
+      fetch('pokemon.json?v='+stamp).then(async r=>{ if(!r.ok) throw new Error('pokemon'); return r.json(); }),
+      fetch('moves.json?v='+stamp).then(async r=>{ if(!r.ok) throw new Error('moves'); return r.json(); }),
+      fetch('abilities.json?v='+stamp).then(r=>r.ok ? r.json() : {}).catch(()=>({})),
+      fetch('season.json?v='+stamp).then(r=>r.ok ? r.json() : {seasons:[]}).catch(()=>({seasons:[]})),
+      fetch('pokemon_moves.json?v='+stamp).then(r=>r.ok ? r.json() : {pokemon:{}}).catch(()=>({pokemon:{}})),
+    ]);
+    POKEMON_DATA = normalizePokemonDataset(pd);
+    MOVES_DATA = normalizeMovesDataset(md);
+    ABILITY_MAP = ad && typeof ad === 'object' ? ad : {};
+    SEASON_DATA = sd && typeof sd === 'object' ? sd : {seasons:[]};
+    POKEMON_MOVES = (pm && pm.pokemon && typeof pm.pokemon === 'object') ? pm.pokemon : {};
+    if(!POKEMON_DATA.length) throw new Error('pokemon-empty');
+    if(!MOVES_DATA.length) throw new Error('moves-empty');
+    pokeIndex = POKEMON_DATA.map((p,i)=>Object.assign({_i:i},p));
+    moveIndex = MOVES_DATA.map((m,i)=>Object.assign({_i:i},m));
+    _dataLoaded = true;
+  } catch(err){
+    console.error('loadGameData failed', err);
+    POKEMON_DATA = [];
+    MOVES_DATA = [];
+    pokeIndex = [];
+    moveIndex = [];
+    setSearchError('データを読み込めませんでした。時間をおいて再読み込みしてください。');
+    throw err;
+  }
 }
 
 async function loadAbilitiesData() {
@@ -1497,12 +1536,13 @@ function renderPokemonPickerList(){
   const list = el('poke-picker-list');
   if(!list) return;
   const q = (el('poke-picker-search')?.value||'').trim();
-  let items = getSeasonFilteredPokes();
-  if(q) items = items.filter(p=>p.name.includes(q));
+  let items = getSeasonFilteredPokes().filter(p=>p && p.name);
+  if(q) items = items.filter(p=>String(p.name).includes(q));
   list.innerHTML = items.slice(0,400).map(p=>{
+    const safeName=String(p.name).replace(/"/g,'&quot;');
     const t1 = p.type1?`<span class="type-pill tp-${p.type1}">${p.type1}</span>`:'';
     const t2 = p.type2?`<span class="type-pill tp-${p.type2}">${p.type2}</span>`:'';
-    return `<button type="button" class="picker-item" onclick="selectPickerPokemon(${JSON.stringify(p.name).replace(/\"/g,'&quot;')})"><div class="picker-item-no">#${String(p.no).padStart(3,'0')}</div><div class="picker-item-name">${p.name}</div><div class="drop-types">${t1}${t2}</div></button>`;
+    return `<button type="button" class="picker-item" onclick="selectPickerPokemon(&quot;${safeName}&quot;)"><div class="picker-item-no">#${String(p.no).padStart(3,'0')}</div><div class="picker-item-name">${p.name}</div><div class="drop-types">${t1}${t2}</div></button>`;
   }).join('') || '<div class="quick-note">該当するポケモンがありません。</div>';
 }
 function openPokemonPicker(side){
@@ -1519,13 +1559,13 @@ function closePokemonPicker(){
   el('poke-picker-modal')?.classList.remove('show');
 }
 function selectPickerPokemon(name){
-  const p = findPokemonByName(name);
+  const p = pokeIndex.find(x=>String(x.name||'')===String(name||''));
   if(!p) return;
   if(_pickerSide==='atk'){
-    el('atk-search').value = p.name;
+    el('atk-search').value = name;
     initAtkPoke(p);
   } else {
-    el('def-search').value = p.name;
+    el('def-search').value = name;
     initDefPoke(p);
   }
   closePokemonPicker();
@@ -1578,44 +1618,36 @@ function setupSearch(inputId,dropId,onSelect) {
   const inp=el(inputId), drop=el(dropId); if(!inp||!drop) return;
   let timer;
   inp.addEventListener('input',()=>{
-    clearTimeout(timer); const q=inp.value.trim();
-    if(!q){drop.classList.remove('show');return;}
+    clearTimeout(timer);
+    const q=(inp.value||'').trim();
+    if(!q){ drop.classList.remove('show'); return; }
     timer=setTimeout(()=>{
-      const res=getSeasonFilteredPokes().filter(p=>String(p.name||'').includes(q)).slice(0,12);
+      const pool = getSeasonFilteredPokes().filter(p=>p && p.name);
+      const res = pool.filter(p=>String(p.name).includes(q)).slice(0,12);
       if(!res.length){
-        drop.innerHTML = '<div class="drop-item" style="cursor:default;color:var(--text2);">候補がありません</div>';
+        drop.innerHTML = `<div class="drop-item" style="cursor:default;color:var(--text2);">候補がありません</div>`;
         drop.classList.add('show');
         return;
       }
-            drop.innerHTML = res.map(p=>{
-        const safeName = String(p.name).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-        const safeArg = JSON.stringify(String(p.name)).replace(/"/g,'&quot;');
+      drop.innerHTML=res.map(p=>{
+        const safeName=String(p.name).replace(/'/g,"\'");
         const t1=p.type1?`<span class="type-pill tp-${p.type1}">${p.type1}</span>`:'';
         const t2=p.type2?`<span class="type-pill tp-${p.type2}">${p.type2}</span>`:'';
-        return `<div class="drop-item" onclick="searchDropSelect('${inputId}','${dropId}',${safeArg})"><span class="drop-name">${safeName}</span><span class="drop-types">${t1}${t2}</span></div>`;
+        return `<div class="drop-item" onclick="searchDropSelect('${inputId}','${dropId}','${safeName}')"><span class="drop-name">${p.name}</span><span class="drop-types">${t1}${t2}</span></div>`;
       }).join('');
       drop.classList.add('show');
     },150);
-  });
-  inp.addEventListener('keydown',e=>{
-    if(e.key==='Enter'){
-      e.preventDefault();
-      if(selectPokemonByInput(inputId)) drop.classList.remove('show');
-    }
-  });
-  inp.addEventListener('blur',()=>{
-    setTimeout(()=>{ selectPokemonByInput(inputId); },120);
   });
   document.addEventListener('click',e=>{
     if(!inp.contains(e.target)&&!drop.contains(e.target)) drop.classList.remove('show');
   });
   if(onSelect) inp._onSelect=onSelect;
+  bindPokemonSearchFinalize(inputId);
 }
 function searchDropSelect(inputId,dropId,name) {
   const inp=el(inputId), drop=el(dropId);
-  inp.value=String(name||'');
-  drop.classList.remove('show');
-  const p=findPokemonByName(name); if(!p) return;
+  inp.value=name; drop.classList.remove('show');
+  const p=pokeIndex.find(x=>String(x.name||'')===String(name||'')); if(!p) return;
   if(inp._onSelect){inp._onSelect(p);return;}
   if(inputId==='atk-search') initAtkPoke(p);
   else if(inputId==='def-search') initDefPoke(p);
@@ -2904,26 +2936,28 @@ function setupEvents(){
 
 // ===== 初期化 =====
 window.onload = async()=>{
-  try {
+  try{
     await loadGameData();
-    if(typeof initAuth==='function') await initAuth();
-    await loadAbilitiesData();
-    setupSearch('atk-search','atk-drop');
-    setupSearch('def-search','def-drop');
-    setupSearch('atk2-search','atk2-drop');
-    setupMoveSearch('atk-move-search','atk-move-drop');
-    setupMoveSearch('atk1b-move-search','atk1b-move-drop');
-    setupMoveSearch('atk2-move-search','atk2-move-drop');
-    initSeasonFilter();
-    setupEvents();
-    updateDefHazardInfo();
-    el('poke-picker-search')?.addEventListener('input',renderPokemonPickerList);
-    el('poke-picker-modal')?.addEventListener('click',e=>{ if(e.target===el('poke-picker-modal')) closePokemonPicker(); });
-    document.addEventListener('keydown',e=>{ if(e.key==='Escape') closePokemonPicker(); });
-    renderQuickMoveChips('');
-  } catch(err) {
-    showPokemonLoadError(err);
+  }catch(e){
+    console.error(e);
   }
+  if(typeof initAuth === 'function'){
+    try{ await initAuth(); }catch(e){ console.warn('auth init skipped', e); }
+  }
+  await loadAbilitiesData();
+  setupSearch('atk-search','atk-drop');
+  setupSearch('def-search','def-drop');
+  setupSearch('atk2-search','atk2-drop');
+  setupMoveSearch('atk-move-search','atk-move-drop');
+  setupMoveSearch('atk1b-move-search','atk1b-move-drop');
+  setupMoveSearch('atk2-move-search','atk2-move-drop');
+  initSeasonFilter();
+  setupEvents();
+  updateDefHazardInfo();
+  el('poke-picker-search')?.addEventListener('input',renderPokemonPickerList);
+  el('poke-picker-modal')?.addEventListener('click',e=>{ if(e.target===el('poke-picker-modal')) closePokemonPicker(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closePokemonPicker(); });
+  renderQuickMoveChips('');
 };
 </script>
 <script>
