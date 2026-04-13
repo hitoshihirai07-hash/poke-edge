@@ -1299,6 +1299,23 @@ function getStoredPowerLikeInfo(){
 function isBodyPressMove(moveName,mcat){
   return moveName==='ボディプレス' && mcat==='物理';
 }
+const DEFENSE_REF_SPECIAL_MOVES = new Set(['サイコショック','サイコブレイク','しんぴのつるぎ']);
+function isDefenseRefSpecialMove(moveName,mcat){
+  return mcat==='特殊' && DEFENSE_REF_SPECIAL_MOVES.has(moveName);
+}
+function getDisplayedMoveCategory(moveName,mcat,atkStatVal=0,spaStatVal=0,defStatVal=0,spdStatVal=0){
+  if(moveName==='シェルアームズ'){
+    const physicalScore = Math.max(1, atkStatVal||0) / Math.max(1, defStatVal||0);
+    const specialScore = Math.max(1, spaStatVal||0) / Math.max(1, spdStatVal||0);
+    return physicalScore > specialScore ? '物理' : '特殊';
+  }
+  return mcat;
+}
+function getEffectiveDefenseCategory(moveName,mcat,atkStats,defStats){
+  if(isDefenseRefSpecialMove(moveName,mcat)) return '物理';
+  if(moveName==='シェルアームズ') return getDisplayedMoveCategory(moveName,mcat,atkStats?.atk||0,atkStats?.spa||0,defStats?.def||0,defStats?.spd||0);
+  return mcat;
+}
 function getAuraModifier(moveType, atkAbilityName='', defAbilityName=''){
   const fairyAura = atkAbilityName==='フェアリーオーラ' || defAbilityName==='フェアリーオーラ';
   const darkAura = atkAbilityName==='ダークオーラ' || defAbilityName==='ダークオーラ';
@@ -1854,6 +1871,7 @@ function calcDamage() {
   const isLowHpMove = moveName==='きしかいせい' || moveName==='じたばた';
   const isStoredPowerLike = moveName==='アシストパワー' || moveName==='つけあがる';
   const isBodyPress = isBodyPressMove(moveName,mcat);
+  const isDefenseRefSpecial = isDefenseRefSpecialMove(moveName,mcat);
 
   // おはかまいり: 基本威力50 + 倒された味方の数 × 50
   if(moveName==='おはかまいり') {
@@ -1901,6 +1919,12 @@ function calcDamage() {
   if(isBodyPress){
     specialMoveInfo=[specialMoveInfo,'ボディプレス: 自分のぼうぎょで計算'].filter(Boolean).join(' / ');
   }
+  if(isDefenseRefSpecial){
+    specialMoveInfo=[specialMoveInfo,moveName+': 特殊技だが相手のぼうぎょで計算'].filter(Boolean).join(' / ');
+  }
+  if(moveName==='シェルアームズ'){
+    specialMoveInfo=[specialMoveInfo,'シェルアームズ: 相手により物理/特殊を自動選択'].filter(Boolean).join(' / ');
+  }
   if(!power){alert('この技はダメージ技ではありません（変化技）');return;}
 
   // スキン特性（ノーマル技のタイプ変更＋威力1.2倍）
@@ -1936,12 +1960,13 @@ function calcDamage() {
   }
 
   const lv=parseInt(el('atk-lv').value)||50;
-  let atkStat=isBodyPress ? (window._atkStats.def||window._atkStats.atk) : (mcat==='物理'?window._atkStats.atk:window._atkStats.spa);
+  const effectiveCat = getEffectiveDefenseCategory(moveName,mcat,window._atkStats,window._defStats);
+  let atkStat=isBodyPress ? (window._atkStats.def||window._atkStats.atk) : (effectiveCat==='物理'?window._atkStats.atk:window._atkStats.spa);
   if(isFoulPlay){
     atkStat=window._defStats.atk||atkStat;
     specialMoveInfo = [specialMoveInfo, 'イカサマ: 相手のこうげきを参照'].filter(Boolean).join(' / ');
   }
-  let defStat=mcat==='物理'?window._defStats.def:window._defStats.spd;
+  let defStat=effectiveCat==='物理'?window._defStats.def:window._defStats.spd;
   const hp=window._defStats.hp;
   const hazardInfo=getHazardInfo(window._defBase,window._defStats);
   const remainingHp=hazardInfo.remaining;
@@ -1950,11 +1975,11 @@ function calcDamage() {
 
   // 天候による防御側ステータス補正
   let weatherDefLabel='';
-  if(weather==='snow'&&defTypes.includes('こおり')&&mcat==='物理'){
+  if(weather==='snow'&&defTypes.includes('こおり')&&effectiveCat==='物理'){
     defStat=Math.floor(defStat*1.5);
     weatherDefLabel=' [雪:こおり防御×1.5]';
   }
-  if(weather==='sand'&&defTypes.includes('いわ')&&mcat==='特殊'){
+  if(weather==='sand'&&defTypes.includes('いわ')&&effectiveCat==='特殊'){
     defStat=Math.floor(defStat*1.5);
     weatherDefLabel=' [砂嵐:いわ特防×1.5]';
   }
@@ -1973,8 +1998,8 @@ function calcDamage() {
   // 持ち物
   const itemKey=el('atk-item').value;
   let itemMult=1;
-  if(itemKey==='hachimaki'&&mcat==='物理'&&!isBodyPress) itemMult=1.5;
-  else if(itemKey==='megane'&&mcat==='特殊') itemMult=1.5;
+  if(itemKey==='hachimaki'&&effectiveCat==='物理'&&!isBodyPress) itemMult=1.5;
+  else if(itemKey==='megane'&&effectiveCat==='特殊') itemMult=1.5;
   else if(itemKey==='inochi') itemMult=1.3;
   else if(itemKey==='tatsujin'&&eff>1) itemMult=1.2;
   else if(itemKey==='juel') itemMult=1.3;
@@ -2051,15 +2076,15 @@ function calcDamage() {
     if(typeMap[atkAbName]===mtype) atkStatMult*=1.5;
   }
   if(['クォークチャージ','こだいかっせい'].includes(atkAbName)) atkStatMult*=1.3;
-  if(['ちからもち','ヨガパワー'].includes(atkAbName)&&mcat==='物理'&&!isBodyPress) atkStatMult*=2;
-  if(atkAbName==='ごりむちゅう'&&mcat==='物理'){ atkStatMult*=1.5; abilityExtraInfo.push('ごりむちゅう: こうげき×1.5'); }
-  if(atkAbName==='はりきり'&&mcat==='物理'){ atkStatMult*=1.5; abilityExtraInfo.push('はりきり: こうげき×1.5'); }
+  if(['ちからもち','ヨガパワー'].includes(atkAbName)&&effectiveCat==='物理'&&!isBodyPress) atkStatMult*=2;
+  if(atkAbName==='ごりむちゅう'&&effectiveCat==='物理'){ atkStatMult*=1.5; abilityExtraInfo.push('ごりむちゅう: こうげき×1.5'); }
+  if(atkAbName==='はりきり'&&effectiveCat==='物理'){ atkStatMult*=1.5; abilityExtraInfo.push('はりきり: こうげき×1.5'); }
   let ignoreBurnPenalty=false;
-  if(atkAbName==='こんじょう'&&mcat==='物理'&&atkBurn==='0.5'){ atkStatMult*=1.5; ignoreBurnPenalty=true; abilityExtraInfo.push('こんじょう: こうげき×1.5 / やけど補正無視'); }
-  if(atkAbName==='サンパワー'&&mcat==='特殊'&&weather==='sunny'){ atkStatMult*=1.5; abilityExtraInfo.push('サンパワー: とくこう×1.5'); }
-  if(atkAbName==='ねつぼうそう'&&mcat==='特殊'&&atkBurn==='0.5'){ atkStatMult*=1.5; abilityExtraInfo.push('ねつぼうそう: とくこう×1.5'); }
+  if(atkAbName==='こんじょう'&&effectiveCat==='物理'&&atkBurn==='0.5'){ atkStatMult*=1.5; ignoreBurnPenalty=true; abilityExtraInfo.push('こんじょう: こうげき×1.5 / やけど補正無視'); }
+  if(atkAbName==='サンパワー'&&effectiveCat==='特殊'&&weather==='sunny'){ atkStatMult*=1.5; abilityExtraInfo.push('サンパワー: とくこう×1.5'); }
+  if(atkAbName==='ねつぼうそう'&&effectiveCat==='特殊'&&atkBurn==='0.5'){ atkStatMult*=1.5; abilityExtraInfo.push('ねつぼうそう: とくこう×1.5'); }
   if(atkAbName==='すなのちから'&&weather==='sand'&&['じめん','いわ','はがね'].includes(mtype)){ powerMult*=1.3; abilityExtraInfo.push('すなのちから: 対象タイプ技×1.3'); }
-  if(atkAlly==='1.3_battery'&&mcat==='特殊') atkStatMult*=1.3;
+  if(atkAlly==='1.3_battery'&&effectiveCat==='特殊') atkStatMult*=1.3;
   if(atkAlly==='1.5_steel'&&mtype==='はがね') atkStatMult*=1.5;
 
   let dmgMult=1;
@@ -2072,7 +2097,7 @@ function calcDamage() {
     dmgMult*=supremeMult;
     abilityExtraInfo.push('そうだいしょう: 倒れた味方'+fainted+'体→×'+supremeMult.toFixed(1));
   }
-  if(atkBurn==='0.5'&&mcat==='物理'&&!ignoreBurnPenalty) dmgMult*=0.5;
+  if(atkBurn==='0.5'&&effectiveCat==='物理'&&!ignoreBurnPenalty) dmgMult*=0.5;
 
   const parentalBondBlocked = atkAbName==='おやこあい' && isParentalBondBlocked(moveName, hitsInfo, notes);
   const parentalBondActive = atkAbName==='おやこあい' && !parentalBondBlocked;
@@ -2095,7 +2120,7 @@ function calcDamage() {
   let defStatMult=1;
   if(['マルチスケイル','ファントムガード'].includes(defAbName)) defStatMult*=0.5;
   if(['フィルター','ハードロック'].includes(defAbName)&&eff>=2) defStatMult*=0.75;
-  if(defAbName==='ファーコート'&&mcat==='物理') defStatMult*=2;
+  if(defAbName==='ファーコート'&&effectiveCat==='物理') defStatMult*=2;
   if(defAbName==='わざわいのうつわ') defStatMult*=(1/0.75);
   if(['クォークチャージ','こだいかっせい'].includes(defAbName)) defStatMult*=1.3;
   if(defAbData&&defAbData.defDmgMult){
@@ -2108,12 +2133,12 @@ function calcDamage() {
     abilityExtraInfo.push('相手パンクロック: 音技半減');
   }
   if(defItem==='def_1.5_kiseki') defStatMult*=1.5;
-  if(defItem==='def_2_metaba'&&mcat==='物理') defStatMult*=2;
+  if(defItem==='def_2_metaba'&&effectiveCat==='物理') defStatMult*=2;
   if(defAlly==='def_0.75_waza2') defStatMult*=(1/0.75);
   if(defItem==='def_0.5_handi') dmgMult*=0.5;
   if(defAlly==='def_0.75_fureka') dmgMult*=0.75;
-  if(defWall==='wall_0.5_hikari'&&mcat==='特殊') dmgMult*=0.5;
-  if(defWall==='wall_0.5_reflect'&&mcat==='物理') dmgMult*=0.5;
+  if(defWall==='wall_0.5_hikari'&&effectiveCat==='特殊') dmgMult*=0.5;
+  if(defWall==='wall_0.5_reflect'&&effectiveCat==='物理') dmgMult*=0.5;
 
   // ランク
   const RANK=[2/8,2/7,2/6,2/5,2/4,2/3,1,3/2,4/2,5/2,6/2,7/2,8/2];
@@ -2390,6 +2415,7 @@ function calcOneDamage(atkSt,atkBase,defSt,defBase,lv,mtype,mcat,hits,power,item
   const isLowHpMove = moveName==='きしかいせい' || moveName==='じたばた';
   const isStoredPowerLike = moveName==='アシストパワー' || moveName==='つけあがる';
   const isBodyPress = isBodyPressMove(moveName,mcat);
+  const effectiveCat = getEffectiveDefenseCategory(moveName,mcat,atkSt,defSt);
   if(isLowHpMove){
     const hpPct=clampNumber(el('atk-current-hp-pct')?.value||100,0,100);
     power=getLowHpMovePower(hpPct);
@@ -2397,9 +2423,9 @@ function calcOneDamage(atkSt,atkBase,defSt,defBase,lv,mtype,mcat,hits,power,item
   if(isStoredPowerLike){
     power=getStoredPowerLikeInfo().power;
   }
-  let atkStat=isBodyPress ? (atkSt.def||atkSt.atk) : (mcat==='物理'?atkSt.atk:atkSt.spa);
+  let atkStat=isBodyPress ? (atkSt.def||atkSt.atk) : (effectiveCat==='物理'?atkSt.atk:atkSt.spa);
   if(isFoulPlay){ atkStat=defSt.atk||atkStat; }
-  const defStat=mcat==='物理'?defSt.def:defSt.spd;
+  const defStat=effectiveCat==='物理'?defSt.def:defSt.spd;
   const defTypes=defBase?[defBase.type1,defBase.type2].filter(Boolean):[];
   const eff=getTypeEff(mtype,defTypes);
   const atkTypes=getEffectiveAtkTypes(atkBase, abilityName, mtype, moveName);
@@ -2407,8 +2433,8 @@ function calcOneDamage(atkSt,atkBase,defSt,defBase,lv,mtype,mcat,hits,power,item
   const aura = getAuraModifier(mtype, abilityName, el('def-ability')?.value||'');
   let hitsPower=Math.max(1, Math.floor((power||0) * aura.mult));
   let itemMult=1;
-  if(itemKey==='hachimaki'&&mcat==='物理'&&!isBodyPress) itemMult=1.5;
-  else if(itemKey==='megane'&&mcat==='特殊') itemMult=1.5;
+  if(itemKey==='hachimaki'&&effectiveCat==='物理'&&!isBodyPress) itemMult=1.5;
+  else if(itemKey==='megane'&&effectiveCat==='特殊') itemMult=1.5;
   else if(itemKey==='inochi') itemMult=1.3;
 
   let abilityDmgMult=1;
