@@ -132,6 +132,9 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 .nav-btn:hover{border-color:var(--accent);color:var(--accent);}
 .nav-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(0,200,240,0.07);}
 
+  background:radial-gradient(ellipse 50% 35% at 10% 5%,rgba(0,200,240,0.06) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 25% at 90% 90%,rgba(255,48,96,0.04) 0%,transparent 60%),
+.logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:6px;color:var(--accent);text-shadow:0 0 20px rgba(0,200,240,0.4);flex-shrink:0;}
 .gen-selector{display:flex;gap:3px;margin-left:auto;}
 .gen-btn{background:transparent;border:1px solid var(--border);color:var(--text2);padding:4px 11px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;font-size:11px;letter-spacing:1px;transition:all 0.18s;white-space:nowrap;position:relative;}
 .gen-btn:hover{border-color:var(--accent);color:var(--accent);}
@@ -265,8 +268,7 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;margin:4p
 .party-slot-list{display:flex;flex-direction:column;gap:6px;}
 .party-slot-btn{
   padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;
-  transition:all 0.18s;position:relative;border:1px solid var(--border);
-}
+  transition:all 0.18s;position:relative;
 .party-slot-btn:hover,.party-slot-btn.active{border-color:var(--accent);}
 .party-slot-btn.active{background:rgba(0,200,240,0.06);}
 .party-slot-btn.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);}
@@ -324,7 +326,7 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;margin:4p
 .add-breakdown{font-size:11px;color:var(--text3);margin-top:8px;line-height:2;}
 .add-ko-tag{display:inline-block;padding:2px 9px;font-size:10px;font-weight:700;letter-spacing:2px;margin-top:6px;}
 .add-ko1{background:var(--accent2);color:#fff;}.add-ko2{background:var(--accent3);color:#000;}.add-ko3{background:var(--text2);color:#fff;}
-footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18px 20px;margin-top:36px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18px 20px;margin-top:36px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
 /* アクティブタブ不要なので非表示 */
 .tabs{ display:none; }
 
@@ -440,9 +442,6 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 <div class="search-wrap">
           <input class="search-input" id="atk-search" type="text" placeholder="名前を入力..." autocomplete="off">
           <div class="dropdown" id="atk-drop"></div>
-        </div>
-        <div class="quick-action-row">
-          <button type="button" class="quick-action-btn" onclick="openPokemonPicker('atk')">一覧から選ぶ</button>
         </div>
         <div class="poke-card" id="atk-card">
           <div class="poke-no" id="atk-no"></div>
@@ -1147,16 +1146,93 @@ let moveIndex = [];
 let _dataLoaded = false;
 let _pickerSide = 'atk';
 
+function firstDefined(obj, keys, fallback=''){
+  for(const key of keys){
+    if(obj && obj[key] !== undefined && obj[key] !== null && obj[key] !== '') return obj[key];
+  }
+  return fallback;
+}
+function normalizePokemonEntry(raw, idx=0){
+  const name = String(firstDefined(raw,['name','display_name','displayName','pokemon_name','ポケモン','ポケモン名','名称'],'')).trim();
+  const no = parseInt(firstDefined(raw,['no','number','dex','national_no','全国図鑑No','図鑑番号'], idx+1)) || (idx+1);
+  const type1 = String(firstDefined(raw,['type1','type_1','type','タイプ1','タイプ'],'')).trim();
+  const type2 = String(firstDefined(raw,['type2','type_2','タイプ2'],'')).trim();
+  return {
+    ...raw,
+    name,
+    no,
+    type1,
+    type2,
+    hp: parseInt(firstDefined(raw,['hp','HP'])) || 0,
+    atk: parseInt(firstDefined(raw,['atk','attack','攻撃'])) || 0,
+    def: parseInt(firstDefined(raw,['def','defense','防御'])) || 0,
+    spa: parseInt(firstDefined(raw,['spa','sp_atk','special_attack','特攻'])) || 0,
+    spd: parseInt(firstDefined(raw,['spd','sp_def','special_defense','特防'])) || 0,
+    spe: parseInt(firstDefined(raw,['spe','speed','素早さ','素早'])) || 0,
+    weight: parseFloat(firstDefined(raw,['weight','weight_kg','体重'],0)) || 0,
+  };
+}
+function normalizeMoveEntry(raw, idx=0){
+  return {
+    ...raw,
+    name: String(firstDefined(raw,['name','move_name','技','技名'], '')).trim(),
+    type: String(firstDefined(raw,['type','タイプ'], '')).trim(),
+    category: String(firstDefined(raw,['category','cat','分類'], '')).trim(),
+    power: parseInt(firstDefined(raw,['power','威力'],0)) || 0,
+    hits: String(firstDefined(raw,['hits','回数'], '1')).trim() || '1',
+    notes: String(firstDefined(raw,['notes','note','description','説明'], '')).trim(),
+    alwaysCrit: String(firstDefined(raw,['alwaysCrit','always_crit','急所'], '')).trim(),
+    _i: idx,
+  };
+}
+function normalizeSeasonData(raw){
+  if(!raw || typeof raw !== 'object') return {seasons:[]};
+  if(Array.isArray(raw.seasons)) return raw;
+  const seasons = Object.keys(raw).filter(k=>Array.isArray(raw[k]));
+  return { ...raw, seasons };
+}
+function findPokemonByName(name){
+  const q = String(name||'').trim();
+  if(!q) return null;
+  return pokeIndex.find(p=>String(p.name||'').trim()===q) || null;
+}
+function selectPokemonByInput(inputId){
+  const inp = el(inputId);
+  if(!inp) return false;
+  const p = findPokemonByName(inp.value);
+  if(!p) return false;
+  if(inputId==='atk-search') initAtkPoke(p);
+  else if(inputId==='def-search') initDefPoke(p);
+  else if(inputId==='atk2-search') initAtk2(p);
+  return true;
+}
+function showPokemonLoadError(err){
+  console.error(err);
+  const msg = 'ポケモンデータの読み込みに失敗しました。pokemon.json の列名またはJSON形式を確認してください。';
+  ['atk-drop','def-drop','atk2-drop'].forEach(id=>{
+    const drop = el(id);
+    if(!drop) return;
+    drop.innerHTML = `<div class="drop-item" style="cursor:default;color:var(--accent2);">${msg}</div>`;
+    drop.classList.add('show');
+  });
+}
+
 async function loadGameData() {
   if(_dataLoaded) return;
-  const [pd,md,ad,sd,pm] = await Promise.all([
-    fetch('pokemon.json?v='+Date.now()).then(r=>r.json()),
-    fetch('moves.json?v='+Date.now()).then(r=>r.json()),
+  const [pdRaw,mdRaw,adRaw,sdRaw,pmRaw] = await Promise.all([
+    fetch('pokemon.json?v='+Date.now()).then(r=>{ if(!r.ok) throw new Error('pokemon.json '+r.status); return r.json(); }),
+    fetch('moves.json?v='+Date.now()).then(r=>{ if(!r.ok) throw new Error('moves.json '+r.status); return r.json(); }),
     fetch('abilities.json?v='+Date.now()).then(r=>r.json()).catch(()=>({})),
     fetch('season.json?v='+Date.now()).then(r=>r.json()).catch(()=>({seasons:[]})),
     fetch('pokemon_moves.json?v='+Date.now()).then(r=>r.json()).catch(()=>({pokemon:{}})),
   ]);
-  POKEMON_DATA = pd; MOVES_DATA = md; ABILITY_MAP = ad; SEASON_DATA = sd; POKEMON_MOVES = (pm&&pm.pokemon)||{};
+  const rawPokemon = Array.isArray(pdRaw) ? pdRaw : (Array.isArray(pdRaw?.pokemon) ? pdRaw.pokemon : (Array.isArray(pdRaw?.data) ? pdRaw.data : []));
+  const rawMoves = Array.isArray(mdRaw) ? mdRaw : (Array.isArray(mdRaw?.moves) ? mdRaw.moves : (Array.isArray(mdRaw?.data) ? mdRaw.data : []));
+  POKEMON_DATA = rawPokemon.map((p,i)=>normalizePokemonEntry(p,i)).filter(p=>p.name);
+  MOVES_DATA = rawMoves.map((m,i)=>normalizeMoveEntry(m,i)).filter(m=>m.name);
+  ABILITY_MAP = adRaw || {};
+  SEASON_DATA = normalizeSeasonData(sdRaw);
+  POKEMON_MOVES = (pmRaw&&pmRaw.pokemon)||{};
   pokeIndex = POKEMON_DATA.map((p,i)=>Object.assign({_i:i},p));
   moveIndex  = MOVES_DATA.map((m,i)=>Object.assign({_i:i},m));
   _dataLoaded = true;
@@ -1443,13 +1519,13 @@ function closePokemonPicker(){
   el('poke-picker-modal')?.classList.remove('show');
 }
 function selectPickerPokemon(name){
-  const p = pokeIndex.find(x=>x.name===name);
+  const p = findPokemonByName(name);
   if(!p) return;
   if(_pickerSide==='atk'){
-    el('atk-search').value = name;
+    el('atk-search').value = p.name;
     initAtkPoke(p);
   } else {
-    el('def-search').value = name;
+    el('def-search').value = p.name;
     initDefPoke(p);
   }
   closePokemonPicker();
@@ -1499,21 +1575,36 @@ function getSeasonFilteredPokes() {
   return pokeIndex.filter(p=>SEASON_DATA[season].includes(p.name));
 }
 function setupSearch(inputId,dropId,onSelect) {
-  const inp=el(inputId), drop=el(dropId); if(!inp) return;
+  const inp=el(inputId), drop=el(dropId); if(!inp||!drop) return;
   let timer;
   inp.addEventListener('input',()=>{
     clearTimeout(timer); const q=inp.value.trim();
     if(!q){drop.classList.remove('show');return;}
     timer=setTimeout(()=>{
-      const res=getSeasonFilteredPokes().filter(p=>p.name.includes(q)).slice(0,12);
-      if(!res.length){drop.classList.remove('show');return;}
-      drop.innerHTML=res.map(p=>{
+      const res=getSeasonFilteredPokes().filter(p=>String(p.name||'').includes(q)).slice(0,12);
+      if(!res.length){
+        drop.innerHTML = '<div class="drop-item" style="cursor:default;color:var(--text2);">候補がありません</div>';
+        drop.classList.add('show');
+        return;
+      }
+            drop.innerHTML = res.map(p=>{
+        const safeName = String(p.name).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+        const safeArg = JSON.stringify(String(p.name)).replace(/"/g,'&quot;');
         const t1=p.type1?`<span class="type-pill tp-${p.type1}">${p.type1}</span>`:'';
         const t2=p.type2?`<span class="type-pill tp-${p.type2}">${p.type2}</span>`:'';
-        return `<div class="drop-item" onclick="searchDropSelect('${inputId}','${dropId}','${p.name}')"><span class="drop-name">${p.name}</span><span class="drop-types">${t1}${t2}</span></div>`;
+        return `<div class="drop-item" onclick="searchDropSelect('${inputId}','${dropId}',${safeArg})"><span class="drop-name">${safeName}</span><span class="drop-types">${t1}${t2}</span></div>`;
       }).join('');
       drop.classList.add('show');
     },150);
+  });
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){
+      e.preventDefault();
+      if(selectPokemonByInput(inputId)) drop.classList.remove('show');
+    }
+  });
+  inp.addEventListener('blur',()=>{
+    setTimeout(()=>{ selectPokemonByInput(inputId); },120);
   });
   document.addEventListener('click',e=>{
     if(!inp.contains(e.target)&&!drop.contains(e.target)) drop.classList.remove('show');
@@ -1522,8 +1613,9 @@ function setupSearch(inputId,dropId,onSelect) {
 }
 function searchDropSelect(inputId,dropId,name) {
   const inp=el(inputId), drop=el(dropId);
-  inp.value=name; drop.classList.remove('show');
-  const p=pokeIndex.find(x=>x.name===name); if(!p) return;
+  inp.value=String(name||'');
+  drop.classList.remove('show');
+  const p=findPokemonByName(name); if(!p) return;
   if(inp._onSelect){inp._onSelect(p);return;}
   if(inputId==='atk-search') initAtkPoke(p);
   else if(inputId==='def-search') initDefPoke(p);
@@ -2812,22 +2904,26 @@ function setupEvents(){
 
 // ===== 初期化 =====
 window.onload = async()=>{
-  await loadGameData();
-  await initAuth();
-  await loadAbilitiesData();
-  setupSearch('atk-search','atk-drop');
-  setupSearch('def-search','def-drop');
-  setupSearch('atk2-search','atk2-drop');
-  setupMoveSearch('atk-move-search','atk-move-drop');
-  setupMoveSearch('atk1b-move-search','atk1b-move-drop');
-  setupMoveSearch('atk2-move-search','atk2-move-drop');
-  initSeasonFilter();
-  setupEvents();
-  updateDefHazardInfo();
-  el('poke-picker-search')?.addEventListener('input',renderPokemonPickerList);
-  el('poke-picker-modal')?.addEventListener('click',e=>{ if(e.target===el('poke-picker-modal')) closePokemonPicker(); });
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closePokemonPicker(); });
-  renderQuickMoveChips('');
+  try {
+    await loadGameData();
+    if(typeof initAuth==='function') await initAuth();
+    await loadAbilitiesData();
+    setupSearch('atk-search','atk-drop');
+    setupSearch('def-search','def-drop');
+    setupSearch('atk2-search','atk2-drop');
+    setupMoveSearch('atk-move-search','atk-move-drop');
+    setupMoveSearch('atk1b-move-search','atk1b-move-drop');
+    setupMoveSearch('atk2-move-search','atk2-move-drop');
+    initSeasonFilter();
+    setupEvents();
+    updateDefHazardInfo();
+    el('poke-picker-search')?.addEventListener('input',renderPokemonPickerList);
+    el('poke-picker-modal')?.addEventListener('click',e=>{ if(e.target===el('poke-picker-modal')) closePokemonPicker(); });
+    document.addEventListener('keydown',e=>{ if(e.key==='Escape') closePokemonPicker(); });
+    renderQuickMoveChips('');
+  } catch(err) {
+    showPokemonLoadError(err);
+  }
 };
 </script>
 <script>
