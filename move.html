@@ -21,7 +21,7 @@
 <script>
 (function(){
   var dark={'--bg':'#07090f','--bg2':'#0b0e1a','--panel':'#0f1423','--panel2':'#11182b','--border':'#1a2540','--border2':'#243356','--accent':'#00c8f0','--accent2':'#ff3060','--accent3':'#ffc800','--green':'#00e676','--text':'#d8e8ff','--text2':'#4a6080','--text3':'#7a90b0'};
-  var light={'--bg':'#e8f4f8','--bg2':'#d0e8f0','--panel':'#f4fbff','--panel2':'#eef8fc','--border':'#90c8e0','--border2':'#60a8cc','--accent':'#0066aa','--accent2':'#cc1040','--accent3':'#cc7700','--green':'#007744','--text':'#051828','--text2':'#2a5070','--text3':'#0a3050'};
+  var light={'--bg':'#edf5f9','--bg2':'#ffffff','--panel':'#f8fbff','--panel2':'#f2f8fc','--border':'#8fb8d0','--border2':'#5f93b3','--accent':'#005f9e','--accent2':'#b80f3e','--accent3':'#a85d00','--green':'#006f42','--text':'#071b2c','--text2':'#264663','--text3':'#35536e'};
   var t=localStorage.getItem('pokeedge_theme')||'dark';
   var vars=t==='light'?light:dark;
   var root=document.documentElement.style;
@@ -75,7 +75,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(7,9,15,0.96);backdrop-f
 .muted{font-size:11px;color:var(--text3);line-height:1.8;}
 .stage-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;}
 @media(max-width:1120px){.stage-grid{grid-template-columns:1fr;}}
-.slot-shell{display:grid;grid-template-columns:190px minmax(0,1fr);gap:14px;align-items:start;}
+.slot-shell{display:grid;grid-template-columns:220px 1fr;gap:14px;align-items:start;}
 @media(max-width:900px){.slot-shell{grid-template-columns:1fr;}}
 .slot-nav{display:flex;flex-direction:column;gap:8px;}
 .slot-btn{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--border);border-radius:16px;padding:11px 12px;cursor:pointer;text-align:left;transition:all 0.18s;position:relative;overflow:hidden;}
@@ -101,11 +101,10 @@ header{position:sticky;top:0;z-index:100;background:rgba(7,9,15,0.96);backdrop-f
 .section-label{font-size:10px;color:var(--text2);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:10px;}
 .section-label::after{content:'';flex:1;height:1px;background:var(--border);}
 .stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
-@media(max-width:560px){.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
-.stat-box{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:12px 10px;}
-.stat-name{font-size:11px;color:var(--text2);margin-bottom:6px;letter-spacing:1px;}
-.stat-input{width:100%;background:transparent;border:none;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:18px;outline:none;}
-.field-note{font-size:10px;color:var(--text2);margin-top:5px;line-height:1.6;}
+@media(max-width:760px){.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+.stat-box{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:10px;}
+.stat-name{font-size:10px;color:var(--text2);margin-bottom:4px;}
+.stat-input{width:100%;background:transparent;border:none;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:14px;outline:none;}
 .real-stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
 .real-pill{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.02);border:1px solid var(--border);font-size:11px;color:var(--text3);} .real-pill strong{color:var(--text);font-family:'JetBrains Mono',monospace;font-weight:500;}
 .move-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
@@ -148,6 +147,19 @@ header{position:sticky;top:0;z-index:100;background:rgba(7,9,15,0.96);backdrop-f
 footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18px 20px;margin-top:36px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
 .footer-logo{font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--text2);letter-spacing:4px;}
 .tp-ノーマル{background:#9e9e9e;color:#fff;}.tp-ほのお,.tp-炎{background:#c62828;color:#fff;}.tp-みず,.tp-水{background:#1565c0;color:#fff;}.tp-でんき,.tp-電気{background:#f9a825;color:#000;}.tp-くさ,.tp-草{background:#2e7d32;color:#fff;}.tp-こおり,.tp-氷{background:#00838f;color:#fff;}.tp-かくとう,.tp-格闘{background:#b71c1c;color:#fff;}.tp-どく,.tp-毒{background:#6a1b9a;color:#fff;}.tp-じめん,.tp-地面{background:#6d4c41;color:#fff;}.tp-ひこう,.tp-飛行{background:#0277bd;color:#fff;}.tp-エスパー{background:#ad1457;color:#fff;}.tp-むし,.tp-虫{background:#558b2f;color:#fff;}.tp-いわ,.tp-岩{background:#4e342e;color:#fff;}.tp-ゴースト{background:#4a148c;color:#fff;}.tp-ドラゴン{background:#4527a0;color:#fff;}.tp-あく,.tp-悪{background:#212121;color:#fff;}.tp-はがね,.tp-鋼{background:#455a64;color:#fff;}.tp-フェアリー{background:#880e4f;color:#fff;}
+
+[data-theme="light"] body{background:var(--bg);}
+[data-theme="light"] body::before{background:radial-gradient(ellipse 55% 38% at 10% 6%,rgba(0,95,158,0.08) 0%,transparent 62%),linear-gradient(rgba(0,95,158,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,95,158,0.05) 1px,transparent 1px);background-size:auto,52px 52px,52px 52px;}
+[data-theme="light"] header{background:rgba(248,251,255,0.96);border-bottom:1px solid var(--border2);}
+[data-theme="light"] .header-nav{background:rgba(248,251,255,0.98);}
+[data-theme="light"] .card,[data-theme="light"] .block,[data-theme="light"] .rank-card,[data-theme="light"] .slot-btn,[data-theme="light"] .slot-editor{background:linear-gradient(180deg,#f8fbff,#f1f7fb);}
+[data-theme="light"] .select,[data-theme="light"] .input,[data-theme="light"] .textarea,[data-theme="light"] .stat-box,[data-theme="light"] .move-card,[data-theme="light"] .matrix,[data-theme="light"] .table-wrap{background:var(--bg2);}
+[data-theme="light"] .matrix thead th{background:#e7f2f8;}
+[data-theme="light"] .matrix tbody tr:hover td{background:#f3f8fb;}
+[data-theme="light"] .btn{background:#f8fbff;color:var(--text);}
+[data-theme="light"] .btn.primary{background:linear-gradient(135deg,var(--accent),#3b84b8);color:#fff;}
+[data-theme="light"] .btn.primary:hover{color:#fff;}
+[data-theme="light"] .nav-btn.active{background:rgba(0,95,158,0.10);}
 </style>
 </head>
 <body>
@@ -180,7 +192,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
     <div>
       <div style="font-size:10px;color:var(--text2);letter-spacing:3px;margin-bottom:6px;">MOVE MATCHUP BOARD</div>
       <div class="page-title">6体 × 4技 × 6体</div>
-      <div class="page-desc">自分側は保存済みパーティ読み込み・ポケモン登録反映・自由入力の3通り。相手側は6体まで自由入力し、プリセットや性格まで調整したうえで、内定ポケモンを中心に対面ごとのダメージをまとめて比較できます。</div>
+      <div class="page-desc">自分側は保存済みパーティ読み込み・ポケモン登録反映・自由入力の3通り。相手側は6体まで自由入力し、プリセットや性格まで調整したうえで、対面ごとのダメージをまとめて比較できます。</div>
     </div>
   </div>
 
@@ -234,7 +246,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
         <div class="summary-pill">技行 <strong>0</strong></div>
         <div class="summary-pill">対面結果 <strong>0</strong></div>
       </div>
-      <div class="muted" style="margin-top:10px;">6体×4技×6体まで埋めると 144 通りの結果になります。候補ポケモンの表示は内定ポケモン優先です。</div>
+      <div class="muted" style="margin-top:10px;">6体×4技×6体まで埋めると 144 通りの結果になります。候補表示は内定ポケモン優先、努力値は見やすい3列表示です。</div>
     </div>
   </div>
 
@@ -285,8 +297,6 @@ let ABILITIES_DATA = [];
 let POKEMON_MOVES = {};
 let BELONGINGS = [];
 let SEASON_DATA = {seasons:[]};
-let confirmedPokemonNames = new Set();
-let confirmedPokemonList = [];
 let pokeIndex = [];
 let moveIndex = [];
 let moveByName = new Map();
@@ -373,30 +383,23 @@ async function loadGameData(){
   POKEMON_MOVES = normalizePokemonMoves(pmd);
   BELONGINGS = normalizeBelongings(bd);
   SEASON_DATA = sd && typeof sd === 'object' ? sd : {seasons:[]};
-  confirmedPokemonNames = new Set(Array.isArray(SEASON_DATA['内定']) ? SEASON_DATA['内定'].map(name=>String(name||'').trim()).filter(Boolean) : []);
   pokeIndex = POKEMON_DATA.map((p,i)=>Object.assign({_i:i}, p));
-  confirmedPokemonList = pokeIndex.filter(p=>confirmedPokemonNames.has(String(p.name||'').trim()));
   moveIndex = MOVES_DATA.map((m,i)=>Object.assign({_i:i}, m));
   pokeByName = new Map(pokeIndex.map(p=>[String(p.name||'').trim(), p]));
   moveByName = new Map(moveIndex.map(m=>[String(m.name||'').trim(), m]));
   _dataLoaded = true;
 }
-function getSelectablePokemonList(){
-  return confirmedPokemonList.length ? confirmedPokemonList : pokeIndex;
-}
-function isConfirmedPokemonName(name){
-  const key = String(name || '').trim();
-  return !confirmedPokemonNames.size || confirmedPokemonNames.has(key);
-}
 function buildDataLists(){
   const pokeList = el('pokemon-datalist');
   const moveList = el('move-datalist');
   const itemList = el('item-datalist');
-  pokeList.innerHTML = getSelectablePokemonList().map(p=>`<option value="${escapeAttr(p.name)}"></option>`).join('');
+  const availablePokes = getAvailablePokemonList();
+  pokeList.innerHTML = availablePokes.map(p=>`<option value="${escapeAttr(p.name)}"></option>`).join('');
   moveList.innerHTML = moveIndex.filter(m=>m.category==='物理'||m.category==='特殊').map(m=>`<option value="${escapeAttr(m.name)}"></option>`).join('');
   itemList.innerHTML = BELONGINGS.map(item=>`<option value="${escapeAttr(getItemName(item))}"></option>`).join('');
 }
 function getItemName(item){ return String(item?.name || item?.item || item?.displayName || item?.title || '').trim(); }
+function getAvailablePokemonList(){ const naitei = SEASON_DATA && Array.isArray(SEASON_DATA['内定']) ? SEASON_DATA['内定'] : null; if(!naitei || !naitei.length) return pokeIndex; const set = new Set(naitei); return pokeIndex.filter(p=>set.has(String(p.name||'').trim())); }
 function getAbilityData(name){ return ABILITIES_DATA.find(a=>a.name===name) || null; }
 function getAbilityOptions(pokeName){ return Array.isArray(ABILITY_MAP[pokeName]) ? ABILITY_MAP[pokeName] : []; }
 function knownMovesForPokemon(pokeName){ const row = POKEMON_MOVES[pokeName]; return row && Array.isArray(row.moves) ? row.moves : []; }
@@ -526,8 +529,7 @@ function renderSelfEditor(){
       </div>
       <div>
         <div class="label">ポケモン名</div>
-        <input class="input" list="pokemon-datalist" value="${escapeAttr(slot.pokeName)}" onchange="setSlotPokemonName('self',${activeSelfIndex},this.value)" placeholder="内定ポケモンから選ぶ">
-        <div class="field-note">候補表示は内定ポケモンのみです。</div>
+        <input class="input" list="pokemon-datalist" value="${escapeAttr(slot.pokeName)}" onchange="setSlotPokemonName('self',${activeSelfIndex},this.value)" placeholder="自由に選ぶ">
       </div>
     </div>
 
@@ -588,8 +590,7 @@ function renderOppEditor(){
     <div class="editor-grid two">
       <div>
         <div class="label">ポケモン名</div>
-        <input class="input" list="pokemon-datalist" value="${escapeAttr(slot.pokeName)}" onchange="setSlotPokemonName('opp',${activeOppIndex},this.value)" placeholder="内定ポケモンから選ぶ">
-        <div class="field-note">候補表示は内定ポケモンのみです。</div>
+        <input class="input" list="pokemon-datalist" value="${escapeAttr(slot.pokeName)}" onchange="setSlotPokemonName('opp',${activeOppIndex},this.value)" placeholder="自由に選ぶ">
       </div>
       <div>
         <div class="label">努力値プリセット</div>
@@ -675,9 +676,6 @@ function setSlotPokemonName(side, index, value){
   if(poke){
     ensureAbility(slot);
     if(side==='self') ensureMoves(slot);
-    if(!isConfirmedPokemonName(name)){
-      setPageStatus('候補表示は内定ポケモンのみです。入力した「' + name + '」はそのまま保持しています。');
-    }
   } else {
     slot.ability = '';
   }
@@ -926,11 +924,11 @@ window.onload = async()=>{
   buildDataLists();
   renderAll();
   applyImmediateThemeButton();
-  setPageStatus('候補表示は内定ポケモンのみです。努力値は見やすい3列表示にしています。');
+  setPageStatus('保存済みパーティ・ポケモン登録・自由入力を混ぜて使えます。候補表示は内定ポケモン優先です。');
 };
 </script>
 <script>
-var THEMES = {dark:{"--bg":"#07090f","--bg2":"#0b0e1a","--panel":"#0f1423","--panel2":"#11182b","--border":"#1a2540","--border2":"#243356","--accent":"#00c8f0","--accent2":"#ff3060","--accent3":"#ffc800","--green":"#00e676","--text":"#d8e8ff","--text2":"#4a6080","--text3":"#7a90b0"},light:{"--bg":"#e8f4f8","--bg2":"#d0e8f0","--panel":"#f4fbff","--panel2":"#eef8fc","--border":"#90c8e0","--border2":"#60a8cc","--accent":"#0066aa","--accent2":"#cc1040","--accent3":"#cc7700","--green":"#007744","--text":"#051828","--text2":"#2a5070","--text3":"#0a3050"}};
+var THEMES = {dark:{"--bg":"#07090f","--bg2":"#0b0e1a","--panel":"#0f1423","--panel2":"#11182b","--border":"#1a2540","--border2":"#243356","--accent":"#00c8f0","--accent2":"#ff3060","--accent3":"#ffc800","--green":"#00e676","--text":"#d8e8ff","--text2":"#4a6080","--text3":"#7a90b0"},light:{"--bg":"#edf5f9","--bg2":"#ffffff","--panel":"#f8fbff","--panel2":"#f2f8fc","--border":"#8fb8d0","--border2":"#5f93b3","--accent":"#005f9e","--accent2":"#b80f3e","--accent3":"#a85d00","--green":"#006f42","--text":"#071b2c","--text2":"#264663","--text3":"#35536e"}};
 function applyTheme(theme){ var vars = THEMES[theme] || THEMES.dark; var root = document.documentElement.style; for(var k in vars) root.setProperty(k, vars[k]); localStorage.setItem('pokeedge_theme', theme); var btn = document.getElementById('theme-btn'); if(btn) btn.textContent = theme === 'light' ? '🌙' : '☀️'; document.documentElement.setAttribute('data-theme', theme); }
 function toggleTheme(){ var current = localStorage.getItem('pokeedge_theme') || 'dark'; applyTheme(current === 'dark' ? 'light' : 'dark'); }
 (function(){ var t = localStorage.getItem('pokeedge_theme') || 'dark'; var vars = THEMES[t] || THEMES.dark; var root = document.documentElement.style; for(var k in vars) root.setProperty(k, vars[k]); document.documentElement.setAttribute('data-theme', t); })();
