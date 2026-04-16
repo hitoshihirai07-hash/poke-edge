@@ -248,13 +248,6 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;margin:4p
 .main-btn:hover{opacity:0.85;transform:translateY(-1px);}
 .result-box{background:var(--bg2);border:1px solid var(--border);padding:16px;display:none;}
 .result-box.show{display:block;}
-.damage-workspace{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start;}
-.damage-main-col,.damage-side-col{min-width:0;}
-.damage-side-col{display:block;}
-.result-sticky{position:sticky;top:66px;display:flex;flex-direction:column;gap:12px;}
-.result-placeholder{background:var(--panel);border:1px solid var(--border);padding:14px;}
-.result-placeholder.hide{display:none;}
-#inline-result-anchor{display:none;}
 .dmg-num{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--accent);line-height:1;text-shadow:0 0 20px rgba(0,200,240,0.3);}
 .dmg-pct{font-family:'JetBrains Mono',monospace;font-size:26px;color:var(--accent);margin-top:4px;}
 .dmg-bar-wrap{height:8px;background:var(--bg);overflow:hidden;margin:8px 0;}
@@ -301,16 +294,8 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;margin:4p
 @media(max-width:700px){.party-layout{grid-template-columns:1fr;}}
 .party-slot-list{display:flex;flex-direction:column;gap:6px;}
 .party-slot-btn{
-  background:var(--bg2);
-  border:1px solid var(--border);
-  padding:10px 12px;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  transition:all 0.18s;
-  position:relative;
-}
+  padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;
+  transition:all 0.18s;position:relative;
 .party-slot-btn:hover,.party-slot-btn.active{border-color:var(--accent);}
 .party-slot-btn.active{background:rgba(0,200,240,0.06);}
 .party-slot-btn.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);}
@@ -368,7 +353,7 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;margin:4p
 .add-breakdown{font-size:11px;color:var(--text3);margin-top:8px;line-height:2;}
 .add-ko-tag{display:inline-block;padding:2px 9px;font-size:10px;font-weight:700;letter-spacing:2px;margin-top:6px;}
 .add-ko1{background:var(--accent2);color:#fff;}.add-ko2{background:var(--accent3);color:#000;}.add-ko3{background:var(--text2);color:#fff;}
-footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18px 20px;margin-top:36px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+footer{position:relative;z-index:1;footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18px 20px;margin-top:36px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
 /* アクティブタブ不要なので非表示 */
 .tabs{ display:none; }
 
@@ -435,26 +420,25 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
   .main-btn{font-size:17px;letter-spacing:3px;}
   .card-title{font-size:11px;}
 }
-
-.mobile-result-bar{display:none;}
-.mobile-result-progress{height:4px;background:rgba(255,255,255,0.08);}
-.mobile-result-progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--accent3));transition:width .25s ease;}
-.mobile-result-summary{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border:none;background:rgba(15,20,35,0.98);color:var(--text);cursor:pointer;text-align:left;}
-.mobile-result-summary-main{font-size:16px;font-weight:700;line-height:1.35;}
-.mobile-result-summary-sub{font-size:11px;color:var(--text2);line-height:1.5;margin-top:2px;}
-.mobile-result-summary-icon{font-size:18px;color:var(--accent3);flex-shrink:0;}
 @media(max-width:768px){
-  .damage-workspace{display:block;gap:12px;}
-  .damage-main-col,.damage-side-col,.calc-grid,.card,.setup-entry,.result-box,.add-section,.add-card{min-width:0;}
-  .result-placeholder{display:none !important;}
-  .mobile-result-bar{display:block;position:fixed;left:0;right:0;bottom:0;z-index:140;border-top:1px solid var(--border2);box-shadow:0 -10px 24px rgba(0,0,0,0.35);}
-  .damage-side-col{display:none;}
-  .result-sticky{gap:0;}
-  #inline-result-anchor{display:block;}
-  .result-box{padding:12px;}
-  .result-box .sec{margin-bottom:8px;}
-  footer{padding-bottom:82px;}
+  .card{padding:14px;overflow:hidden;}
+  .poke-card{padding:10px;overflow:hidden;}
+  .poke-name{font-size:18px;line-height:1.35;}
+  .poke-types{margin-bottom:6px;flex-wrap:wrap;}
+  .type-pill{padding:3px 6px;font-size:10px;}
+  #atk-basestats,#def-basestats,#atk2-basestats{display:none !important;}
+  #atk-abilities,#def-abilities,#atk2-abilities{margin-top:4px !important;gap:4px !important;flex-wrap:wrap !important;}
+  .slider-inputs{grid-template-columns:minmax(0,1fr) 68px;}
+  .real-stat-box{padding:10px 10px 8px;}
+  .real-stat-row{display:grid;grid-template-columns:52px minmax(0,1fr);gap:2px 8px;align-items:end;}
+  .real-stat-label{width:auto;}
+  .real-stat-val{justify-self:end;font-size:20px;}
+  .real-stat-note{grid-column:2;justify-self:end;text-align:right;}
+  .corr-grid{grid-template-columns:1fr !important;}
+  .corr-section{padding:10px 10px 8px;overflow:hidden;}
+  .hp-wrap,.real-stat-box,.corr-section,.search-wrap,.quick-action-row,.quick-chip-wrap{max-width:100%;}
 }
+
 /* ===== ライトモード ===== */
 </style>
 </head>
@@ -1253,17 +1237,6 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
   </div>
 </div>
 
-<div class="mobile-result-bar" id="mobile-result-bar" hidden>
-  <div class="mobile-result-progress"><div class="mobile-result-progress-fill" id="mobile-result-progress-fill"></div></div>
-  <button type="button" class="mobile-result-summary" onclick="scrollToResultBox()">
-    <span>
-      <span class="mobile-result-summary-main" id="mobile-result-summary-main">ダメージ結果はここに表示されます</span>
-      <span class="mobile-result-summary-sub" id="mobile-result-summary-sub">攻撃側・防御側・技を決めると自動更新されます</span>
-    </span>
-    <span class="mobile-result-summary-icon">⌃</span>
-  </button>
-</div>
-
 <footer>
   <div class="footer-logo">PokeEdge</div>
   <div class="footer-text">非公式ファンサイト / Unofficial Fan Tool<br>ポケモン1210種・技520種対応</div>
@@ -1833,29 +1806,26 @@ function renderDamageSetupPicked(kind){
   box.innerHTML = `<strong>${escapeHtml(name)}</strong><div class="damage-setup-item-meta">${escapeHtml(types)}</div>`;
 }
 function renderDamageSetupLists(){
-  const isMobileSetup = window.innerWidth <= 768;
   ['atk','def'].forEach(kind=>{
     const list = el(`setup-${kind}-list`);
     if(!list) return;
     const selectedName = _damageSetupState[`${kind}Name`];
-    const q = (el(`setup-${kind}-search`)?.value||'').trim();
-    const items = (isMobileSetup && !q) ? [] : getSetupPokemonItems(kind);
+    const items = getSetupPokemonItems(kind);
     list.innerHTML = items.map(p=>{
       const selected = selectedName===p.name ? ' is-selected' : '';
       const types = [p.type1,p.type2].filter(Boolean).join(' / ');
       return `<button type="button" class="damage-setup-item${selected}" onclick="selectDamageSetupOption('${kind}','${encodeJsArg(p.name)}')"><div class="picker-item-no">#${String(p.no).padStart(3,'0')}</div><div class="picker-item-name">${escapeHtml(p.name)}</div><div class="damage-setup-item-meta">${escapeHtml(types||'タイプ不明')}</div></button>`;
-    }).join('') || `<div class="quick-note">${isMobileSetup && !q ? '検索して候補を表示します。' : '該当するポケモンがありません。'}</div>`;
+    }).join('') || '<div class="quick-note">該当するポケモンがありません。</div>';
   });
   const moveList = el('setup-move-list');
   if(moveList){
-    const q = (el('setup-move-search')?.value||'').trim();
-    const items = (isMobileSetup && !q) ? [] : getSetupMoveItems();
+    const items = getSetupMoveItems();
     moveList.innerHTML = items.map(m=>{
       const selected = _damageSetupState.moveName===m.name ? ' is-selected' : '';
       const extra = [m.type||'—', m.category||'—', `威力 ${m.power ?? '—'}`];
       const known = m._known ? '判明技を優先表示' : '';
       return `<button type="button" class="damage-setup-item${selected}" onclick="selectDamageSetupOption('move','${encodeJsArg(m.name)}')"><div class="picker-item-name">${escapeHtml(m.name)}</div><div class="damage-setup-item-meta">${escapeHtml(extra.join(' / '))}${known?`<br>${escapeHtml(known)}`:''}</div></button>`;
-    }).join('') || `<div class="quick-note">${isMobileSetup && !q ? '技名を入れると候補を表示します。' : '該当する技がありません。'}</div>`;
+    }).join('') || '<div class="quick-note">該当する技がありません。</div>';
   }
   renderDamageSetupPicked('atk');
   renderDamageSetupPicked('def');
@@ -1951,7 +1921,6 @@ function clearDamageSetupSelection(){
   if(el('result-box')) el('result-box').classList.remove('show');
   renderQuickMoveChips('');
   updateDamageSetupSummary();
-  updateResultAreaState();
 }
 
 function clearAbilitySide(side){
@@ -2070,20 +2039,30 @@ function moveDrop(inputId,dropId,name) {
 // ===== 種族値バー =====
 function renderBaseStats(side,p) {
   const el2=el(side+'-basestats'); if(!el2||!p) return;
+  if(window.innerWidth <= 768){
+    el2.innerHTML='';
+    return;
+  }
   const stats=[{k:'HP',v:p.hp,c:'#e53935'},{k:'攻撃',v:p.atk,c:'#fb8c00'},{k:'防御',v:p.def,c:'#fdd835'},
     {k:'特攻',v:p.spa,c:'#1e88e5'},{k:'特防',v:p.spd,c:'#00acc1'},{k:'素早',v:p.spe,c:'#8e24aa'}];
   const total=stats.reduce((s,x)=>s+(x.v||0),0);
-  el2.innerHTML='<div style="margin-top:4px;">'+stats.map(s=>{
+  el2.innerHTML='<div style="margin-top:4px;min-width:0;">'+stats.map(s=>{
     const pct=Math.min(100,Math.round((s.v||0)/255*100));
-    return `<div style="display:flex;align-items:center;gap:4px;margin-bottom:1px;">
-      <span style="font-size:9px;color:var(--text2);width:24px;text-align:right;">${s.k}</span>
-      <div style="flex:1;height:4px;background:var(--bg);border-radius:2px;">
+    return `<div style="display:grid;grid-template-columns:28px minmax(0,1fr) 28px;align-items:center;gap:4px;margin-bottom:2px;min-width:0;">
+      <span style="font-size:9px;color:var(--text2);text-align:right;">${s.k}</span>
+      <div style="min-width:0;height:4px;background:var(--bg);border-radius:2px;overflow:hidden;">
         <div style="width:${pct}%;height:100%;background:${s.c};border-radius:2px;"></div>
       </div>
-      <span style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--text3);width:26px;">${s.v||0}</span>
+      <span style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--text3);text-align:right;">${s.v||0}</span>
     </div>`;
-  }).join('')+`<div style="font-size:9px;color:var(--text2);text-align:right;margin-top:1px;">合計 <span style="color:var(--accent3);">${total}</span></div></div>`;
+  }).join('')+`<div style="font-size:9px;color:var(--text2);text-align:right;margin-top:2px;">合計 <span style="color:var(--accent3);">${total}</span></div></div>`;
 }
+
+window.addEventListener('resize', ()=>{
+  if(window._atkBase) renderBaseStats('atk', window._atkBase);
+  if(window._defBase) renderBaseStats('def', window._defBase);
+  if(window._atk2Base) renderBaseStats('atk2', window._atk2Base);
+});
 
 // ===== 特性バッジ =====
 function getAbilityByName(name){ return ABILITIES_DATA.find(a=>a.name===name)||null; }
@@ -2824,7 +2803,6 @@ function calcDamage(options={}) {
   else if(judgeMn*3>=100) {kt.innerHTML='<span class="ko-tag ko3">確定3発</span>';el('dmg-desc').textContent=judgePrefix+'3回で確実に倒せます';}
   else if(judgeMx*3>=100) {kt.innerHTML='<span class="ko-tag ko3">乱数3発</span>';el('dmg-desc').textContent=judgePrefix+'乱数次第で3発で倒せます';}
   else                {kt.innerHTML='<span class="ko-tag ko3">4発以上</span>';el('dmg-desc').textContent=judgePrefix+'4回以上必要です';}
-  updateResultAreaState();
   return true;
 }
 function showResult0(abName){
@@ -2836,7 +2814,6 @@ function showResult0(abName){
   el('ko-tag').innerHTML='<span class="ko-tag ko3">無効</span>';
   el('dmg-desc').textContent='特性により無効化されます';
   el('dmg-rolls').innerHTML='';
-  updateResultAreaState();
 }
 
 // ===== 加算計算 =====
@@ -3347,102 +3324,6 @@ function setupEvents(){
   });
 }
 
-
-
-function ensureDamageWorkspace(){
-  const tab=el('tab-damage');
-  const setup=tab?.querySelector('.setup-entry');
-  const resultBox=el('result-box');
-  if(!tab || !setup || !resultBox) return;
-  if(!el('damage-workspace')){
-    const workspace=document.createElement('div');
-    workspace.className='damage-workspace';
-    workspace.id='damage-workspace';
-    const main=document.createElement('div');
-    main.className='damage-main-col';
-    main.id='damage-main-col';
-    const inlineAnchor=document.createElement('div');
-    inlineAnchor.id='inline-result-anchor';
-    const side=document.createElement('aside');
-    side.className='damage-side-col';
-    side.id='damage-side-col';
-    const sticky=document.createElement('div');
-    sticky.className='result-sticky';
-    sticky.id='result-sticky';
-    const placeholder=document.createElement('div');
-    placeholder.className='result-placeholder card';
-    placeholder.id='result-placeholder';
-    placeholder.innerHTML='<div class="card-title">計算結果</div><div style="font-size:12px;color:var(--text3);line-height:1.8;">ここにダメージ結果を表示します。攻撃側・防御側・技を決めたあと、努力値や性格、ランクを変えるたびに更新されます。</div>';
-    sticky.appendChild(placeholder);
-    side.appendChild(sticky);
-
-    const moving=[];
-    let node=setup.nextElementSibling;
-    while(node){
-      const next=node.nextElementSibling;
-      if(node.id==='damage-workspace' || node.id==='mobile-result-bar') break;
-      moving.push(node);
-      node=next;
-    }
-    moving.forEach(child=>{
-      if(child===resultBox) return;
-      if(child.id==='add-section') main.appendChild(inlineAnchor);
-      main.appendChild(child);
-    });
-    if(!inlineAnchor.parentNode) main.appendChild(inlineAnchor);
-    workspace.appendChild(main);
-    workspace.appendChild(side);
-    setup.insertAdjacentElement('afterend', workspace);
-  }
-  placeResultBoxForViewport();
-}
-function placeResultBoxForViewport(){
-  const box=el('result-box');
-  const inlineAnchor=el('inline-result-anchor');
-  const sticky=el('result-sticky');
-  if(!box || !inlineAnchor || !sticky) return;
-  if(window.innerWidth<=768){
-    if(box.parentElement!==inlineAnchor) inlineAnchor.appendChild(box);
-  }else{
-    if(box.parentElement!==sticky) sticky.appendChild(box);
-  }
-}
-
-function updateResultAreaState(){
-  placeResultBoxForViewport();
-  const placeholder=el('result-placeholder');
-  const resultBox=el('result-box');
-  const hasResult=!!(resultBox && resultBox.classList.contains('show'));
-  if(placeholder) placeholder.classList.toggle('hide', hasResult);
-  updateMobileResultBar();
-}
-function updateMobileResultBar(){
-  const bar=el('mobile-result-bar');
-  if(!bar) return;
-  const resultBox=el('result-box');
-  const shown=!!(resultBox && resultBox.classList.contains('show'));
-  bar.hidden=false;
-  if(!shown){
-    if(el('mobile-result-summary-main')) el('mobile-result-summary-main').textContent='ダメージ結果はここに表示されます';
-    if(el('mobile-result-summary-sub')) el('mobile-result-summary-sub').textContent='攻撃側・防御側・技を決めると自動更新されます';
-    if(el('mobile-result-progress-fill')) el('mobile-result-progress-fill').style.width='0%';
-    return;
-  }
-  const main=el('mobile-result-summary-main');
-  const sub=el('mobile-result-summary-sub');
-  const dmg=(el('dmg-num')?el('dmg-num').textContent:'—').trim();
-  const pct=(el('dmg-pct')?el('dmg-pct').textContent:'').trim();
-  const ko=(el('ko-tag')?el('ko-tag').textContent:'').trim();
-  if(main) main.textContent=dmg + (pct ? '（'+pct+'）' : '');
-  if(sub) sub.textContent=ko || ((el('dmg-desc')?el('dmg-desc').textContent:'').trim()) || '詳細を確認';
-  const p=(el('dmg-bar')?el('dmg-bar').style.width:'0%') || '0%';
-  if(el('mobile-result-progress-fill')) el('mobile-result-progress-fill').style.width=p;
-}
-function scrollToResultBox(){
-  const box=el('result-box');
-  if(!box) return;
-  box.scrollIntoView({behavior:'smooth', block:'start'});
-}
 // ===== 初期化 =====
 window.onload = async()=>{
   await loadGameData();
@@ -3465,9 +3346,6 @@ window.onload = async()=>{
   document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closePokemonPicker(); closeDamageSetupModal(); } });
   renderQuickMoveChips('');
   updateDamageSetupSummary();
-  ensureDamageWorkspace();
-  updateResultAreaState();
-  window.addEventListener('resize', ()=>{ placeResultBoxForViewport(); renderDamageSetupLists(); updateMobileResultBar(); });
 };
 </script>
 <script>
