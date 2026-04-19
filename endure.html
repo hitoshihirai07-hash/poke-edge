@@ -1,0 +1,1345 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>耐久調整ツール | Poke-Edge</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b1220;
+    --bg2:#121c30;
+    --panel:#16233a;
+    --panel2:#1b2b46;
+    --line:#29405f;
+    --text:#eef4ff;
+    --muted:#aebcd7;
+    --accent:#7dd3fc;
+    --accent2:#86efac;
+    --chip:#22324f;
+    --danger:#fca5a5;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#09111d 0%,#0b1220 100%);color:var(--text);font-family:"Noto Sans JP",system-ui,sans-serif;min-height:100vh;overflow-x:hidden;}
+  .wrap{max-width:1320px;margin:0 auto;padding:18px 14px 42px}
+  h1{margin:0 0 6px;font-size:28px;line-height:1.2}
+  h2{margin:0 0 10px;font-size:20px}
+  h3{margin:0 0 10px;font-size:17px}
+  p{margin:0}
+  .lead{color:var(--muted);font-size:13px;line-height:1.8}
+  .card{background:rgba(22,35,58,.92);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.24)}
+  .section-gap{margin-top:14px}
+  .stack{display:grid;gap:14px}
+  .grid-2{display:grid;grid-template-columns:1.08fr 1.18fr;gap:14px;align-items:start}
+  .grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .field-grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+  label{display:block;margin:0 0 6px;font-size:12px;color:var(--muted)}
+  input[type="text"], input[type="number"], select{width:100%;background:var(--bg2);border:1px solid var(--line);color:var(--text);padding:10px 12px;border-radius:12px;font-size:14px;outline:none}
+  input:focus,select:focus{border-color:var(--accent)}
+  .btn-row,.chip-row,.mega-row{display:flex;gap:8px;flex-wrap:wrap}
+  .btn,.mini-btn,.rank-chip{appearance:none;border:1px solid var(--line);background:var(--chip);color:var(--text);padding:8px 12px;border-radius:999px;font-size:12px;cursor:pointer}
+  .btn.active,.mini-btn.active,.rank-chip.active{background:linear-gradient(90deg,rgba(125,211,252,.25),rgba(134,239,172,.18));border-color:var(--accent)}
+  .mini-btn{padding:6px 10px}
+  .sub{font-size:12px;color:var(--muted);line-height:1.8}
+  .sub-strong{font-size:12px;color:var(--text);line-height:1.8}
+  .mode-line{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+  .pill{display:inline-block;padding:4px 8px;border-radius:999px;background:rgba(125,211,252,.16);color:var(--accent);font-size:11px;border:1px solid rgba(125,211,252,.28)}
+  .ev-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+  .ev-grid.atk{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .ev-box{background:rgba(10,16,28,.35);border:1px solid var(--line);border-radius:12px;padding:8px}
+  .ev-box span{display:block;font-size:11px;color:var(--muted);margin-bottom:5px}
+  .stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
+  .stats-grid.atk{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .stat{background:rgba(10,16,28,.4);border:1px solid var(--line);border-radius:12px;padding:8px 10px;text-align:center}
+  .stat .k{font-size:11px;color:var(--muted)}
+  .stat .v{font-size:18px;font-weight:700;margin-top:3px}
+  .result-panel{background:rgba(10,16,28,.35);border:1px solid var(--line);border-radius:14px;padding:12px}
+  .result-grid{display:grid;grid-template-columns:1.2fr .8fr .8fr;gap:10px;align-items:start}
+  .result-big{font-size:28px;font-weight:800;line-height:1.2}
+  .result-range{font-size:13px;color:var(--muted);line-height:1.7;margin-top:4px}
+  .result-box{background:rgba(10,16,28,.45);border:1px solid var(--line);border-radius:12px;padding:10px}
+  .result-box .k{font-size:11px;color:var(--muted)}
+  .result-box .v{font-size:16px;font-weight:700;margin-top:4px;line-height:1.5}
+  .result-rolls{margin-top:10px;background:rgba(10,16,28,.45);border:1px solid var(--line);border-radius:12px;padding:10px;line-height:1.9;font-size:13px}
+  .result-bar{height:16px;background:var(--bg2);border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-top:10px}
+  .result-bar > div{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .18s ease}
+  .chooser{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;max-height:340px;overflow:auto;padding-right:2px}
+  .rank-chip{border-radius:14px;padding:10px 12px;text-align:left;display:flex;justify-content:space-between;align-items:center;background:rgba(15,24,40,.75)}
+  .rank-chip .name{display:block;font-size:14px}
+  .rank-chip .meta{display:block;font-size:10px;color:var(--muted);margin-top:3px;line-height:1.5}
+  .rank-chip .num{display:inline-flex;min-width:34px;justify-content:center;font-weight:700;color:var(--accent)}
+  .selected-list{display:grid;gap:12px}
+  .selected-card{border:1px solid var(--line);border-radius:14px;padding:12px;background:rgba(11,18,32,.35)}
+  .selected-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap;margin-bottom:10px}
+  .selected-title{font-size:18px;font-weight:700}
+  .danger{color:var(--danger)}
+  .muted-banner{border:1px dashed var(--line);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--muted);line-height:1.8}
+  .hidden-frame{position:absolute;left:-99999px;top:-99999px;width:1200px;height:2400px;opacity:0;pointer-events:none}
+  .empty{border:1px dashed var(--line);border-radius:14px;padding:18px;color:var(--muted);text-align:center}
+  .top-space{margin-top:14px}
+  .status-line{font-size:12px;color:var(--muted);line-height:1.8}
+  .clear-btn{margin-left:auto}
+  
+header{position:sticky;top:0;z-index:100;background:rgba(7,9,15,0.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--line);height:52px;padding:0 20px;display:flex;align-items:center;gap:14px;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:6px;color:var(--accent);text-shadow:0 0 20px rgba(125,211,252,0.35);flex-shrink:0;cursor:pointer;}
+.logo em{color:#ff5c8a;font-style:normal;}
+.header-sep{width:1px;height:16px;background:var(--line);flex-shrink:0;}
+.header-sub{font-size:10px;color:var(--muted);letter-spacing:2px;flex-shrink:0;}
+.header-nav{display:flex;gap:3px;margin-left:auto;flex-wrap:nowrap;overflow-x:auto;}
+.nav-btn{background:transparent;border:1px solid var(--line);color:var(--muted);padding:4px 10px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;font-size:11px;letter-spacing:1px;transition:all 0.18s;text-decoration:none;display:inline-block;white-space:nowrap;flex-shrink:0;}
+.nav-btn:hover{border-color:var(--accent);color:var(--accent);}
+.nav-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(125,211,252,0.08);}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;margin-left:auto;background:none;border:none;}
+.hamburger span{display:block;width:22px;height:2px;background:var(--text);transition:all 0.3s;}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+.nav-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:98;}
+.nav-overlay.show{display:block;}
+footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:18px 20px;margin-top:36px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--muted);letter-spacing:4px;}
+.footer-text{font-size:10px;color:var(--muted);line-height:1.6;}
+
+  .page-shell{max-width:1560px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:18px;align-items:start}
+  .content-main{min-width:0}
+  .side-nav{position:sticky;top:70px;padding:18px 14px 24px}
+  .side-card{background:rgba(22,35,58,.92);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+  .side-card + .side-card{margin-top:12px}
+  .side-title{font-size:11px;letter-spacing:2px;color:var(--muted);margin-bottom:10px}
+  .side-links{display:grid;gap:8px}
+  .side-link{display:block;text-decoration:none;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;color:var(--text);font-size:13px;transition:all .18s}
+  .side-link:hover{border-color:var(--accent);color:var(--accent)}
+  .side-link.active{border-color:var(--accent);background:rgba(125,211,252,.10);color:var(--accent);font-weight:700}
+  .side-note{font-size:12px;line-height:1.8;color:var(--muted)}
+  .defender-window{position:fixed;right:292px;bottom:18px;width:320px;z-index:96;background:rgba(22,35,58,.97);border:1px solid var(--line);border-radius:16px;box-shadow:0 14px 40px rgba(0,0,0,.28);overflow:hidden}
+  .defender-window.collapsed .defender-window-body{display:none}
+  .defender-window-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:12px 12px 10px;border-bottom:1px solid var(--line)}
+  .defender-window.collapsed .defender-window-head{border-bottom:none}
+  .defender-window-title{font-size:11px;letter-spacing:2px;color:var(--muted)}
+  .defender-window-current{font-size:15px;font-weight:700;color:var(--text);margin-top:3px;line-height:1.4}
+  .defender-window-btn{appearance:none;border:1px solid var(--line);background:var(--chip);color:var(--text);padding:7px 12px;border-radius:999px;font-size:12px;cursor:pointer;white-space:nowrap}
+  .defender-window-btn:hover{border-color:var(--accent);color:var(--accent)}
+  .defender-window-body{padding:12px;display:grid;gap:10px;max-height:min(72vh,560px);overflow:auto}
+  .defender-window-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .defender-window label{font-size:11px;margin-bottom:4px}
+  .defender-window input[type="text"],.defender-window input[type="number"],.defender-window select{padding:8px 10px;font-size:13px}
+  .defender-window .mega-row{gap:6px}
+  .defender-window .mini-btn{padding:5px 9px;font-size:11px}
+  .defender-window-evs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+  .defender-window-ev-box{background:rgba(10,16,28,.35);border:1px solid var(--line);border-radius:12px;padding:7px}
+  .defender-window-ev-box span{display:block;font-size:10px;color:var(--muted);margin-bottom:4px}
+  .defender-window-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .defender-window-stat{background:rgba(10,16,28,.4);border:1px solid var(--line);border-radius:12px;padding:7px 8px;text-align:center}
+  .defender-window-stat .k{font-size:10px;color:var(--muted)}
+  .defender-window-stat .v{font-size:16px;font-weight:700;margin-top:2px;line-height:1.2}
+  .defender-window-note{font-size:11px;line-height:1.7;color:var(--muted)}
+  [data-theme="light"] body{background:linear-gradient(180deg,#edf5fa 0%,#dfeef7 100%);color:#102132}
+  [data-theme="light"] header{background:rgba(248,252,255,.96);border-bottom-color:#9abbd1}
+  [data-theme="light"] .header-nav{background:rgba(248,252,255,.98)}
+  [data-theme="light"] .logo{color:#0b6aa6;text-shadow:none}
+  [data-theme="light"] .logo em{color:#e25082}
+  [data-theme="light"] .header-sub,
+  [data-theme="light"] .nav-btn,
+  [data-theme="light"] .footer-logo,
+  [data-theme="light"] .footer-text{color:#3f566b}
+  [data-theme="light"] .nav-btn.active{background:rgba(0,106,163,.08)}
+  [data-theme="light"] .card,
+  [data-theme="light"] .side-card{background:rgba(255,255,255,.96);box-shadow:0 8px 24px rgba(63,86,107,.08);border-color:#a9c4d8}
+  [data-theme="light"] .defender-window{background:rgba(255,255,255,.98);border-color:#a9c4d8;box-shadow:0 12px 28px rgba(63,86,107,.12)}
+  [data-theme="light"] .defender-window-btn{background:#f5fbff;border-color:#a9c4d8;color:#102132}
+  [data-theme="light"] .defender-window-current{color:#102132}
+  [data-theme="light"] .defender-window-note,
+  [data-theme="light"] .defender-window-title,
+  [data-theme="light"] .defender-window-stat .k,
+  [data-theme="light"] .defender-window-ev-box span{color:#415a70}
+  [data-theme="light"] .defender-window-ev-box,
+  [data-theme="light"] .defender-window-stat{background:#f7fbfe;border-color:#a9c4d8}
+  [data-theme="light"] .defender-window-stat .v{color:#102132}
+  [data-theme="light"] h1,
+  [data-theme="light"] h2,
+  [data-theme="light"] h3,
+  [data-theme="light"] .selected-title{color:#0f2234}
+  [data-theme="light"] .lead,
+  [data-theme="light"] .sub,
+  [data-theme="light"] .status-line,
+  [data-theme="light"] .muted-banner,
+  [data-theme="light"] .rank-chip .meta,
+  [data-theme="light"] .side-note,
+  [data-theme="light"] label,
+  [data-theme="light"] .stat .k,
+  [data-theme="light"] .result-box .k,
+  [data-theme="light"] .result-range,
+  [data-theme="light"] .sub-strong{color:#415a70}
+  [data-theme="light"] .muted-banner{background:#f3f9fd}
+  [data-theme="light"] input[type="text"],
+  [data-theme="light"] input[type="number"],
+  [data-theme="light"] select,
+  [data-theme="light"] .side-link,
+  [data-theme="light"] .btn,
+  [data-theme="light"] .mini-btn,
+  [data-theme="light"] .rank-chip{background:#f8fbfe;border-color:#a9c4d8;color:#102132}
+  [data-theme="light"] .rank-chip{background:#f6fbff}
+  [data-theme="light"] .ev-box,
+  [data-theme="light"] .stat,
+  [data-theme="light"] .result-panel,
+  [data-theme="light"] .result-box,
+  [data-theme="light"] .result-rolls,
+  [data-theme="light"] .selected-card{background:#f7fbfe;border-color:#a9c4d8}
+  [data-theme="light"] .result-big,
+  [data-theme="light"] .result-box .v,
+  [data-theme="light"] .stat .v{color:#102132}
+  [data-theme="light"] .empty{border-color:#a9c4d8;color:#415a70;background:#f7fbfe}
+
+@media(max-width:768px){
+  .header-nav{display:none;position:fixed;top:52px;right:0;width:220px;height:calc(100vh - 52px);background:rgba(7,9,15,0.98);border-left:1px solid var(--line);flex-direction:column;gap:0;padding:12px 0;z-index:99;overflow-y:auto;backdrop-filter:blur(20px);}
+  .header-nav.open{display:flex;}
+  .nav-btn{padding:14px 22px;font-size:13px;border:none;border-bottom:1px solid var(--line);width:100%;text-align:left;letter-spacing:1px;}
+  .nav-btn:last-child{border-bottom:none;}
+  .nav-btn.active{background:rgba(125,211,252,0.08);border-left:3px solid var(--accent);}
+  .hamburger{display:flex;}
+}
+
+@media (max-width:1240px){.page-shell{grid-template-columns:1fr}.side-nav{display:none}}
+@media (max-width:1240px){.defender-window{right:16px;width:min(340px,calc(100vw - 20px));}}
+@media (max-width:720px){.defender-window{right:10px;left:10px;bottom:10px;width:auto}.defender-window-evs,.defender-window-stats{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media (max-width:1080px){
+    .grid-2,.result-grid,.field-grid-4{grid-template-columns:1fr}
+    .chooser{grid-template-columns:repeat(2,minmax(0,1fr))}
+  }
+  @media (max-width:720px){
+    .wrap{padding:14px 10px 32px}
+    h1{font-size:24px}
+    .field-grid,.grid-3,.chooser,.ev-grid,.ev-grid.atk,.stats-grid,.stats-grid.atk{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo" onclick="location.href='index.html'">Poke<em>Edge</em></div>
+  <div class="header-sep"></div>
+  <div class="header-sub">耐久調整</div>
+  <div class="header-nav" id="main-nav">
+    <a class="nav-btn" href="index.html">トップ</a>
+    <a class="nav-btn" href="calc.html">ダメージ計算</a>
+    <a class="nav-btn active" href="endure.html">耐久調整</a>
+    <a class="nav-btn" href="move.html">技選択判定</a>
+    <a class="nav-btn" href="party.html">パーティ管理</a>
+    <a class="nav-btn" href="pokemon.html">ポケモン登録</a>
+    <a class="nav-btn" href="items.html">アイテム</a>
+    <a class="nav-btn" href="stats.html">選出率記録</a>
+    <a class="nav-btn" href="scope.html">バトルアナライザー</a>
+    <a class="nav-btn" href="season.html">使用可能ポケモン</a>
+    <a class="nav-btn" href="speed.html">素早さライン</a>
+    <a class="nav-btn" href="blog.html">記事</a>
+    <a class="nav-btn" href="policy.html">サイト情報</a>
+  </div>
+  <button id="theme-btn" onclick="toggleTheme()" style="background:transparent;border:1px solid var(--line);color:var(--muted);padding:4px 10px;font-size:16px;cursor:pointer;transition:all 0.18s;flex-shrink:0;line-height:1;" title="ライト/ダークモード切替">🌙</button>
+  <button class="hamburger" id="hamburger" onclick="toggleNav()" aria-label="メニュー">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-overlay" id="nav-overlay" onclick="closeNav()"></div>
+</header>
+<div class="page-shell"><main class="content-main"><div class="wrap stack">
+  <section class="card">
+    <h1>耐久調整ツール</h1>
+    <p class="lead">シングル用の耐久調整ページです。耐久したい側を決めたあと、自由入力やランキング側から攻撃側を選ぶと、自動でダメージを並べて確認できます。</p>
+  </section>
+
+  <section class="card">
+    <div class="mode-line">
+      <div>
+        <h2>対象範囲</h2>
+        <div class="btn-row" id="mode-buttons"></div>
+        <div class="status-line" id="mode-status">読み込み中です…</div>
+      </div>
+      <div><span class="pill">シングル固定</span></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>耐久したい側</h2>
+    <div class="grid-2">
+      <div class="stack">
+        <div class="field-grid">
+          <div>
+            <label for="defender-name">ポケモン</label>
+            <input id="defender-name" list="pokemon-list" type="text" placeholder="ポケモン名を入力">
+          </div>
+          <div>
+            <label for="defender-nature">性格</label>
+            <select id="defender-nature"></select>
+          </div>
+        </div>
+        <div>
+          <label>メガ進化</label>
+          <div class="mega-row" id="defender-mega"></div>
+        </div>
+        <div>
+          <label for="defender-ability">特性</label>
+          <select id="defender-ability"></select>
+        </div>
+        <div>
+          <label>努力値（Champions 0〜32）</label>
+          <div class="ev-grid" id="defender-evs"></div>
+        </div>
+      </div>
+      <div class="stack">
+        <div>
+          <label>実数値</label>
+          <div class="stats-grid" id="defender-stats"></div>
+        </div>
+        <div class="muted-banner">上で決めた防御側に対して、下の自由入力やランキング側の結果をまとめて見られる形にしています。</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>自由入力</h2>
+    <div class="grid-2">
+      <div class="stack">
+        <div class="field-grid">
+          <div>
+            <label for="free-pokemon">ポケモン</label>
+            <input id="free-pokemon" list="pokemon-list" type="text" placeholder="ポケモン名を入力">
+          </div>
+          <div>
+            <label for="free-nature">性格</label>
+            <select id="free-nature"></select>
+          </div>
+        </div>
+        <div>
+          <label>メガ進化</label>
+          <div class="mega-row" id="free-mega"></div>
+        </div>
+        <div class="field-grid">
+          <div>
+            <label for="free-ability">特性</label>
+            <select id="free-ability"></select>
+          </div>
+          <div>
+            <label for="free-move">技候補</label>
+            <select id="free-move"></select>
+          </div>
+        </div>
+        <div class="field-grid">
+          <div>
+            <label for="free-weather">天候</label>
+            <select id="free-weather"></select>
+          </div>
+          <div>
+            <label for="free-move-free">技入力</label>
+            <input id="free-move-free" list="damaging-move-list" type="text" placeholder="候補にない技名を入力">
+            <div class="sub">候補にない攻撃技もここで確認できます。</div>
+          </div>
+        </div>
+        <div>
+          <label>努力値（Champions 0〜32）</label>
+          <div class="ev-grid atk" id="free-evs"></div>
+        </div>
+        <div>
+          <label>実数値</label>
+          <div class="stats-grid atk" id="free-stats"></div>
+        </div>
+      </div>
+      <div class="stack">
+        <div class="result-panel" id="free-result-panel">
+          <div class="sub-strong" id="free-result-matchup">条件を選ぶとここに反映されます。</div>
+          <div class="result-grid top-space">
+            <div>
+              <div class="result-big" id="free-result-dmg">—</div>
+              <div class="result-range" id="free-result-range">攻撃側・防御側・技をそろえると結果が出ます。</div>
+              <div class="result-bar"><div id="free-result-bar"></div></div>
+            </div>
+            <div class="result-box">
+              <div class="k">割合</div>
+              <div class="v" id="free-result-pct">—</div>
+            </div>
+            <div class="result-box">
+              <div class="k">確定数</div>
+              <div class="v" id="free-result-ko">—</div>
+            </div>
+          </div>
+          <div class="result-rolls" id="free-result-rolls">16乱数はここに表示されます。</div>
+          <div class="status-line" id="free-result-status">既存ダメージ計算の読み込み待ちです。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card stack">
+    <div class="mode-line">
+      <div>
+        <h2>ランキング側</h2>
+        <div class="sub">変化技は候補から外し、攻撃技だけ見られる形にしています。クリックしたポケモンは下にまとめて表示されます。</div>
+      </div>
+      <button type="button" class="btn clear-btn" id="clear-ranking-selection">選択をクリア</button>
+    </div>
+    <div class="chooser" id="ranking-list"></div>
+  </section>
+
+  <section class="card">
+    <h2>選んだポケモン</h2>
+    <div class="selected-list" id="ranking-selected-list"></div>
+  </section>
+
+  <datalist id="pokemon-list"></datalist>
+  <datalist id="damaging-move-list"></datalist>
+  <iframe id="calc-frame" class="hidden-frame" src="calc.html" title="hidden calc"></iframe>
+
+</div></main>
+<aside class="side-nav">
+  <div class="side-card">
+    <div class="side-title">ツール移動</div>
+    <div class="side-links">
+      <a class="side-link" href="calc.html">ダメージ計算</a>
+      <a class="side-link active" href="endure.html">耐久調整</a>
+      <a class="side-link" href="move.html">技選択判定</a>
+      <a class="side-link" href="party.html">パーティ管理</a>
+      <a class="side-link" href="pokemon.html">ポケモン登録</a>
+      <a class="side-link" href="stats.html">選出率記録</a>
+      <a class="side-link" href="scope.html">バトルアナライザー</a>
+      <a class="side-link" href="speed.html">素早さライン</a>
+    </div>
+  </div>
+  <div class="side-card">
+    <div class="side-title">このページ</div>
+    <div class="side-note">耐久したい側を先に決めて、自由入力かランキング側の攻撃候補を並べて見られます。ライト表示でも文字が沈まないよう配色を調整しています。</div>
+  </div>
+</aside>
+</div>
+
+<div class="defender-window" id="defender-window">
+  <div class="defender-window-head">
+    <div>
+      <div class="defender-window-title">耐久側を常時表示</div>
+      <div class="defender-window-current" id="defender-window-current">未選択</div>
+    </div>
+    <button type="button" class="defender-window-btn" id="defender-window-btn" onclick="toggleDefenderWindow()">隠す</button>
+  </div>
+  <div class="defender-window-body" id="defender-window-body">
+    <div class="defender-window-grid">
+      <div>
+        <label for="floating-defender-name">ポケモン</label>
+        <input id="floating-defender-name" list="pokemon-list" type="text" placeholder="ポケモン名">
+      </div>
+      <div>
+        <label for="floating-defender-nature">性格</label>
+        <select id="floating-defender-nature"></select>
+      </div>
+    </div>
+    <div>
+      <label>メガ進化</label>
+      <div class="mega-row" id="floating-defender-mega"></div>
+    </div>
+    <div>
+      <label for="floating-defender-ability">特性</label>
+      <select id="floating-defender-ability"></select>
+    </div>
+    <div>
+      <label>努力値</label>
+      <div class="defender-window-evs" id="floating-defender-evs"></div>
+    </div>
+    <div>
+      <label>実数値</label>
+      <div class="defender-window-stats" id="floating-defender-stats"></div>
+    </div>
+    <div class="defender-window-note">ここから耐久側を変えても、上の本体と同時に反映します。</div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">PokeEdge</div>
+  <div class="footer-text">非公式ファンサイト / Unofficial Fan Tool<br>耐久ラインを複数候補で並べて確認</div>
+  <div style="font-size:10px;"><a href="policy.html" style="color:var(--muted);text-decoration:none;">プライバシーポリシー / 利用規約</a></div>
+</footer>
+
+<script>
+const NATURE_NAMES = [
+  'がんばりや','すなお','てれや','きまぐれ','おとぼけ',
+  'さみしがり','いじっぱり','やんちゃ','ゆうかん',
+  'ずぶとい','わんぱく','のうてんき','のんき',
+  'ひかえめ','おっとり','うっかりや','れいせい',
+  'おだやか','おとなしい','しんちょう','なまいき',
+  'おくびょう','せっかち','ようき','むじゃき'
+];
+const PERSONALITIES = {
+  'がんばりや':{atk:1,def:1,spa:1,spd:1,spe:1},'すなお':{atk:1,def:1,spa:1,spd:1,spe:1},'てれや':{atk:1,def:1,spa:1,spd:1,spe:1},'きまぐれ':{atk:1,def:1,spa:1,spd:1,spe:1},'おとぼけ':{atk:1,def:1,spa:1,spd:1,spe:1},
+  'さみしがり':{atk:1.1,def:0.9,spa:1,spd:1,spe:1},'いじっぱり':{atk:1.1,def:1,spa:0.9,spd:1,spe:1},'やんちゃ':{atk:1.1,def:1,spa:1,spd:0.9,spe:1},'ゆうかん':{atk:1.1,def:1,spa:1,spd:1,spe:0.9},
+  'ずぶとい':{atk:0.9,def:1.1,spa:1,spd:1,spe:1},'わんぱく':{atk:1,def:1.1,spa:0.9,spd:1,spe:1},'のうてんき':{atk:1,def:1.1,spa:1,spd:0.9,spe:1},'のんき':{atk:1,def:1.1,spa:1,spd:1,spe:0.9},
+  'ひかえめ':{atk:0.9,def:1,spa:1.1,spd:1,spe:1},'おっとり':{atk:1,def:0.9,spa:1.1,spd:1,spe:1},'うっかりや':{atk:1,def:1,spa:1.1,spd:0.9,spe:1},'れいせい':{atk:1,def:1,spa:1.1,spd:1,spe:0.9},
+  'おだやか':{atk:0.9,def:1,spa:1,spd:1.1,spe:1},'おとなしい':{atk:1,def:1,spa:0.9,spd:1.1,spe:1},'しんちょう':{atk:1,def:1,spa:0.9,spd:1.1,spe:1},'なまいき':{atk:1,def:1,spa:1,spd:1.1,spe:0.9},
+  'おくびょう':{atk:1,def:1,spa:1,spd:0.9,spe:1.1},'せっかち':{atk:1,def:0.9,spa:1,spd:1,spe:1.1},'ようき':{atk:1,def:1,spa:0.9,spd:1,spe:1.1},'むじゃき':{atk:1,def:1,spa:1,spd:0.9,spe:1.1}
+};
+const DEF_EV_KEYS = ['hp','atk','def','spd'];
+const ATK_EV_KEYS = ['atk','def','spa'];
+const WEATHER_OPTIONS = [
+  {value:'', label:'なし'},
+  {value:'sunny', label:'にほんばれ（晴れ）'},
+  {value:'rain', label:'あめ'},
+  {value:'sand', label:'すなあらし'},
+  {value:'snow', label:'ゆき'}
+];
+const STATE = {
+  mode: 'inner',
+  data: null,
+  frameReady: false,
+  updateToken: 0,
+  defender: { baseName: '', formName: '', nature: 'がんばりや', ability: '', ev: {hp:0,atk:0,def:0,spd:0}, abilityOptions: [] },
+  free: { baseName: '', formName: '', nature: 'がんばりや', ability: '', move: '', freeMove: '', weather: '', ev: {atk:0,def:0,spa:0}, moveOptions: [], abilityOptions: [] },
+  rankingSelected: [],
+  rankingConfigs: {},
+  defenderWindowOpen: true
+};
+function el(id){ return document.getElementById(id); }
+function clamp32(v){ const n = parseInt(v,10); return Number.isFinite(n) ? Math.max(0, Math.min(32, n)) : 0; }
+function uniq(arr){ return [...new Set((arr||[]).filter(Boolean))]; }
+function calcHP(base, iv, ev, lv){ return Math.floor((Math.floor((base*2 + iv) * lv / 100) + 10 + lv)) + ev; }
+function calcStat(base, iv, ev, lv, nat){ return Math.floor((Math.floor((base*2 + iv) * lv / 100) + 5) * nat) + Math.floor(ev * nat); }
+function getNatureName(text){
+  const s = String(text || '').trim();
+  return NATURE_NAMES.find(name => s.startsWith(name)) || 'がんばりや';
+}
+function parseSpread(text){
+  const nums = String(text || '').match(/\d+/g) || [];
+  if(nums.length < 6) return {hp:0,atk:0,def:0,spa:0,spd:0,spe:0};
+  return {hp:+nums[0]||0, atk:+nums[1]||0, def:+nums[2]||0, spa:+nums[3]||0, spd:+nums[4]||0, spe:+nums[5]||0};
+}
+function stripRate(text){
+  const m = String(text || '').match(/^(.+?)\s*\(([\d.]+)%\)$/);
+  return m ? m[1].trim() : String(text || '').trim();
+}
+function escapeHtml(str){
+  return String(str || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function safeKey(name){ return encodeURIComponent(String(name || '')).replace(/%/g, '_'); }
+function createNatureOptions(select, selected){
+  select.innerHTML = NATURE_NAMES.map(name => `<option value="${name}">${name}</option>`).join('');
+  select.value = selected || 'がんばりや';
+}
+function weatherOptionsHtml(selected=''){
+  return WEATHER_OPTIONS.map(item => `<option value="${item.value}" ${item.value===selected?'selected':''}>${item.label}</option>`).join('');
+}
+function getWeatherLabel(value=''){
+  return WEATHER_OPTIONS.find(item => item.value===value)?.label || 'なし';
+}
+function getAllowedNames(){
+  if(!STATE.data) return [];
+  if(STATE.mode === 'all') return STATE.data.allPokemonNames;
+  return STATE.data.innerNames;
+}
+function getPokemon(name){ return STATE.data?.pokemonByName?.[name] || null; }
+function stripMegaPrefix(name){ return String(name || '').trim().replace(/^メガ/, '').replace(/[XY]$/, ''); }
+function isMegaName(name){ return !!(STATE.data?.megaFormSet && STATE.data.megaFormSet.has(String(name || '').trim())); }
+function resolveBaseName(name){
+  const n = String(name || '').trim();
+  if(!n) return '';
+  return isMegaName(n) ? stripMegaPrefix(n) : n;
+}
+function getMegaForms(baseName){
+  if(!STATE.data) return [];
+  return (STATE.data.megaMap[baseName] || []).slice();
+}
+function normalizePokemonInput(raw){
+  const value = String(raw || '').trim();
+  if(!value) return '';
+  if(getPokemon(value)) return value;
+  return '';
+}
+function normalizeMoveInput(raw){
+  const value = String(raw || '').trim();
+  if(!value) return '';
+  return isDamagingMoveName(value) ? value : '';
+}
+function renderModeButtons(){
+  const wrap = el('mode-buttons');
+  wrap.innerHTML = [
+    {key:'inner', label:'内定'},
+    {key:'all', label:'全部'}
+  ].map(item => `<button type="button" class="btn ${STATE.mode===item.key?'active':''}" data-mode="${item.key}">${item.label}</button>`).join('');
+  wrap.querySelectorAll('[data-mode]').forEach(btn => btn.addEventListener('click', () => {
+    STATE.mode = btn.dataset.mode;
+    renderModeButtons();
+    renderPokemonDatalist();
+    updateModeStatus();
+    if(STATE.defender.baseName && !getAllowedNames().includes(STATE.defender.baseName) && STATE.mode === 'inner'){
+      STATE.defender.baseName = '';
+      STATE.defender.formName = '';
+      el('defender-name').value = '';
+      STATE.defender.ability = '';
+      STATE.defender.abilityOptions = [];
+      renderDefenderSection();
+    }
+    if(STATE.free.baseName && !getAllowedNames().includes(resolveBaseName(STATE.free.baseName)) && STATE.mode === 'inner'){
+      STATE.free.baseName = '';
+      STATE.free.formName = '';
+      el('free-pokemon').value = '';
+      STATE.free.ability = '';
+      STATE.free.move = '';
+      STATE.free.freeMove = '';
+      STATE.free.abilityOptions = [];
+      STATE.free.moveOptions = [];
+      renderFreeSection();
+    }
+    scheduleUpdateAllResults();
+  }));
+}
+function updateModeStatus(){
+  const count = getAllowedNames().length;
+  el('mode-status').textContent = STATE.mode === 'inner'
+    ? `内定ポケモン ${count}体を選択候補に出します。ランキング側はシングル順位を固定表示します。`
+    : `全ポケモン ${count}体を選択候補に出します。ランキング側はシングル順位を固定表示します。`;
+}
+function renderPokemonDatalist(){
+  const list = getAllowedNames();
+  el('pokemon-list').innerHTML = list.map(name => `<option value="${escapeHtml(name)}"></option>`).join('');
+}
+function renderDamagingMoveDatalist(){
+  el('damaging-move-list').innerHTML = STATE.data.damagingMoveNames.map(name => `<option value="${escapeHtml(name)}"></option>`).join('');
+}
+function renderStatBoxes(containerId, stats){
+  const labels = {hp:'HP',atk:'攻撃',def:'防御',spa:'特攻',spd:'特防',spe:'素早'};
+  el(containerId).innerHTML = Object.entries(stats).map(([key, value]) => `
+    <div class="stat"><div class="k">${labels[key]}</div><div class="v">${value}</div></div>
+  `).join('');
+}
+function calcDisplayedStats(poke, role, natureName, ev){
+  if(!poke) return role === 'def' ? {hp:'—',atk:'—',def:'—',spd:'—'} : {atk:'—',def:'—',spa:'—'};
+  const nat = PERSONALITIES[natureName] || PERSONALITIES['がんばりや'];
+  if(role === 'def'){
+    return {
+      hp: calcHP(poke.hp, 31, clamp32(ev.hp), 50),
+      atk: calcStat(poke.atk, 31, clamp32(ev.atk), 50, nat.atk || 1),
+      def: calcStat(poke.def, 31, clamp32(ev.def), 50, nat.def || 1),
+      spd: calcStat(poke.spd, 31, clamp32(ev.spd), 50, nat.spd || 1)
+    };
+  }
+  return {
+    atk: calcStat(poke.atk, 31, clamp32(ev.atk), 50, nat.atk || 1),
+    def: calcStat(poke.def, 31, clamp32(ev.def), 50, nat.def || 1),
+    spa: calcStat(poke.spa, 31, clamp32(ev.spa), 50, nat.spa || 1)
+  };
+}
+function populateAbilitySelect(selectId, options, selected, disabled=false){
+  const select = el(selectId);
+  const list = uniq(['', ...(options || [])]);
+  select.innerHTML = list.map(name => `<option value="${escapeHtml(name)}">${name ? escapeHtml(name) : 'なし'}</option>`).join('');
+  select.value = list.includes(selected) ? selected : (list[1] || '');
+  select.disabled = !!disabled;
+}
+function resolveAbilityOptions(pokeName, rankingFallback = []){
+  const byPokemon = STATE.data.abilityMap[pokeName] || [];
+  return uniq([...(rankingFallback || []), ...byPokemon]);
+}
+function pickForcedAbilityForForm(formName, fallback = []){
+  const byPokemon = STATE.data?.abilityMap?.[formName] || [];
+  const options = isMegaName(formName)
+    ? uniq([...(byPokemon || [])])
+    : uniq([...(fallback || []), ...(byPokemon || [])]);
+  return {
+    options,
+    ability: options[0] || ''
+  };
+}
+function isDamagingMoveName(name){
+  if(!name) return false;
+  const move = STATE.data.movesByName[name];
+  if(move) return move.category !== '変化';
+  return false;
+}
+function resolveMoveOptionsForPokemon(pokeName, rankingMoves = []){
+  const rankingList = (rankingMoves || []).map(stripRate).filter(isDamagingMoveName);
+  const pm = STATE.data.pokemonMoves[pokeName];
+  const candidateList = (pm?.candidateMoves || []).map(m => m.name).filter(isDamagingMoveName);
+  const moveList = (pm?.moves || []).filter(m => m.candidate).map(m => m.name).filter(isDamagingMoveName);
+  return uniq([...rankingList, ...candidateList, ...moveList]);
+}
+function renderMoveSelect(selectId, options, selected){
+  const select = el(selectId);
+  const list = uniq(options).filter(Boolean);
+  select.innerHTML = list.length
+    ? list.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('')
+    : '<option value="">候補なし</option>';
+  if(list.length) select.value = list.includes(selected) ? selected : list[0];
+}
+function buildEvInputs(containerId, evKeys, stateObj, onChange){
+  const labels = {hp:'HP',atk:'攻撃',def:'防御',spa:'特攻',spd:'特防'};
+  const container = el(containerId);
+  container.innerHTML = evKeys.map(key => `
+    <div class="ev-box">
+      <span>${labels[key]}</span>
+      <input type="number" min="0" max="32" step="1" data-ev-key="${key}" value="${clamp32(stateObj.ev[key] || 0)}">
+    </div>
+  `).join('');
+  container.querySelectorAll('input[data-ev-key]').forEach(input => {
+    input.addEventListener('input', () => {
+      stateObj.ev[input.dataset.evKey] = clamp32(input.value);
+      input.value = stateObj.ev[input.dataset.evKey];
+      onChange();
+    });
+  });
+}
+function buildFloatingDefenderEvInputs(){
+  const labels = {hp:'HP',atk:'攻撃',def:'防御',spd:'特防'};
+  const container = el('floating-defender-evs');
+  if(!container) return;
+  container.innerHTML = DEF_EV_KEYS.map(key => `
+    <div class="defender-window-ev-box">
+      <span>${labels[key]}</span>
+      <input type="number" min="0" max="32" step="1" data-floating-ev-key="${key}" value="${clamp32(STATE.defender.ev[key] || 0)}">
+    </div>
+  `).join('');
+  container.querySelectorAll('[data-floating-ev-key]').forEach(input => {
+    input.addEventListener('input', () => {
+      STATE.defender.ev[input.dataset.floatingEvKey] = clamp32(input.value);
+      input.value = STATE.defender.ev[input.dataset.floatingEvKey];
+      renderDefenderSection();
+      scheduleUpdateAllResults();
+    });
+  });
+}
+function renderFloatingDefenderStats(){
+  const stats = calcDisplayedStats(getPokemon(STATE.defender.formName || STATE.defender.baseName), 'def', STATE.defender.nature, STATE.defender.ev);
+  const box = el('floating-defender-stats');
+  if(!box) return;
+  box.innerHTML = [
+    {k:'HP',v:stats.hp},{k:'防御',v:stats.def},{k:'特防',v:stats.spd}
+  ].map(stat => `<div class="defender-window-stat"><div class="k">${stat.k}</div><div class="v">${stat.v}</div></div>`).join('');
+}
+function setDefenderWindowOpen(open){
+  STATE.defenderWindowOpen = !!open;
+  const box = el('defender-window');
+  const btn = el('defender-window-btn');
+  if(box) box.classList.toggle('collapsed', !STATE.defenderWindowOpen);
+  if(btn) btn.textContent = STATE.defenderWindowOpen ? '隠す' : '表示';
+}
+function toggleDefenderWindow(){
+  setDefenderWindowOpen(!STATE.defenderWindowOpen);
+}
+function renderDefenderWindow(){
+  const currentName = STATE.defender.formName || STATE.defender.baseName || '未選択';
+  if(el('defender-window-current')) el('defender-window-current').textContent = currentName;
+  if(el('floating-defender-name')) el('floating-defender-name').value = currentName === '未選択' ? '' : currentName;
+  createNatureOptions(el('floating-defender-nature'), STATE.defender.nature);
+  renderMegaButtons('floating-defender-mega', STATE.defender.formName || STATE.defender.baseName, selectedName => {
+    STATE.defender.formName = selectedName;
+    const forced = pickForcedAbilityForForm(selectedName);
+    STATE.defender.abilityOptions = forced.options;
+    STATE.defender.ability = forced.ability;
+    renderDefenderSection();
+    scheduleUpdateAllResults();
+  });
+  populateAbilitySelect('floating-defender-ability', STATE.defender.abilityOptions, STATE.defender.ability, isMegaName(STATE.defender.formName || STATE.defender.baseName));
+  buildFloatingDefenderEvInputs();
+  renderFloatingDefenderStats();
+  if(el('floating-defender-nature')) el('floating-defender-nature').onchange = () => {
+    STATE.defender.nature = el('floating-defender-nature').value;
+    renderDefenderSection();
+    scheduleUpdateAllResults();
+  };
+  if(el('floating-defender-ability')) el('floating-defender-ability').onchange = () => {
+    STATE.defender.ability = el('floating-defender-ability').value;
+    renderDefenderSection();
+    scheduleUpdateAllResults();
+  };
+}
+function renderMegaButtons(containerId, currentName, onSelect){
+  const wrap = el(containerId);
+  wrap.innerHTML = '';
+  if(!currentName) return;
+  const base = isMegaName(currentName) ? resolveBaseName(currentName) : currentName;
+  const forms = getMegaForms(base);
+  if(!forms.length){
+    wrap.innerHTML = '<button type="button" class="mini-btn active">メガ進化なし</button>';
+    return;
+  }
+  [{name:base,label:base}, ...forms.map(name => ({name,label:name}))].forEach(info => {
+    const btn = document.createElement('button');
+    btn.type='button';
+    btn.className='mini-btn'+(info.name===currentName?' active':'');
+    btn.textContent = info.name===base ? (isMegaName(currentName) ? `${base} に戻す` : `${base}`) : info.label;
+    btn.addEventListener('click', () => onSelect(info.name));
+    wrap.appendChild(btn);
+  });
+}
+function renderDefenderSection(){
+  createNatureOptions(el('defender-nature'), STATE.defender.nature);
+  renderMegaButtons('defender-mega', STATE.defender.formName || STATE.defender.baseName, selectedName => {
+    STATE.defender.formName = selectedName;
+    const forced = pickForcedAbilityForForm(selectedName);
+    STATE.defender.abilityOptions = forced.options;
+    STATE.defender.ability = forced.ability;
+    renderDefenderSection();
+    scheduleUpdateAllResults();
+  });
+  populateAbilitySelect('defender-ability', STATE.defender.abilityOptions, STATE.defender.ability, isMegaName(STATE.defender.formName || STATE.defender.baseName));
+  buildEvInputs('defender-evs', DEF_EV_KEYS, STATE.defender, () => { renderDefenderStats(); renderDefenderWindow(); scheduleUpdateAllResults(); });
+  renderDefenderStats();
+  renderDefenderWindow();
+  el('defender-nature').onchange = () => { STATE.defender.nature = el('defender-nature').value; renderDefenderStats(); renderDefenderWindow(); scheduleUpdateAllResults(); };
+  el('defender-ability').onchange = () => { STATE.defender.ability = el('defender-ability').value; renderDefenderWindow(); scheduleUpdateAllResults(); };
+}
+function renderDefenderStats(){
+  renderStatBoxes('defender-stats', calcDisplayedStats(getPokemon(STATE.defender.formName || STATE.defender.baseName), 'def', STATE.defender.nature, STATE.defender.ev));
+}
+function applyDefenderPokemon(name){
+  const normalized = normalizePokemonInput(name);
+  if(!normalized) return;
+  const base = resolveBaseName(normalized);
+  STATE.defender.baseName = base;
+  STATE.defender.formName = normalized;
+  const forced = pickForcedAbilityForForm(normalized);
+  STATE.defender.abilityOptions = forced.options;
+  STATE.defender.ability = forced.ability;
+  el('defender-name').value = normalized;
+  renderDefenderSection();
+  scheduleUpdateAllResults();
+}
+function renderFreeSection(){
+  createNatureOptions(el('free-nature'), STATE.free.nature);
+  renderMegaButtons('free-mega', STATE.free.formName || STATE.free.baseName, selectedName => {
+    STATE.free.formName = selectedName;
+    const forced = pickForcedAbilityForForm(selectedName);
+    STATE.free.abilityOptions = forced.options;
+    STATE.free.ability = forced.ability;
+    STATE.free.moveOptions = resolveMoveOptionsForPokemon(selectedName);
+    if(!STATE.free.moveOptions.includes(STATE.free.move)) STATE.free.move = STATE.free.moveOptions[0] || '';
+    renderFreeSection();
+    scheduleUpdateAllResults();
+  });
+  populateAbilitySelect('free-ability', STATE.free.abilityOptions, STATE.free.ability, isMegaName(STATE.free.formName || STATE.free.baseName));
+  renderMoveSelect('free-move', STATE.free.moveOptions, STATE.free.move);
+  el('free-weather').innerHTML = weatherOptionsHtml(STATE.free.weather || '');
+  buildEvInputs('free-evs', ATK_EV_KEYS, STATE.free, () => { renderFreeStats(); scheduleUpdateAllResults(); });
+  renderFreeStats();
+  el('free-nature').onchange = () => { STATE.free.nature = el('free-nature').value; renderFreeStats(); scheduleUpdateAllResults(); };
+  el('free-ability').onchange = () => { STATE.free.ability = el('free-ability').value; scheduleUpdateAllResults(); };
+  el('free-move').onchange = () => { STATE.free.move = el('free-move').value; STATE.free.freeMove=''; el('free-move-free').value=''; scheduleUpdateAllResults(); };
+  el('free-weather').onchange = () => { STATE.free.weather = el('free-weather').value || ''; scheduleUpdateAllResults(); };
+}
+function renderFreeStats(){
+  renderStatBoxes('free-stats', calcDisplayedStats(getPokemon(STATE.free.formName || STATE.free.baseName), 'atk', STATE.free.nature, STATE.free.ev));
+}
+function applyFreePokemon(name){
+  const normalized = normalizePokemonInput(name);
+  if(!normalized) return;
+  STATE.free.baseName = resolveBaseName(normalized);
+  STATE.free.formName = normalized;
+  const forced = pickForcedAbilityForForm(normalized);
+  STATE.free.abilityOptions = forced.options;
+  STATE.free.ability = forced.ability;
+  STATE.free.moveOptions = resolveMoveOptionsForPokemon(normalized);
+  STATE.free.move = STATE.free.moveOptions[0] || '';
+  STATE.free.freeMove = '';
+  el('free-pokemon').value = normalized;
+  el('free-move-free').value = '';
+  renderFreeSection();
+  scheduleUpdateAllResults();
+}
+function getRankingRow(name){ return STATE.data.rankingRows.find(r => r.name === name); }
+function ensureRankingConfig(name){
+  if(STATE.rankingConfigs[name]) return STATE.rankingConfigs[name];
+  const row = getRankingRow(name);
+  if(!row) return null;
+  const nature = getNatureName(stripRate((row.natures || [])[0] || 'がんばりや'));
+  const spread = parseSpread((row.spreads || [])[0] || '0-0-0-0-0-0');
+  const rankingAbilities = (row.abilities || []).map(stripRate);
+  const cfg = {
+    rowName: row.name,
+    formName: row.name,
+    nature,
+    abilityOptions: [],
+    ability: '',
+    moveOptions: resolveMoveOptionsForPokemon(row.name, row.moves),
+    move: '',
+    freeMove: '',
+    weather: '',
+    ev: {atk: clamp32(spread.atk), def: clamp32(spread.def), spa: clamp32(spread.spa)}
+  };
+  const forced = pickForcedAbilityForForm(row.name, rankingAbilities);
+  cfg.abilityOptions = forced.options;
+  cfg.ability = forced.ability;
+  cfg.move = cfg.moveOptions[0] || '';
+  STATE.rankingConfigs[name] = cfg;
+  return cfg;
+}
+function toggleRankingSelection(name){
+  const idx = STATE.rankingSelected.indexOf(name);
+  if(idx >= 0){
+    STATE.rankingSelected.splice(idx, 1);
+  }else{
+    STATE.rankingSelected.push(name);
+    ensureRankingConfig(name);
+  }
+  renderRankingList();
+  renderSelectedRankingCards();
+  scheduleUpdateAllResults();
+}
+function renderRankingList(){
+  const wrap = el('ranking-list');
+  wrap.innerHTML = STATE.data.rankingRows.map(row => {
+    const moves = (row.moves || []).map(stripRate).filter(isDamagingMoveName).slice(0,3).join(' / ') || '技候補なし';
+    const active = STATE.rankingSelected.includes(row.name);
+    return `
+      <button type="button" class="rank-chip ${active ? 'active' : ''}" data-rank-name="${escapeHtml(row.name)}">
+        <span>
+          <span class="name"><span class="num">#${row.rank}</span> ${escapeHtml(row.name)}</span>
+          <span class="meta">${escapeHtml(moves)}</span>
+        </span>
+      </button>
+    `;
+  }).join('');
+  wrap.querySelectorAll('[data-rank-name]').forEach(btn => btn.addEventListener('click', () => toggleRankingSelection(btn.dataset.rankName)));
+}
+function rankingCardHtml(name, cfg, row){
+  const key = safeKey(name);
+  const current = cfg.formName || cfg.rowName;
+  const stats = calcDisplayedStats(getPokemon(current), 'atk', cfg.nature, cfg.ev);
+  const abilityOptions = uniq(['', ...(cfg.abilityOptions || [])]);
+  const moveOptions = uniq(cfg.moveOptions || []);
+  const base = isMegaName(current) ? resolveBaseName(current) : current;
+  const megaForms = getMegaForms(base);
+  const megaBtns = megaForms.length
+    ? [{name:base,label:base}, ...megaForms.map(v => ({name:v,label:v}))].map(info => `<button type="button" class="mini-btn ${info.name===current?'active':''}" data-rank-mega="${key}" data-mega-name="${escapeHtml(info.name)}">${escapeHtml(info.name===base ? (isMegaName(current)?`${base} に戻す` : base) : info.label)}</button>`).join('')
+    : '<button type="button" class="mini-btn active">メガ進化なし</button>';
+  return `
+    <div class="selected-card" id="ranking-card-${key}">
+      <div class="selected-head">
+        <div>
+          <div class="selected-title">#${row.rank} ${escapeHtml(row.name)}</div>
+          <div class="sub">クリックしたポケモンを下に縦並びで確認できます。</div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="stack">
+          <div class="field-grid">
+            <div>
+              <label>ポケモン</label>
+              <input type="text" value="${escapeHtml(current)}" readonly>
+            </div>
+            <div>
+              <label>性格</label>
+              <select data-rank-nature="${key}">
+                ${NATURE_NAMES.map(n => `<option value="${n}" ${n===cfg.nature?'selected':''}>${n}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+          <div>
+            <label>メガ進化</label>
+            <div class="mega-row">${megaBtns}</div>
+          </div>
+          <div class="field-grid">
+            <div>
+              <label>特性</label>
+              <select data-rank-ability="${key}" ${isMegaName(current)?'disabled':''}>
+                ${abilityOptions.map(v => `<option value="${escapeHtml(v)}" ${v===cfg.ability?'selected':''}>${v ? escapeHtml(v) : 'なし'}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label>技候補</label>
+              <select data-rank-move="${key}">
+                ${moveOptions.length ? moveOptions.map(v => `<option value="${escapeHtml(v)}" ${v===cfg.move?'selected':''}>${escapeHtml(v)}</option>`).join('') : '<option value="">候補なし</option>'}
+              </select>
+            </div>
+          </div>
+          <div class="field-grid">
+            <div>
+              <label>天候</label>
+              <select data-rank-weather="${key}">
+                ${weatherOptionsHtml(cfg.weather || '')}
+              </select>
+            </div>
+            <div>
+              <label>技入力</label>
+              <input type="text" list="damaging-move-list" data-rank-free-move="${key}" value="${escapeHtml(cfg.freeMove || '')}" placeholder="候補にない技名を入力">
+            </div>
+          </div>
+          <div>
+            <label>努力値（Champions 0〜32）</label>
+            <div class="ev-grid atk">
+              ${ATK_EV_KEYS.map(stat => `<div class="ev-box"><span>${({atk:'攻撃',def:'防御',spa:'特攻'})[stat]}</span><input type="number" min="0" max="32" step="1" data-rank-ev="${key}" data-rank-ev-key="${stat}" value="${clamp32(cfg.ev[stat] || 0)}"></div>`).join('')}
+            </div>
+          </div>
+          <div>
+            <label>実数値</label>
+            <div class="stats-grid atk">
+              ${Object.entries(stats).map(([k,v]) => `<div class="stat"><div class="k">${({atk:'攻撃',def:'防御',spa:'特攻'})[k]}</div><div class="v">${v}</div></div>`).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="stack">
+          <div class="result-panel">
+            <div class="sub-strong" id="rank-result-${key}-matchup">条件を選ぶとここに反映されます。</div>
+            <div class="result-grid top-space">
+              <div>
+                <div class="result-big" id="rank-result-${key}-dmg">—</div>
+                <div class="result-range" id="rank-result-${key}-range">攻撃側・防御側・技をそろえると結果が出ます。</div>
+                <div class="result-bar"><div id="rank-result-${key}-bar"></div></div>
+              </div>
+              <div class="result-box">
+                <div class="k">割合</div>
+                <div class="v" id="rank-result-${key}-pct">—</div>
+              </div>
+              <div class="result-box">
+                <div class="k">確定数</div>
+                <div class="v" id="rank-result-${key}-ko">—</div>
+              </div>
+            </div>
+            <div class="result-rolls" id="rank-result-${key}-rolls">16乱数はここに表示されます。</div>
+            <div class="status-line" id="rank-result-${key}-status">読み込み待ちです。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function renderSelectedRankingCards(){
+  const wrap = el('ranking-selected-list');
+  if(!STATE.rankingSelected.length){
+    wrap.innerHTML = '<div class="empty">上のランキングからポケモンを選ぶと、ここにまとめて表示されます。</div>';
+    return;
+  }
+  wrap.innerHTML = STATE.rankingSelected.map(name => {
+    const cfg = ensureRankingConfig(name);
+    const row = getRankingRow(name);
+    return rankingCardHtml(name, cfg, row);
+  }).join('');
+  bindRankingCardEvents();
+}
+function bindRankingCardEvents(){
+  el('ranking-selected-list').querySelectorAll('[data-rank-nature]').forEach(node => {
+    node.addEventListener('change', () => {
+      const key = node.dataset.rankNature;
+      const name = decodeURIComponent(key.replace(/_/g, '%'));
+      const cfg = ensureRankingConfig(name);
+      cfg.nature = node.value;
+      renderSelectedRankingCards();
+      scheduleUpdateAllResults();
+    });
+  });
+  el('ranking-selected-list').querySelectorAll('[data-rank-ability]').forEach(node => {
+    node.addEventListener('change', () => {
+      const name = decodeURIComponent(node.dataset.rankAbility.replace(/_/g, '%'));
+      const cfg = ensureRankingConfig(name);
+      cfg.ability = node.value;
+      scheduleUpdateAllResults();
+    });
+  });
+  el('ranking-selected-list').querySelectorAll('[data-rank-move]').forEach(node => {
+    node.addEventListener('change', () => {
+      const name = decodeURIComponent(node.dataset.rankMove.replace(/_/g, '%'));
+      const cfg = ensureRankingConfig(name);
+      cfg.move = node.value;
+      cfg.freeMove = '';
+      renderSelectedRankingCards();
+      scheduleUpdateAllResults();
+    });
+  });
+  el('ranking-selected-list').querySelectorAll('[data-rank-free-move]').forEach(node => {
+    node.addEventListener('input', () => {
+      const name = decodeURIComponent(node.dataset.rankFreeMove.replace(/_/g, '%'));
+      const cfg = ensureRankingConfig(name);
+      cfg.freeMove = node.value.trim();
+      scheduleUpdateAllResults();
+    });
+  });
+  el('ranking-selected-list').querySelectorAll('[data-rank-weather]').forEach(node => {
+    node.addEventListener('change', () => {
+      const name = decodeURIComponent(node.dataset.rankWeather.replace(/_/g, '%'));
+      const cfg = ensureRankingConfig(name);
+      cfg.weather = node.value || '';
+      scheduleUpdateAllResults();
+    });
+  });
+  el('ranking-selected-list').querySelectorAll('[data-rank-ev]').forEach(node => {
+    node.addEventListener('input', () => {
+      const name = decodeURIComponent(node.dataset.rankEv.replace(/_/g, '%'));
+      const cfg = ensureRankingConfig(name);
+      cfg.ev[node.dataset.rankEvKey] = clamp32(node.value);
+      node.value = cfg.ev[node.dataset.rankEvKey];
+      renderSelectedRankingCards();
+      scheduleUpdateAllResults();
+    });
+  });
+  el('ranking-selected-list').querySelectorAll('[data-rank-mega]').forEach(node => {
+    node.addEventListener('click', () => {
+      const name = decodeURIComponent(node.dataset.rankMega.replace(/_/g, '%'));
+      const cfg = ensureRankingConfig(name);
+      cfg.formName = node.dataset.megaName;
+      const forced = pickForcedAbilityForForm(cfg.formName, (getRankingRow(name)?.abilities || []).map(stripRate));
+      cfg.abilityOptions = forced.options;
+      cfg.ability = forced.ability;
+      cfg.moveOptions = resolveMoveOptionsForPokemon(cfg.formName, getRankingRow(name)?.moves || []);
+      if(!cfg.moveOptions.includes(cfg.move)) cfg.move = cfg.moveOptions[0] || '';
+      renderSelectedRankingCards();
+      scheduleUpdateAllResults();
+    });
+  });
+}
+function clearResultBox(prefix){
+  el(`${prefix}-dmg`).textContent = '—';
+  el(`${prefix}-range`).textContent = '攻撃側・防御側・技をそろえると結果が出ます。';
+  el(`${prefix}-pct`).textContent = '—';
+  el(`${prefix}-ko`).textContent = '—';
+  el(`${prefix}-rolls`).innerHTML = '16乱数はここに表示されます。';
+  el(`${prefix}-bar`).style.width = '0%';
+}
+function setResultBox(prefix, data){
+  el(`${prefix}-matchup`).textContent = data.matchup;
+  el(`${prefix}-dmg`).textContent = data.dmgNum || '—';
+  el(`${prefix}-range`).textContent = data.dmgRange || '—';
+  el(`${prefix}-pct`).textContent = data.dmgPct || '—';
+  el(`${prefix}-ko`).innerHTML = data.koHtml || '—';
+  el(`${prefix}-rolls`).innerHTML = data.rollsHtml || '—';
+  el(`${prefix}-bar`).style.width = data.barWidth || '0%';
+  el(`${prefix}-status`).textContent = data.status;
+}
+async function waitForCalcFrame(){
+  const frame = el('calc-frame');
+  const ensureLoaded = async()=>{
+    const win = frame.contentWindow;
+    if(!win) throw new Error('calc frame not found');
+    if(typeof win.loadGameData !== 'function'){
+      await new Promise(resolve => frame.addEventListener('load', resolve, {once:true}));
+    }
+    const readyWin = frame.contentWindow;
+    if(typeof readyWin.loadGameData === 'function') await readyWin.loadGameData();
+    if(typeof readyWin.loadAbilitiesData === 'function') await readyWin.loadAbilitiesData();
+    await new Promise(resolve => setTimeout(resolve, 120));
+    return readyWin;
+  };
+  await ensureLoaded();
+  STATE.frameReady = true;
+}
+function syncFrameModes(win){
+  if(win.el('atk-mode-champions')) win.el('atk-mode-champions').checked = true;
+  if(win.el('atk-mode-classic')) win.el('atk-mode-classic').checked = false;
+  if(win.el('def-mode-champions')) win.el('def-mode-champions').checked = true;
+  if(win.el('def-mode-classic')) win.el('def-mode-classic').checked = false;
+  if(typeof win.onAtkModeChange === 'function') win.onAtkModeChange();
+  if(typeof win.onDefModeChange === 'function') win.onDefModeChange();
+}
+function fillAttackerIntoFrame(win, attackerName, stateObj){
+  const poke = getPokemon(attackerName);
+  if(!poke) return false;
+  win.el('atk-search').value = attackerName;
+  win.initAtkPoke(poke);
+  win.el('atk-lv').value = 50;
+  win.el('atk-iv').value = 31;
+  win.el('atk-nature').value = stateObj.nature || 'がんばりや';
+  win.el('atk-ev-atk').value = clamp32(stateObj.ev.atk);
+  win.el('atk-ev-def').value = clamp32(stateObj.ev.def);
+  win.el('atk-ev-spa').value = clamp32(stateObj.ev.spa);
+  if(stateObj.ability) win.selectAbility('atk', stateObj.ability); else win.clearAbilitySide('atk');
+  const moveName = normalizeMoveInput(stateObj.freeMove) || stateObj.move;
+  const move = STATE.data.movesByName[moveName];
+  if(!move) return false;
+  win.setAtkMove(move);
+  win.el('atk-item').value = 'none';
+  if(win.el('atk-weather')) win.el('atk-weather').value = stateObj.weather || '';
+  win.recalcAtk();
+  return true;
+}
+function fillDefenderIntoFrame(win){
+  const defenderName = STATE.defender.formName || STATE.defender.baseName;
+  const poke = getPokemon(defenderName);
+  if(!poke) return false;
+  win.el('def-search').value = defenderName;
+  win.initDefPoke(poke);
+  win.el('def-lv').value = 50;
+  win.el('def-iv').value = 31;
+  win.el('def-nature').value = STATE.defender.nature || 'がんばりや';
+  win.el('def-ev-hp').value = clamp32(STATE.defender.ev.hp);
+  win.el('def-ev-atk').value = clamp32(STATE.defender.ev.atk);
+  win.el('def-ev-def').value = clamp32(STATE.defender.ev.def);
+  win.el('def-ev-spd').value = clamp32(STATE.defender.ev.spd);
+  if(STATE.defender.ability) win.selectAbility('def', STATE.defender.ability); else win.clearAbilitySide('def');
+  win.el('def-item').value = '1';
+  win.el('def-wall').value = '1';
+  win.recalcDef();
+  return true;
+}
+async function calculateMatchup(attackerName, attackerState){
+  const defenderName = STATE.defender.formName || STATE.defender.baseName;
+  const moveName = normalizeMoveInput(attackerState.freeMove) || attackerState.move || '';
+  const matchup = attackerName && defenderName && moveName
+    ? `${attackerName} の ${moveName} → ${defenderName}`
+    : '攻撃側・防御側・技をそろえると結果が出ます。';
+  if(!attackerName || !defenderName || !moveName){
+    return {matchup, status:'攻撃側・防御側・技を選んでください。'};
+  }
+  try{
+    if(!STATE.frameReady) await waitForCalcFrame();
+    const win = el('calc-frame').contentWindow;
+    syncFrameModes(win);
+    if(!fillAttackerIntoFrame(win, attackerName, attackerState)){
+      return {matchup, status:'攻撃側の反映に失敗しました。'};
+    }
+    if(!fillDefenderIntoFrame(win)){
+      return {matchup, status:'防御側の反映に失敗しました。'};
+    }
+    const ok = win.calcDamage({silent:true});
+    if(!ok){
+      return {matchup, status:'この条件ではダメージを計算できませんでした。'};
+    }
+    return {
+      matchup,
+      dmgNum: win.el('dmg-num')?.textContent?.trim() || '—',
+      dmgRange: win.el('dmg-range')?.textContent?.trim() || '—',
+      dmgPct: win.el('dmg-pct')?.textContent?.trim() || '—',
+      koHtml: win.el('ko-tag')?.innerHTML?.trim() || '—',
+      rollsHtml: win.el('dmg-rolls')?.innerHTML?.trim() || '—',
+      barWidth: win.el('dmg-bar')?.style?.width || '0%',
+      status: `既存ダメージ計算と同じロジックで自動反映しています。天候: ${getWeatherLabel(attackerState.weather || '')}`
+    };
+  }catch(err){
+    console.error(err);
+    return {matchup, status:'計算中にエラーが出ました。'};
+  }
+}
+let updateTimer = null;
+function scheduleUpdateAllResults(){
+  clearTimeout(updateTimer);
+  updateTimer = setTimeout(updateAllResults, 120);
+}
+async function updateAllResults(){
+  if(!STATE.data) return;
+  const token = ++STATE.updateToken;
+  clearResultBox('free-result');
+  el('free-result-matchup').textContent = '条件を選ぶとここに反映されます。';
+  const freeAttackerName = STATE.free.formName || STATE.free.baseName;
+  const freeResult = await calculateMatchup(freeAttackerName, STATE.free);
+  if(token !== STATE.updateToken) return;
+  setResultBox('free-result', freeResult);
+
+  for(const name of STATE.rankingSelected){
+    const key = safeKey(name);
+    if(!el(`rank-result-${key}-dmg`)) continue;
+    clearResultBox(`rank-result-${key}`);
+    const cfg = ensureRankingConfig(name);
+    const result = await calculateMatchup(cfg.formName || cfg.rowName, cfg);
+    if(token !== STATE.updateToken) return;
+    setResultBox(`rank-result-${key}`, result);
+  }
+}
+async function loadData(){
+  const [pokemon, moves, season, ranking, abilities, pokemonMoves] = await Promise.all([
+    fetch('pokemon.json').then(r=>r.json()),
+    fetch('moves.json').then(r=>r.json()),
+    fetch('season.json').then(r=>r.json()),
+    fetch('season_ranking_single.json').then(r=>r.json()),
+    fetch('abilities.json').then(r=>r.json()),
+    fetch('pokemon_moves.json').then(r=>r.json())
+  ]);
+  const pokemonByName = Object.fromEntries((pokemon || []).map(p => [p.name, p]));
+  const allPokemonNames = (pokemon || []).map(p => p.name);
+  const innerNames = Array.isArray(season?.['内定']) ? season['内定'] : (Array.isArray(season?.seasons) ? season.seasons : []);
+  const movesByName = Object.fromEntries((moves || []).map(m => [m.name, m]));
+  const damagingMoveNames = (moves || []).filter(m => m.category !== '変化').map(m => m.name).sort((a,b)=>a.localeCompare(b,'ja'));
+  const megaMap = {};
+  const megaFormSet = new Set();
+  (pokemon || []).forEach(p => {
+    const name = String(p.name || '').trim();
+    if(!name.startsWith('メガ')) return;
+    const base = stripMegaPrefix(name);
+    if(!pokemonByName[base]) return;
+    megaMap[base] = megaMap[base] || [];
+    megaMap[base].push(name);
+    megaFormSet.add(name);
+  });
+  Object.values(megaMap).forEach(arr => arr.sort((a,b)=>a.localeCompare(b,'ja')));
+  return {
+    pokemonByName,
+    allPokemonNames,
+    innerNames,
+    movesByName,
+    damagingMoveNames,
+    rankingRows: Array.isArray(ranking?.rows) ? ranking.rows : [],
+    abilityMap: abilities || {},
+    pokemonMoves: pokemonMoves?.pokemon || {},
+    megaMap,
+    megaFormSet
+  };
+}
+function bindStaticEvents(){
+  el('defender-name').addEventListener('change', e => applyDefenderPokemon(e.target.value));
+  el('defender-name').addEventListener('blur', e => applyDefenderPokemon(e.target.value));
+  el('floating-defender-name').addEventListener('change', e => applyDefenderPokemon(e.target.value));
+  el('floating-defender-name').addEventListener('blur', e => applyDefenderPokemon(e.target.value));
+  el('free-pokemon').addEventListener('change', e => applyFreePokemon(e.target.value));
+  el('free-pokemon').addEventListener('blur', e => applyFreePokemon(e.target.value));
+  el('free-move-free').addEventListener('input', () => { STATE.free.freeMove = el('free-move-free').value.trim(); scheduleUpdateAllResults(); });
+  el('clear-ranking-selection').addEventListener('click', () => {
+    STATE.rankingSelected = [];
+    renderRankingList();
+    renderSelectedRankingCards();
+    scheduleUpdateAllResults();
+  });
+
+}
+async function init(){
+  createNatureOptions(el('defender-nature'), 'がんばりや');
+  createNatureOptions(el('free-nature'), 'がんばりや');
+  buildEvInputs('defender-evs', DEF_EV_KEYS, STATE.defender, () => { renderDefenderStats(); renderDefenderWindow(); scheduleUpdateAllResults(); });
+  buildEvInputs('free-evs', ATK_EV_KEYS, STATE.free, () => { renderFreeStats(); scheduleUpdateAllResults(); });
+  renderStatBoxes('defender-stats', {hp:'—',atk:'—',def:'—',spd:'—'});
+  renderStatBoxes('free-stats', {atk:'—',def:'—',spa:'—'});
+  renderModeButtons();
+  bindStaticEvents();
+  STATE.data = await loadData();
+  renderDamagingMoveDatalist();
+  renderPokemonDatalist();
+  updateModeStatus();
+  renderRankingList();
+  const defaultRanking = STATE.data.rankingRows.slice(0,3).map(r => r.name);
+  STATE.rankingSelected = defaultRanking.slice();
+  defaultRanking.forEach(name => ensureRankingConfig(name));
+  renderSelectedRankingCards();
+  if(getAllowedNames().length) applyDefenderPokemon(getAllowedNames()[0]);
+  const freeDefault = getAllowedNames().find(name => !isMegaName(name)) || getAllowedNames()[0] || '';
+  if(freeDefault) applyFreePokemon(freeDefault);
+  renderFreeSection();
+  renderDefenderSection();
+  setDefenderWindowOpen(true);
+  scheduleUpdateAllResults();
+}
+document.getElementById('calc-frame').addEventListener('load', () => {
+  if(STATE.data) scheduleUpdateAllResults();
+});
+init().catch(err => {
+  console.error(err);
+  el('mode-status').textContent = 'データ読み込みに失敗しました。';
+  el('free-result-status').textContent = '必要データの確認が必要です。';
+});
+var THEMES = {
+  dark:  {'--bg':'#0b1220','--bg2':'#121c30','--panel':'#16233a','--panel2':'#1b2b46','--line':'#29405f','--text':'#eef4ff','--muted':'#aebcd7','--accent':'#7dd3fc','--accent2':'#86efac','--chip':'#22324f','--danger':'#fca5a5'},
+  light: {'--bg':'#e8f4f8','--bg2':'#d6e8f3','--panel':'#f5fbff','--panel2':'#eaf5fb','--line':'#9abbd1','--text':'#102132','--muted':'#4f667b','--accent':'#006aa3','--accent2':'#138b63','--chip':'#d8e7f2','--danger':'#b94a4a'}
+};
+function applyTheme(theme){
+  var vars=THEMES[theme]||THEMES.dark, root=document.documentElement.style;
+  for(var k in vars) root.setProperty(k, vars[k]);
+  localStorage.setItem('pokeedge_theme', theme);
+  var btn=document.getElementById('theme-btn');
+  if(btn) btn.textContent = theme==='light' ? '🌙' : '☀️';
+  document.documentElement.setAttribute('data-theme', theme);
+}
+function toggleTheme(){
+  var t=localStorage.getItem('pokeedge_theme')||'dark';
+  applyTheme(t==='dark' ? 'light' : 'dark');
+}
+(function(){
+  var t=localStorage.getItem('pokeedge_theme')||'dark';
+  var vars=THEMES[t]||THEMES.dark, root=document.documentElement.style;
+  for(var k in vars) root.setProperty(k, vars[k]);
+  document.documentElement.setAttribute('data-theme', t);
+  var btn=document.getElementById('theme-btn');
+  if(btn) btn.textContent = t==='light' ? '🌙' : '☀️';
+})();
+function toggleNav(){var nav=document.querySelector('.header-nav');var hb=document.getElementById('hamburger');var ov=document.getElementById('nav-overlay');if(!nav)return;nav.classList.toggle('open');hb.classList.toggle('open');ov.classList.toggle('show');}
+function closeNav(){var nav=document.querySelector('.header-nav');var hb=document.getElementById('hamburger');var ov=document.getElementById('nav-overlay');if(!nav)return;nav.classList.remove('open');hb.classList.remove('open');ov.classList.remove('show');}
+
+</script>
+</body>
+</html>
