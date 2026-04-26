@@ -785,11 +785,25 @@ function adminCardHTML(items){
   return '<div class="admin-check-grid">' + items.map(x=>'<div class="admin-check-card"><div class="admin-check-val">' + adminEsc(x.value) + '</div><div class="admin-check-lbl">' + adminEsc(x.label) + '</div></div>').join('') + '</div>';
 }
 function adminBlock(title, body){ return '<div class="admin-check-block"><div class="admin-check-title">' + adminEsc(title) + '</div><div class="admin-check-list">' + body + '</div></div>'; }
+const ADMIN_NON_MEGA_PREFIX_NAMES = ['メガヤンマ'];
+const ADMIN_FORM_VARIANT_PREFIX_NAMES = ['メガニャオニクス','メガジガルデ'];
+function adminMegaBaseCandidate(name){
+  return String(name||'').trim().replace(/^メガ/, '').replace(/X$/,'').replace(/Y$/,'').replace(/Z$/,'');
+}
+function adminIsTrueMegaName(name, pokeNameSet){
+  const n = String(name||'').trim();
+  if(!/^メガ/.test(n)) return false;
+  if(ADMIN_NON_MEGA_PREFIX_NAMES.includes(n) || ADMIN_FORM_VARIANT_PREFIX_NAMES.includes(n)) return false;
+  if(pokeNameSet && !pokeNameSet.has(adminMegaBaseCandidate(n))) return false;
+  return true;
+}
 function adminNormalizeBaseName(name){
   let n = String(name||'').trim();
   if(!n) return '';
   if(n === 'ギルガルド剣' || n === 'ギルガルド盾' || n === 'ギルガルドブレード' || n === 'ギルガルドシールド') return 'ギルガルド';
-  if(/^メガ/.test(n)) return n.replace(/^メガ/, '').replace(/X$/,'').replace(/Y$/,'').replace(/Z$/,'');
+  if(ADMIN_NON_MEGA_PREFIX_NAMES.includes(n)) return n;
+  if(ADMIN_FORM_VARIANT_PREFIX_NAMES.includes(n)) return n.replace(/^メガ/, '').replace(/X$/,'').replace(/Y$/,'').replace(/Z$/,'');
+  if(/^メガ/.test(n)) return adminMegaBaseCandidate(n);
   return n;
 }
 function adminMoveNameSet(moves){
@@ -880,7 +894,8 @@ async function runAdminMegaFormCheck(){
   try{
     const [pokemon, belongings] = await Promise.all([adminFetchJSON('pokemon.json'), adminFetchJSON('belongings.json')]);
     const itemNames = (belongings||[]).map(x=>String(x.name||'').trim()).filter(Boolean);
-    const megaRows = (pokemon||[]).filter(p=>/^メガ/.test(p.name||'')).map(p=>{
+    const pokeNameSet = new Set((pokemon||[]).map(p=>String(p.name||'').trim()).filter(Boolean));
+    const megaRows = (pokemon||[]).filter(p=>adminIsTrueMegaName(p.name, pokeNameSet)).map(p=>{
       const mega = p.name;
       const base = adminNormalizeBaseName(mega);
       const baseData = (pokemon||[]).find(x=>x.name === base);
@@ -893,6 +908,7 @@ async function runAdminMegaFormCheck(){
       const n = p.name || '';
       let base = '';
       if(n.includes('ギルガルド')) base = 'ギルガルド';
+      else if(ADMIN_FORM_VARIANT_PREFIX_NAMES.includes(n)) base = adminNormalizeBaseName(n);
       else if(/[AHG]$/.test(n)) base = n.replace(/[AHG]$/,'');
       else if(/^ロトム/.test(n) && n !== 'ロトム') base = 'ロトム';
       else return;
