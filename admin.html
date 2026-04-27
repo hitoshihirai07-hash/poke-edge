@@ -776,6 +776,7 @@ input[type=file]{display:none;}
         <button class="analytics-period-btn" type="button" data-period="30d" onclick="setAnalyticsPeriod('30d')">30日</button>
         <button class="analytics-period-btn" type="button" data-period="all" onclick="setAnalyticsPeriod('all')">全期間</button>
         <button class="btn btn-gen" type="button" onclick="loadAnalyticsDashboard()" style="margin-left:auto;">🔄 再読み込み</button>
+        <button class="btn btn-del" type="button" onclick="sendAnalyticsTestLog()">🧪 テストログ送信</button>
       </div>
       <div class="log" id="admin-access-log">確認を実行してください</div>
       <div id="admin-access-area"></div>
@@ -791,7 +792,7 @@ let ADMIN_ANALYTICS_PERIOD = 'today';
 const ADMIN_EVENT_LABELS = {
   page_view:'ページ閲覧', login_seen:'ログイン利用者確認', calc_run:'ダメージ計算実行', calc_add_run:'合計ダメージ計算', calc_record_save:'計算履歴保存',
   season_search:'使用可能ポケモン検索', season_type_filter:'タイプ絞り込み', season_detail_open:'詳細表示', move_check:'技選択判定',
-  scope_select_decide:'選出決定', scope_record:'対戦記録保存', scope_damage_tab:'技対面タブ表示', party_save:'パーティ保存', party_load:'パーティ読込', pokemon_save:'ポケモン登録保存', endure_run:'耐久調整実行'
+  scope_select_decide:'選出決定', scope_record:'対戦記録保存', scope_damage_tab:'技対面タブ表示', party_save:'パーティ保存', party_load:'パーティ読込', pokemon_save:'ポケモン登録保存', endure_run:'耐久調整実行', calc_run_click:'ダメージ計算クリック', move_check_click:'技判定クリック', party_save_click:'パーティ保存クリック', pokemon_save_click:'ポケモン登録クリック', scope_record_click:'対戦記録クリック', endure_run_click:'耐久調整クリック', admin_test:'管理画面テスト'
 };
 function setAnalyticsPeriod(period){
   ADMIN_ANALYTICS_PERIOD = period || 'today';
@@ -825,6 +826,30 @@ function adminPageLabel(page){
   };
   return (map[page] ? map[page] + ' / ' : '') + page;
 }
+
+async function sendAnalyticsTestLog(){
+  const log = document.getElementById('admin-access-log');
+  try{
+    if(!log) return;
+    log.innerHTML = '<span class="warn">テストログを送信中...</span>';
+    if(typeof getSB !== 'function') throw new Error('Supabase接続が見つかりません。');
+    const sessionKey = 'admin_test_' + Date.now().toString(36);
+    const { error } = await getSB().from('site_analytics_events').insert({
+      page: 'admin.html',
+      event_name: 'admin_test',
+      session_key: sessionKey,
+      user_key: null,
+      logged_in: false,
+      meta: { source: 'admin_test_button' }
+    });
+    if(error) throw error;
+    log.innerHTML = '<span class="ok">✅ テストログを送信しました。再読み込みします。</span>';
+    await loadAnalyticsDashboard();
+  }catch(e){
+    if(log) log.innerHTML = '<span class="err">テストログ送信に失敗しました：' + adminEsc(e.message || e) + '</span>';
+  }
+}
+
 async function loadAnalyticsDashboard(){
   const log = document.getElementById('admin-access-log');
   const area = document.getElementById('admin-access-area');
