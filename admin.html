@@ -165,6 +165,24 @@ input[type=file]{display:none;}
 .admin-mini-table th{color:var(--text2);font-weight:500;background:rgba(255,255,255,.03);position:sticky;top:0;}
 .admin-pill{display:inline-block;border:1px solid var(--border2);padding:2px 7px;margin:2px 4px 2px 0;font-size:10px;color:var(--text2);background:var(--panel);}
 .admin-pill.ok{border-color:rgba(0,230,118,.35);color:var(--green);}.admin-pill.warn{border-color:rgba(255,200,0,.35);color:var(--accent3);}.admin-pill.err{border-color:rgba(255,48,96,.35);color:var(--accent2);}
+
+.analytics-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0 14px;}
+.analytics-period-btn{background:var(--bg2);border:1px solid var(--border);color:var(--text2);padding:7px 12px;font-family:'Noto Sans JP',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;}
+.analytics-period-btn:hover,.analytics-period-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(0,200,240,.08);}
+.analytics-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:12px 0 14px;}
+.analytics-card{background:var(--bg2);border:1px solid var(--border);padding:12px 14px;}
+.analytics-val{font-family:'Bebas Neue',sans-serif;font-size:30px;line-height:1;color:var(--accent);letter-spacing:1px;}
+.analytics-lbl{font-size:10px;color:var(--text2);letter-spacing:2px;margin-top:6px;}
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;}
+.analytics-table{width:100%;border-collapse:collapse;font-size:11px;}
+.analytics-table th{color:var(--text2);font-weight:400;text-align:left;border-bottom:1px solid var(--border);padding:7px 8px;white-space:nowrap;}
+.analytics-table td{border-bottom:1px solid var(--border);padding:7px 8px;vertical-align:top;}
+.analytics-table .num{text-align:right;font-family:'JetBrains Mono',monospace;color:var(--accent3);}
+.analytics-note{font-size:10px;color:var(--text2);line-height:1.7;margin-top:8px;}
+.analytics-error{background:rgba(255,48,96,.08);border:1px solid rgba(255,48,96,.25);color:var(--accent2);padding:12px;font-size:12px;line-height:1.8;}
+.analytics-sql{white-space:pre-wrap;max-height:260px;overflow:auto;background:#05070c;border:1px solid var(--border);padding:12px;font-size:10px;color:var(--text3);line-height:1.6;margin-top:10px;}
+@media(max-width:760px){.analytics-summary{grid-template-columns:1fr 1fr;}.analytics-grid{grid-template-columns:1fr;}.analytics-table{font-size:10px;}}
+
 @media(max-width:768px){.admin-tabs{top:52px;overflow-x:auto;flex-wrap:nowrap;margin-left:-16px;margin-right:-16px;padding:10px 16px;}.admin-tab-btn{white-space:nowrap;}.main{padding-bottom:30px;}.admin-mini-table{display:block;overflow-x:auto;white-space:nowrap;}}
 
 </style>
@@ -233,6 +251,7 @@ input[type=file]{display:none;}
     <button class="admin-tab-btn" id="admin-tab-btn-mega" type="button" onclick="showAdminTab('mega')">メガ・フォルム</button>
     <button class="admin-tab-btn" id="admin-tab-btn-calc" type="button" onclick="showAdminTab('calc')">計算チェック</button>
     <button class="admin-tab-btn" id="admin-tab-btn-article" type="button" onclick="showAdminTab('article')">記事確認</button>
+    <button class="admin-tab-btn" id="admin-tab-btn-access" type="button" onclick="showAdminTab('access');loadAnalyticsDashboard();">アクセス確認</button>
   </div>
 
   <div class="admin-tab-panel active" id="admin-tab-update">
@@ -745,10 +764,112 @@ input[type=file]{display:none;}
     </div>
   </div>
 
+
+  <div class="admin-tab-panel" id="admin-tab-access">
+    <div class="section">
+      <div class="sec-title">アクセス確認</div>
+      <div class="sec-file">ページ閲覧数 / 主要操作 / ログイン利用者数</div>
+      <div class="sec-cols">ページ別の閲覧数、操作回数、匿名化したログイン利用者数を確認します。メールアドレスや検索語句は保存しません。</div>
+      <div class="analytics-toolbar">
+        <button class="analytics-period-btn active" type="button" data-period="today" onclick="setAnalyticsPeriod('today')">今日</button>
+        <button class="analytics-period-btn" type="button" data-period="7d" onclick="setAnalyticsPeriod('7d')">7日</button>
+        <button class="analytics-period-btn" type="button" data-period="30d" onclick="setAnalyticsPeriod('30d')">30日</button>
+        <button class="analytics-period-btn" type="button" data-period="all" onclick="setAnalyticsPeriod('all')">全期間</button>
+        <button class="btn btn-gen" type="button" onclick="loadAnalyticsDashboard()" style="margin-left:auto;">🔄 再読み込み</button>
+      </div>
+      <div class="log" id="admin-access-log">確認を実行してください</div>
+      <div id="admin-access-area"></div>
+    </div>
+  </div>
+
 </div>
 
 <script>
 // ===== 管理タブ・確認機能 =====
+
+let ADMIN_ANALYTICS_PERIOD = 'today';
+const ADMIN_EVENT_LABELS = {
+  page_view:'ページ閲覧', login_seen:'ログイン利用者確認', calc_run:'ダメージ計算実行', calc_add_run:'合計ダメージ計算', calc_record_save:'計算履歴保存',
+  season_search:'使用可能ポケモン検索', season_type_filter:'タイプ絞り込み', season_detail_open:'詳細表示', move_check:'技選択判定',
+  scope_select_decide:'選出決定', scope_record:'対戦記録保存', scope_damage_tab:'技対面タブ表示', party_save:'パーティ保存', party_load:'パーティ読込', pokemon_save:'ポケモン登録保存', endure_run:'耐久調整実行'
+};
+function setAnalyticsPeriod(period){
+  ADMIN_ANALYTICS_PERIOD = period || 'today';
+  document.querySelectorAll('.analytics-period-btn').forEach(btn=>btn.classList.toggle('active', btn.dataset.period === ADMIN_ANALYTICS_PERIOD));
+  loadAnalyticsDashboard();
+}
+function adminAnalyticsStartISO(){
+  const now = new Date();
+  if(ADMIN_ANALYTICS_PERIOD === 'all') return null;
+  const d = new Date(now);
+  if(ADMIN_ANALYTICS_PERIOD === 'today') d.setHours(0,0,0,0);
+  if(ADMIN_ANALYTICS_PERIOD === '7d') d.setDate(d.getDate()-7);
+  if(ADMIN_ANALYTICS_PERIOD === '30d') d.setDate(d.getDate()-30);
+  return d.toISOString();
+}
+function adminAnalyticsPeriodLabel(){
+  return ({today:'今日', '7d':'直近7日', '30d':'直近30日', all:'全期間'})[ADMIN_ANALYTICS_PERIOD] || '今日';
+}
+function adminCountMap(rows, keyFn){
+  const m = new Map();
+  (rows||[]).forEach(row=>{ const k = keyFn(row); if(k) m.set(k,(m.get(k)||0)+1); });
+  return [...m.entries()].sort((a,b)=>b[1]-a[1] || String(a[0]).localeCompare(String(b[0])));
+}
+function adminAnalyticsTable(rows, headers){
+  if(!rows.length) return '<div class="note">データがありません。</div>';
+  return '<table class="analytics-table"><thead><tr>' + headers.map(h=>'<th>'+adminEsc(h)+'</th>').join('') + '</tr></thead><tbody>' + rows.map(r=>'<tr>' + r.map((c,i)=>'<td class="'+(i===r.length-1?'num':'')+'">'+adminEsc(c)+'</td>').join('') + '</tr>').join('') + '</tbody></table>';
+}
+function adminPageLabel(page){
+  const map = {
+    'index.html':'トップ','calc.html':'ダメージ計算','endure.html':'耐久調整','move.html':'技選択判定','party.html':'パーティ管理','pokemon.html':'ポケモン登録','items.html':'アイテム','scope.html':'バトルアナライザー','season.html':'使用可能ポケモン','speed.html':'素早さライン','stats.html':'選出率記録','blog.html':'記事一覧','policy.html':'サイト情報'
+  };
+  return (map[page] ? map[page] + ' / ' : '') + page;
+}
+async function loadAnalyticsDashboard(){
+  const log = document.getElementById('admin-access-log');
+  const area = document.getElementById('admin-access-area');
+  if(!log || !area) return;
+  log.innerHTML = '<span class="warn">アクセス情報を読み込み中...</span>';
+  area.innerHTML = '';
+  try{
+    if(typeof getSB !== 'function') throw new Error('Supabase接続が見つかりません。');
+    let q = getSB().from('site_analytics_events').select('created_at,page,event_name,session_key,user_key,logged_in').order('created_at',{ascending:false}).limit(10000);
+    const start = adminAnalyticsStartISO();
+    if(start) q = q.gte('created_at', start);
+    const { data, error } = await q;
+    if(error) throw error;
+    const rows = Array.isArray(data) ? data : [];
+    const pageViews = rows.filter(r=>r.event_name === 'page_view');
+    const operationRows = rows.filter(r=>r.event_name && r.event_name !== 'page_view' && r.event_name !== 'login_seen');
+    const sessions = new Set(rows.map(r=>r.session_key).filter(Boolean));
+    const loggedUsers = new Set(rows.filter(r=>r.logged_in || r.user_key).map(r=>r.user_key).filter(Boolean));
+    const pages = adminCountMap(pageViews, r=>r.page || 'unknown').slice(0,30);
+    const events = adminCountMap(operationRows, r=>r.event_name || 'event').slice(0,30);
+    const loginPages = adminCountMap(rows.filter(r=>r.user_key), r=>r.page || 'unknown').slice(0,20);
+    const summary = '<div class="analytics-summary">' +
+      '<div class="analytics-card"><div class="analytics-val">'+pageViews.length+'</div><div class="analytics-lbl">ページ閲覧数</div></div>' +
+      '<div class="analytics-card"><div class="analytics-val">'+sessions.size+'</div><div class="analytics-lbl">匿名端末数</div></div>' +
+      '<div class="analytics-card"><div class="analytics-val">'+operationRows.length+'</div><div class="analytics-lbl">主要操作数</div></div>' +
+      '<div class="analytics-card"><div class="analytics-val">'+loggedUsers.size+'</div><div class="analytics-lbl">ログイン利用者数</div></div>' +
+      '</div>';
+    const html = summary +
+      '<div class="analytics-note">期間：'+adminEsc(adminAnalyticsPeriodLabel())+'。ログイン利用者数は、ログイン中ユーザーIDを匿名化した値の重複なし件数です。</div>' +
+      '<div class="analytics-grid">' +
+      '<div class="admin-check-block"><div class="admin-check-title">ページ別閲覧数</div>'+adminAnalyticsTable(pages.map(([p,c])=>[adminPageLabel(p), c]), ['ページ','閲覧'])+'</div>' +
+      '<div class="admin-check-block"><div class="admin-check-title">主要操作数</div>'+adminAnalyticsTable(events.map(([e,c])=>[ADMIN_EVENT_LABELS[e] || e, c]), ['操作','回数'])+'</div>' +
+      '<div class="admin-check-block"><div class="admin-check-title">ログイン利用があったページ</div>'+adminAnalyticsTable(loginPages.map(([p,c])=>[adminPageLabel(p), c]), ['ページ','回数'])+'</div>' +
+      '<div class="admin-check-block"><div class="admin-check-title">最近のイベント</div>'+adminAnalyticsTable(rows.slice(0,30).map(r=>[(r.created_at||'').replace('T',' ').slice(0,16), adminPageLabel(r.page||''), ADMIN_EVENT_LABELS[r.event_name] || r.event_name || '']), ['日時','ページ','内容'])+'</div>' +
+      '</div>' + (rows.length >= 10000 ? '<div class="analytics-note">※ 表示上限10000件に達しています。期間を短くすると正確に見やすくなります。</div>' : '');
+    area.innerHTML = html;
+    log.innerHTML = '<span class="ok">✅ アクセス情報を読み込みました。</span>';
+  }catch(e){
+    const sql = `-- Supabase SQL Editorで一度だけ実行してください。\n` +
+`create table if not exists public.site_analytics_events (\n  id bigint generated by default as identity primary key,\n  created_at timestamptz not null default now(),\n  page text not null,\n  event_name text not null,\n  session_key text,\n  user_key text,\n  logged_in boolean not null default false,\n  meta jsonb not null default '{}'::jsonb\n);\nalter table public.site_analytics_events enable row level security;\ncreate policy "analytics_insert_anyone" on public.site_analytics_events for insert to anon, authenticated with check (true);\ncreate policy "analytics_select_anyone" on public.site_analytics_events for select to anon, authenticated using (true);`;
+    log.innerHTML = '<span class="err">アクセス情報を読み込めませんでした。</span>';
+    area.innerHTML = '<div class="analytics-error">site_analytics_events テーブルが未作成、またはRLSポリシー未設定の可能性があります。付属の analytics_schema.sql をSupabase SQL Editorで実行してください。<br>詳細：'+adminEsc(e.message || e)+'</div><pre class="analytics-sql">'+adminEsc(sql)+'</pre>';
+  }
+}
+
 function showAdminTab(name){
   document.querySelectorAll('.admin-tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.admin-tab-btn').forEach(b=>b.classList.remove('active'));
