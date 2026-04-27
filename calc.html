@@ -1902,11 +1902,14 @@ function getWeightPower(moveName, atkW, defW) {
 // ===== 連続技ヒット数 =====
 function parseHits(raw) {
   const s=String(raw||'1').trim();
-  if(s.includes('〜')||s.includes('~')) {
-    const parts=s.split(/[〜~]/); const mn=parseInt(parts[0])||1, mx=parseInt(parts[1])||mn;
+  if(s.includes('～')||s.includes('〜')||s.includes('~')) {
+    const parts=s.split(/[～〜~]/);
+    const mn=parseInt(parts[0])||1;
+    const mx=parseInt(parts[1])||mn;
     return {min:mn,max:mx};
   }
-  const n=parseInt(s)||1; return {min:n,max:n};
+  const n=parseInt(s)||1;
+  return {min:n,max:n};
 }
 function clampNumber(v,min,max){
   const n=Number(v);
@@ -2003,19 +2006,34 @@ function clearSelectedMove(){
   ['atk-move-search','atk-move-pow','atk-move-type','atk-move-cat','atk-move-hits','atk-move-notes','atk-move-crit'].forEach(id=>{ if(el(id)) el(id).value=''; });
   renderSelectedMoveInfo('atk',null);
 }
+function getCalcMoveMaster(moveName){
+  const name = String(moveName||'').trim();
+  if(!name) return null;
+  return (moveIndex||[]).find(m=>m.name===name) || (MOVES_DATA||[]).find(m=>m && m.name===name) || null;
+}
 function normalizeMoveFromPokemonEntry(entry){
   if(!entry) return null;
-  const known = moveIndex.find(m=>m.name===entry.name);
-  if(known) return known;
-  const power = parseInt(String(entry.power||'').replace(/[^0-9-]/g,''))||0;
+  const name = String(entry.name ?? entry.moveName ?? '').trim();
+  if(!name) return null;
+  const known = getCalcMoveMaster(name);
+  const rawNotes = String(entry.description ?? entry.notes ?? entry.effect ?? '').trim();
+  const knownNotes = String(known?.notes ?? known?.effect ?? '').trim();
+  const rawHits = String(entry.hits ?? entry.hitCount ?? entry['回数'] ?? '').trim();
+  const knownHits = String(known?.hits ?? known?.hitCount ?? known?.['回数'] ?? '').trim();
+  const hits = (rawHits && rawHits !== '1') ? rawHits : (knownHits || rawHits || '1');
+  const rawPower = String(entry.power ?? '').trim();
+  const knownPower = known ? parseInt(known.power)||0 : 0;
+  const power = rawPower ? (parseInt(rawPower.replace(/[^0-9-]/g,''))||0) : knownPower;
+  const type = String(entry.type || known?.type || '').trim();
+  const category = normalizeMoveCategoryValue(name, entry.category || known?.category || '', entry.effect || known?.effect || '', rawNotes || knownNotes);
   return {
-    name: entry.name||'',
-    type: entry.type||'',
-    category: normalizeMoveCategoryValue(entry.name||'', entry.category||'', entry.effect||'', entry.description||entry.notes||''),
+    name,
+    type,
+    category,
     power,
-    hits: entry.hits||'1',
-    notes: entry.description||entry.notes||'',
-    alwaysCrit: '',
+    hits,
+    notes: rawNotes || knownNotes,
+    alwaysCrit: String(entry.alwaysCrit ?? known?.alwaysCrit ?? '').trim(),
   };
 }
 function getPokemonKnownMoves(name){
@@ -2061,16 +2079,9 @@ function pickRegisteredMove(pokeName, moveName){
   const moves = (CURRENT_ATK_REGISTERED_RECORD && CURRENT_ATK_REGISTERED_RECORD.pokeName===pokeName && Array.isArray(CURRENT_ATK_REGISTERED_RECORD.moves))
     ? CURRENT_ATK_REGISTERED_RECORD.moves
     : [];
-  const entry = moves.find(m=>m && m.name===moveName);
-  if(entry) setAtkMove({
-    name: entry.name,
-    type: entry.type || '',
-    power: parseInt(entry.power)||0,
-    category: normalizeMoveCategoryValue(entry.name || '', entry.category || '', entry.effect || '', entry.notes || ''),
-    notes: entry.notes || '',
-    hits: entry.hits || '1',
-    alwaysCrit: entry.alwaysCrit || ''
-  });
+  const entry = moves.find(m=>m && m.name===moveName) || {name: moveName};
+  const normalized = normalizeMoveFromPokemonEntry(entry);
+  if(normalized) setAtkMove(normalized);
 }
 function renderSelectedMoveInfo(prefix, m){
   const box = el(prefix+'-move-info');
@@ -3123,6 +3134,7 @@ function updateDefHazardInfo(){
 
 // ===== 技セット =====
 function setAtkMove(m) {
+  m = normalizeMoveFromPokemonEntry(m) || m || {};
   el('atk-move-search').value=m.name;
   el('atk-move-pow').value=m.power||0;
   el('atk-move-type').value=m.type||'';
