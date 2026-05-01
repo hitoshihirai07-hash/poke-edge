@@ -1726,7 +1726,7 @@ async function fetchTextWithRetry(url, retries=2){
   let lastErr = null;
   for(let i=0;i<=retries;i++){
     try{
-      const res = await fetch(url + (url.includes('?') ? '&' : '?') + 'v=' + Date.now() + '_' + i, {cache:'no-store'});
+      const res = await fetch(url, {cache:'no-cache'});
       if(!res.ok) throw new Error('fetch_failed');
       let txt = await res.text();
       txt = String(txt||'').replace(/^\uFEFF/, '').trim();

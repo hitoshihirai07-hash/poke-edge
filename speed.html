@@ -398,10 +398,10 @@ const GAME_RULES = {
 
 async function loadData(){
   const [pd,ad,sd,abd]=await Promise.all([
-    fetch('pokemon.json?v='+Date.now()).then(r=>r.json()),
-    fetch('abilities.json?v='+Date.now()).then(r=>r.json()).catch(()=>({})),
-    fetch('season.json?v='+Date.now()).then(r=>r.json()).catch(()=>({seasons:[]})),
-    fetch('abilities_data.json?v='+Date.now()).then(r=>r.json()).catch(()=>[]),
+    fetch('pokemon.json', {cache:'no-cache'}).then(r=>r.json()),
+    fetch('abilities.json', {cache:'no-cache'}).then(r=>r.json()).catch(()=>({})),
+    fetch('season.json', {cache:'no-cache'}).then(r=>r.json()).catch(()=>({seasons:[]})),
+    fetch('abilities_data.json', {cache:'no-cache'}).then(r=>r.json()).catch(()=>[]),
   ]);
   POKEMON_DATA=pd; ABILITY_MAP=ad; SEASON_DATA=sd; ABILITY_DATA=abd;
   initSeasonFilter();

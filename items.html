@@ -260,7 +260,7 @@ function render(){
 }
 async function init(){
   try{
-    const res = await fetch('belongings.json?v=' + Date.now());
+    const res = await fetch('belongings.json', {cache:'no-cache'});
     if(!res.ok) throw new Error('belongings.json の取得に失敗しました');
     ITEMS_DATA = await res.json();
     const updated = ITEMS_DATA.map(x => x.updatedAt).filter(Boolean).sort().pop() || '—';

@@ -23,8 +23,8 @@
 </script>
 <script>
 (function(){
-  var dark={'--bg':'#07090f','--bg2':'#0b0e1a','--panel':'#0f1423','--border':'#1a2540','--border2':'#243356','--accent':'#00c8f0','--accent2':'#ff3060','--accent3':'#ffc800','--green':'#00e676','--text':'#d8e8ff','--text2':'#4a6080','--text3':'#7a90b0'};
-  var light={'--bg':'#e8f4f8','--bg2':'#d0e8f0','--panel':'#f4fbff','--border':'#90c8e0','--border2':'#60a8cc','--accent':'#0066aa','--accent2':'#cc1040','--accent3':'#cc7700','--green':'#007744','--text':'#051828','--text2':'#2a5070','--text3':'#0a3050'};
+  var dark={'--bg':'#0d1420','--bg2':'#141e2e','--panel':'#1a2638','--border':'#304766','--border2':'#3d5b82','--accent':'#59d2ff','--accent2':'#ff6b92','--accent3':'#f2c66a','--green':'#57d89a','--text':'#f2f7ff','--text2':'#9fb3cb','--text3':'#c0d0e1'};
+  var light={'--bg':'#e7edf4','--bg2':'#f1f5f9','--panel':'#f8fbff','--border':'#b8c8d8','--border2':'#93abc3','--accent':'#0c6bb7','--accent2':'#c4456a','--accent3':'#a96a00','--green':'#157c52','--text':'#162335','--text2':'#5b7087','--text3':'#2f4a66'};
   var t=localStorage.getItem('pokeedge_theme')||'dark';
   var vars=t==='light'?light:dark;
   var root=document.documentElement.style;
@@ -219,6 +219,62 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;}
 .ev-row{display:grid;grid-template-columns:1fr 48px;gap:6px;align-items:center;}
 .ev-remain{font-size:11px;color:var(--accent3);font-family:'JetBrains Mono',monospace;}
 .ev-over{color:var(--accent2)!important;}
+
+/* ランキングおすすめ / おまかせ耐久 */
+.assist-grid{display:grid;grid-template-columns:1fr;gap:12px;}
+.assist-card{background:var(--bg2);border:1px solid var(--border);padding:12px;display:grid;gap:10px;}
+@media(min-width:801px){
+  .assist-card{padding:14px;}
+  .bulk-candidate-table{min-width:760px;table-layout:auto;}
+  .bulk-candidate-table th,.bulk-candidate-table td{padding:8px 10px;font-size:12px;vertical-align:middle;}
+  .bulk-candidate-table th{font-size:11px;}
+  .bulk-candidate-table .bulk-ev-cell,.bulk-candidate-table .bulk-real-cell{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;white-space:normal;line-height:1.6;}
+  .bulk-candidate-table .bulk-subline{display:inline;font-size:11px;}
+}
+.assist-head{font-size:11px;font-weight:700;color:var(--accent3);letter-spacing:1px;}
+.assist-note{font-size:10px;color:var(--text2);line-height:1.8;}
+.assist-mini{font-size:10px;color:var(--text2);letter-spacing:1px;margin-bottom:4px;}
+.assist-mode-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.assist-chip-btn{background:var(--panel);border:1px solid var(--border2);color:var(--text);padding:7px 12px;font-size:11px;cursor:pointer;line-height:1.3;transition:all .18s;}
+.assist-chip-btn.active,.assist-chip-btn:hover{border-color:var(--accent);color:var(--accent);}
+.assist-chip-btn.active{background:rgba(0,200,240,0.08);}
+.assist-result{font-size:11px;color:var(--text3);line-height:1.8;background:rgba(0,200,240,0.04);border:1px solid var(--border);padding:10px;}
+.assist-block{display:grid;gap:6px;}
+.assist-subgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.assist-inline-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.assist-inline-grid .ev-row{grid-template-columns:1fr;}
+.assist-table-wrap{overflow:auto;border:1px solid var(--border);}
+.assist-table{width:100%;border-collapse:collapse;min-width:620px;}
+.assist-table th,.assist-table td{border-bottom:1px solid var(--border);padding:7px 8px;font-size:11px;text-align:left;white-space:nowrap;}
+.assist-table th{font-size:10px;color:var(--text2);background:rgba(0,0,0,0.12);position:sticky;top:0;}
+.bulk-candidate-table .bulk-ev-cell,.bulk-candidate-table .bulk-real-cell{white-space:normal;line-height:1.5;}
+.bulk-candidate-table .bulk-ev-cell strong,.bulk-candidate-table .bulk-real-cell strong{color:var(--text);font-weight:700;}
+.bulk-candidate-table .bulk-subline{display:block;font-size:10px;color:var(--text2);} 
+.assist-tag{display:inline-block;padding:2px 7px;border:1px solid var(--border2);font-size:10px;color:var(--text3);}
+.assist-tag.good{border-color:var(--green);color:var(--green);}
+.assist-tag.warn{border-color:var(--accent3);color:var(--accent3);}
+.ratio-line{font-size:11px;color:var(--text3);display:flex;justify-content:space-between;gap:12px;}
+.bulk-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.bulk-actions button,.assist-secondary-btn{padding:9px 14px;background:var(--panel);border:1px solid var(--border2);color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:11px;cursor:pointer;transition:all .18s;}
+.bulk-actions button:hover,.assist-secondary-btn:hover{border-color:var(--accent);color:var(--accent);}
+.bulk-actions .primary{background:linear-gradient(135deg,var(--accent),#007a99);border:none;color:#000;font-weight:700;}
+.bulk-actions .primary:hover{opacity:.85;color:#000;}
+.ranking-chip{padding:7px 9px;font-size:10px;}
+.ranking-chip strong{font-size:11px;color:var(--text);}
+@media(max-width:800px){
+  .assist-grid{grid-template-columns:1fr;}
+  .assist-subgrid,.assist-inline-grid{grid-template-columns:1fr;}
+  .bulk-candidate-table{min-width:0;table-layout:fixed;}
+  .bulk-candidate-table th,.bulk-candidate-table td{padding:6px 5px;font-size:10px;white-space:normal;word-break:break-word;vertical-align:top;}
+  .bulk-candidate-table th:nth-child(5),.bulk-candidate-table td:nth-child(5),
+  .bulk-candidate-table th:nth-child(6),.bulk-candidate-table td:nth-child(6){display:none;}
+  .bulk-candidate-table th:nth-child(1),.bulk-candidate-table td:nth-child(1){width:34px;}
+  .bulk-candidate-table th:nth-child(2),.bulk-candidate-table td:nth-child(2){width:64px;}
+  .bulk-candidate-table th:nth-child(7),.bulk-candidate-table td:nth-child(7){width:58px;}
+  .bulk-candidate-table .assist-secondary-btn{padding:7px 8px;font-size:10px;white-space:nowrap;}
+  .bulk-candidate-table .bulk-subline{font-size:9px;}
+}
+
 /* 技 */
 .moves-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;}
 .move-slot{background:var(--bg2);border:1px solid var(--border);padding:8px 10px;min-height:48px;position:relative;display:flex;align-items:center;gap:8px;}
@@ -360,6 +416,9 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 
 </style>
 <script src="usage-tracker.js"></script>
+
+<link rel="stylesheet" href="contrast-tune.css">
+<link rel="stylesheet" href="updates-widget.css">
 </head>
 <body>
 <header>
@@ -576,11 +635,11 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
         <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;padding:8px;background:var(--bg2);border:1px solid var(--border);">
           <span style="font-size:10px;color:var(--text2);letter-spacing:1px;">ゲーム:</span>
           <label style="display:flex;align-items:center;gap:4px;cursor:pointer;">
-            <input type="radio" name="poke-game-mode" id="poke-mode-classic" value="classic" checked onchange="onPokeModeChange()">
+            <input type="radio" name="poke-game-mode" id="poke-mode-classic" value="classic" onchange="onPokeModeChange()">
             <span style="font-size:11px;color:var(--text);">従来作（最大252）</span>
           </label>
           <label style="display:flex;align-items:center;gap:4px;cursor:pointer;">
-            <input type="radio" name="poke-game-mode" id="poke-mode-champions" value="champions" onchange="onPokeModeChange()">
+            <input type="radio" name="poke-game-mode" id="poke-mode-champions" value="champions" checked onchange="onPokeModeChange()">
             <span style="font-size:11px;color:var(--accent3);">Champions（最大32）</span>
           </label>
         </div>
@@ -632,6 +691,56 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
         <div class="real-grid" id="real-grid"></div>
       </div>
 
+
+      <!-- ランキングおすすめ -->
+      <div class="section">
+        <div class="sec-title">ランキングおすすめ</div>
+        <div class="assist-card">
+          <div class="assist-head">ランキングからおすすめを表示</div>
+          <div class="assist-note">選択中のポケモンについて、シングル / ダブルの上位候補を表示します。技・持ち物・特性・性格・努力値候補をそのまま反映できます。メガ進化ポケモンは、ランキングにメガ名が無い場合のみ通常形態を参照します。</div>
+          <div class="assist-mode-row">
+            <span class="assist-mini">参照ルール</span>
+            <button type="button" id="ranking-mode-single" class="assist-chip-btn active" onclick="setRankingAssistMode('single')">シングル</button>
+            <button type="button" id="ranking-mode-double" class="assist-chip-btn" onclick="setRankingAssistMode('double')">ダブル</button>
+          </div>
+          <div id="ranking-reco-status" class="assist-result">ポケモンを選ぶと、ここにランキング上位の候補を表示します。</div>
+          <div class="assist-block"><div class="assist-mini">技おすすめ</div><div id="ranking-reco-moves" class="quick-chip-wrap"></div></div>
+          <div class="assist-block"><div class="assist-mini">持ち物おすすめ</div><div id="ranking-reco-items" class="quick-chip-wrap"></div></div>
+          <div class="assist-block"><div class="assist-mini">特性おすすめ</div><div id="ranking-reco-abilities" class="quick-chip-wrap"></div></div>
+          <div class="assist-block"><div class="assist-mini">性格おすすめ</div><div id="ranking-reco-natures" class="quick-chip-wrap"></div></div>
+          <div class="assist-block"><div class="assist-mini">努力値おすすめ</div><div id="ranking-reco-spreads" class="quick-chip-wrap"></div></div>
+        </div>
+      </div>
+
+      <!-- おまかせ総合耐久調整 -->
+      <div class="section">
+        <div class="sec-title">おまかせ総合耐久調整</div>
+        <div class="assist-card">
+          <div class="assist-head">おまかせ総合耐久調整</div>
+          <div class="assist-note">今入力している努力値をそのまま基準にして、余っている努力値をHP / 防御 / 特防へどう回すと総合耐久指数が伸びやすいかを表示します。攻撃・特攻・素早さだけでなく、すでに入っているHP / 防御 / 特防もそのまま意識して候補を出します。</div>
+          <div>
+            <label>物理・特殊の攻撃を受ける比率</label>
+            <input type="range" id="bulk-ratio" min="0" max="100" value="50" oninput="updateBulkRatioLabel()">
+            <div class="ratio-line"><span id="bulk-ratio-phys">物理 50%</span><span id="bulk-ratio-spec">特殊 50%</span></div>
+          </div>
+          <div class="bulk-actions">
+            <button type="button" class="primary" onclick="runBulkRecommend()">耐久調整</button>
+          </div>
+          <div id="bulk-summary" class="assist-result">今入力している努力値を基準に、そのままおすすめ候補だけ表示します。努力値は自動変更しません。</div>
+          <div class="assist-mini">総合耐久指数表（上位候補）</div>
+          <div class="assist-table-wrap">
+            <table class="assist-table bulk-candidate-table">
+              <thead>
+                <tr><th>順位</th><th>性格</th><th>努力値</th><th>実数値</th><th>指数</th><th>HP調整</th><th>反映</th></tr>
+              </thead>
+              <tbody id="bulk-candidate-body">
+                <tr><td colspan="7" style="color:var(--text2);">耐久調整後、ここに上位候補を表示します。</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <!-- 技 -->
       <div class="section">
         <div class="sec-title">技（最大4つ）</div>
@@ -676,6 +785,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 <script>
 
 // ===== 外部JSONデータ読み込み =====
+const DATA_FETCH_OPTIONS = {cache:'no-cache'};
 let POKEMON_DATA = [];
 let MOVES_DATA   = [];
 let ABILITY_MAP  = {};
@@ -685,6 +795,42 @@ let POKEMON_MOVES = {};
 let pokeIndex    = [];
 let moveIndex    = [];
 let _dataLoaded = false;
+let RANKING_SINGLE = {rows:[]};
+let RANKING_DOUBLE = {rows:[]};
+let rankingAssistMode = 'single';
+let lastBulkCandidates = [];
+let _pokemonMovesLoaded = false;
+let _pokemonMovesPromise = null;
+let _rankingLoaded = {single:false, double:false};
+let _rankingPromises = {single:null, double:null};
+
+function fetchDataJson(path, fallback){
+  return fetch(path, DATA_FETCH_OPTIONS).then(r=>r.ok ? r.json() : Promise.reject(new Error(path))).catch(()=>fallback);
+}
+async function ensurePokemonMovesLoaded(){
+  if(_pokemonMovesLoaded) return POKEMON_MOVES;
+  if(_pokemonMovesPromise) return _pokemonMovesPromise;
+  _pokemonMovesPromise = fetchDataJson('pokemon_moves.json', {pokemon:{}}).then(data=>{
+    POKEMON_MOVES = data && data.pokemon ? data.pokemon : {};
+    _pokemonMovesLoaded = true;
+    return POKEMON_MOVES;
+  });
+  return _pokemonMovesPromise;
+}
+async function ensureRankingDataLoaded(mode){
+  const key = mode==='double' ? 'double' : 'single';
+  if(_rankingLoaded[key]) return key==='double' ? RANKING_DOUBLE : RANKING_SINGLE;
+  if(_rankingPromises[key]) return _rankingPromises[key];
+  const file = key==='double' ? 'season_ranking_double.json' : 'season_ranking_single.json';
+  _rankingPromises[key] = fetchDataJson(file, {rows:[]}).then(data=>{
+    const normalized = data && Array.isArray(data.rows) ? data : {rows:[]};
+    if(key==='double') RANKING_DOUBLE = normalized;
+    else RANKING_SINGLE = normalized;
+    _rankingLoaded[key] = true;
+    return normalized;
+  });
+  return _rankingPromises[key];
+}
 
 
 // ===== 特殊フォルムの登録名統一 =====
@@ -829,20 +975,18 @@ function getAegislashForms(){ return getSpecialForms(AEGISLASH_BASE_NAME); }
 async function loadGameData() {
   if(_dataLoaded) return;
   try {
-    const [pd, md, ad, sd, idata, pmdata] = await Promise.all([
-      fetch('pokemon.json?v='+Date.now()).then(r=>r.json()),
-      fetch('moves.json?v='+Date.now()).then(r=>r.json()),
-      fetch('abilities.json?v='+Date.now()).then(r=>r.json()).catch(()=>({})),
-      fetch('season.json?v='+Date.now()).then(r=>r.json()).catch(()=>({seasons:[]})),
-      fetch('belongings.json?v='+Date.now()).then(r=>r.json()).catch(()=>([])),
-      fetch('pokemon_moves.json?v='+Date.now()).then(r=>r.json()).catch(()=>({pokemon:{}})),
+    const [pd, md, ad, sd, idata] = await Promise.all([
+      fetchDataJson('pokemon.json', []),
+      fetchDataJson('moves.json', []),
+      fetchDataJson('abilities.json', {}),
+      fetchDataJson('season.json', {seasons:[]}),
+      fetchDataJson('belongings.json', []),
     ]);
     POKEMON_DATA = ensureSpecialFormDisplayPokemon((Array.isArray(pd)?pd:[]).map(markSpecialFormEntry));
     MOVES_DATA   = md;
     ABILITY_MAP  = ad;
     SEASON_DATA  = sd;
     ITEMS_DATA   = Array.isArray(idata) ? idata : [];
-    POKEMON_MOVES = pmdata && pmdata.pokemon ? pmdata.pokemon : {};
     pokeIndex    = POKEMON_DATA.map((p,i)=>Object.assign({_i:i},p));
     moveIndex    = MOVES_DATA.map((m,i)=>Object.assign({_i:i},m));
     _dataLoaded  = true;
@@ -896,12 +1040,21 @@ function renderMoveQuick(pokeName){
   const wrap=document.getElementById('move-quick');
   const note=document.getElementById('move-quick-note');
   if(!wrap || !note) return;
-  const moves=getPokemonKnownMoves(pokeName);
   if(!pokeName){
     wrap.innerHTML='';
     note.textContent='ポケモンを選ぶと、候補技をここから追加できます。';
     return;
   }
+  if(!_pokemonMovesLoaded){
+    wrap.innerHTML='<span class="quick-chip subtle">候補技を読み込み中...</span>';
+    note.textContent='候補技データを読み込んでいます。';
+    ensurePokemonMovesLoaded().then(()=>{
+      const active=currentPokeData?.name || document.getElementById('poke-search')?.value || '';
+      if(active) renderMoveQuick(normalizeAegislashDisplayName(active));
+    });
+    return;
+  }
+  const moves=getPokemonKnownMoves(pokeName);
   if(!moves.length){
     wrap.innerHTML='<span class="quick-chip subtle">候補技データなし</span>';
     note.textContent='候補技データがない場合は、下の検索欄から追加してください。';
@@ -936,6 +1089,361 @@ function addKnownMove(idx){
   if(currentMoves.find(x=>x.name===m.name)){alert('同じ技は登録できません');return;}
   currentMoves.push(buildRegisteredMoveEntry(m));
   renderMoves();
+}
+
+
+function getRankingDataset(mode){
+  return mode==='double' ? RANKING_DOUBLE : RANKING_SINGLE;
+}
+function normalizeRankingToken(value){
+  return String(value||'').replace(/\s*[\(（][\d.]+%[\)）]\s*$/,'').trim();
+}
+function extractRankingPercent(value){
+  const m=String(value||'').match(/[\(（]([\d.]+)%[\)）]\s*$/);
+  return m ? parseFloat(m[1]) : null;
+}
+function parseRankingNatureEntry(value){
+  const raw=String(value||'').trim();
+  const percent=extractRankingPercent(raw);
+  const label=normalizeRankingToken(raw);
+  const natureName=Object.keys(NATURES).find(name=>label.startsWith(name)) || label;
+  const detail=label.slice(natureName.length).trim();
+  return {name:natureName, detail, percent, label};
+}
+function parseRankingSpreadEntry(value){
+  const raw=String(value||'').trim();
+  const label=normalizeRankingToken(raw);
+  const nums=label.split('-').map(v=>parseInt(v,10));
+  if(nums.length!==6 || nums.some(v=>Number.isNaN(v))) return null;
+  return {
+    ev:{hp:nums[0],atk:nums[1],def:nums[2],spa:nums[3],spd:nums[4],spe:nums[5]},
+    percent:extractRankingPercent(raw),
+    label
+  };
+}
+function getRankingLookupNames(name){
+  const names=[];
+  const add=(value)=>{
+    const v=String(value||'').trim();
+    if(v && !names.includes(v)) names.push(v);
+  };
+  getLookupNamesForPokemon(name).forEach(add);
+  const megaBase=getMegaBaseName(name);
+  if(megaBase) add(megaBase);
+  const base=getSpecialFormBaseName(name);
+  if(base) add(base);
+  const display=normalizeAegislashDisplayName(name);
+  if(display) add(display);
+  return names.filter(Boolean);
+}
+function getRankingAssistContext(name, mode){
+  if(!name) return null;
+  const rows=(getRankingDataset(mode)||{}).rows || [];
+  const lookups=getRankingLookupNames(name);
+  for(const lookup of lookups){
+    const row=rows.find(row=>{
+      const rowNames=[row?.name,row?.siteName,normalizeAegislashDisplayName(row?.name||''),getSpecialFormBaseName(row?.name||'')].filter(Boolean).map(v=>String(v).trim());
+      return rowNames.includes(lookup);
+    });
+    if(row){
+      return {
+        row,
+        rankingName: lookup,
+        selectedName: String(name||'').trim(),
+        isMega: isMegaFormName(name),
+        megaBase: getMegaBaseName(name) || '',
+        usedFallback: isMegaFormName(name) ? lookup !== String(name||'').trim() : false
+      };
+    }
+  }
+  return null;
+}
+function getRankingRowForPokemon(name, mode){
+  return getRankingAssistContext(name, mode)?.row || null;
+}
+function escapeHtml(text){
+  return String(text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function setRankingAssistMode(mode){
+  rankingAssistMode = mode==='double' ? 'double' : 'single';
+  const s=document.getElementById('ranking-mode-single');
+  const d=document.getElementById('ranking-mode-double');
+  if(s) s.classList.toggle('active', rankingAssistMode==='single');
+  if(d) d.classList.toggle('active', rankingAssistMode==='double');
+  renderRankingAssist();
+}
+function renderRankingSuggestionWrap(targetId, rows, kind){
+  const wrap=document.getElementById(targetId);
+  if(!wrap) return;
+  if(!rows || !rows.length){
+    wrap.innerHTML='<span class="quick-chip subtle">候補なし</span>';
+    return;
+  }
+  wrap.innerHTML=rows.map((label,idx)=>`<button type="button" class="quick-chip ranking-chip" onclick="applyRankingSuggestion('${kind}',${idx})">${escapeHtml(label)}</button>`).join('');
+}
+async function renderRankingAssist(){
+  const status=document.getElementById('ranking-reco-status');
+  const name=currentPokeData?.name || document.getElementById('poke-search')?.value || '';
+  if(!name){
+    if(status) status.textContent='ポケモンを選ぶと、ここにランキング上位の候補を表示します。';
+    ['ranking-reco-moves','ranking-reco-items','ranking-reco-abilities','ranking-reco-natures','ranking-reco-spreads'].forEach(id=>renderRankingSuggestionWrap(id, [], ''));
+    return;
+  }
+  if(!_rankingLoaded[rankingAssistMode]){
+    if(status) status.textContent=(rankingAssistMode==='double' ? 'ダブル' : 'シングル') + '順位候補を読み込み中...';
+    ['ranking-reco-moves','ranking-reco-items','ranking-reco-abilities','ranking-reco-natures','ranking-reco-spreads'].forEach(id=>renderRankingSuggestionWrap(id, [], ''));
+    await ensureRankingDataLoaded(rankingAssistMode);
+  }
+  const ctx=getRankingAssistContext(name, rankingAssistMode);
+  const row=ctx?.row;
+  if(!row){
+    if(status) status.textContent='このポケモンのランキング候補が見つかりませんでした。';
+    ['ranking-reco-moves','ranking-reco-items','ranking-reco-abilities','ranking-reco-natures','ranking-reco-spreads'].forEach(id=>renderRankingSuggestionWrap(id, [], ''));
+    return;
+  }
+  if(status){
+    const updated=row.updatedAt ? ` / 更新 ${row.updatedAt}` : '';
+    if(ctx?.isMega && ctx?.usedFallback && ctx?.megaBase){
+      status.innerHTML=`${rankingAssistMode==='double'?'ダブル':'シングル'}順位 <strong style="color:var(--accent3);">${row.rank ?? '—'}位</strong> / 登録中 ${escapeHtml(ctx.selectedName)} / ランキング参照 ${escapeHtml(ctx.megaBase)}${updated}<div style="margin-top:6px;font-size:11px;color:var(--text2);line-height:1.6;">メガ進化ポケモンは技・持ち物・性格・努力値を通常形態ランキングから参照しています。特性はメガ後とズレやすいため候補を出していません。</div>`;
+    } else {
+      status.innerHTML=`${rankingAssistMode==='double'?'ダブル':'シングル'}順位 <strong style="color:var(--accent3);">${row.rank ?? '—'}位</strong> / ${escapeHtml(row.name||name)}${updated}`;
+    }
+  }
+  renderRankingSuggestionWrap('ranking-reco-moves', (row.moves||[]).slice(0,10), 'move');
+  renderRankingSuggestionWrap('ranking-reco-items', (row.items||[]).slice(0,10), 'item');
+  renderRankingSuggestionWrap('ranking-reco-abilities', (ctx?.isMega && ctx?.usedFallback) ? [] : (row.abilities||[]).slice(0,5), 'ability');
+  renderRankingSuggestionWrap('ranking-reco-natures', (row.natures||[]).slice(0,5), 'nature');
+  renderRankingSuggestionWrap('ranking-reco-spreads', (row.spreads||[]).slice(0,5), 'spread');
+}
+function applyRankingSuggestion(kind, idx){
+  const name=currentPokeData?.name || document.getElementById('poke-search')?.value || '';
+  const ctx=getRankingAssistContext(name, rankingAssistMode);
+  const row=ctx?.row;
+  if(!row) return;
+  if(kind==='move'){
+    const moveName=normalizeRankingToken(row.moves?.[idx]);
+    const master=getMoveMasterForRegister(moveName);
+    if(!master){ alert('技データに見つかりませんでした'); return; }
+    if(currentMoves.find(x=>x.name===moveName)) return;
+    if(currentMoves.length>=4){ alert('技は4つまでです'); return; }
+    currentMoves.push(buildRegisteredMoveEntry(master));
+    renderMoves();
+    return;
+  }
+  if(kind==='item'){
+    document.getElementById('f-item').value=normalizeRankingToken(row.items?.[idx]);
+    return;
+  }
+  if(kind==='ability'){
+    if(ctx?.isMega && ctx?.usedFallback) return;
+    const ability=normalizeRankingToken(row.abilities?.[idx]);
+    const sel=document.getElementById('f-ability');
+    if(sel){ sel.value=ability; }
+    return;
+  }
+  if(kind==='nature'){
+    const parsed=parseRankingNatureEntry(row.natures?.[idx]);
+    if(parsed && NATURES[parsed.name]){
+      document.getElementById('f-nature').value=parsed.name;
+      recalcReal();
+      return;
+    }
+  }
+  if(kind==='spread'){
+    const parsed=parseRankingSpreadEntry(row.spreads?.[idx]);
+    if(!parsed) return;
+    const champ=document.getElementById('poke-mode-champions');
+    if(champ) champ.checked=true;
+    const classic=document.getElementById('poke-mode-classic');
+    if(classic) classic.checked=false;
+    onPokeModeChange();
+    ['hp','atk','def','spa','spd','spe'].forEach(stat=>{
+      document.getElementById('ev-'+stat+'-r').value=parsed.ev[stat]||0;
+      document.getElementById('ev-'+stat).value=parsed.ev[stat]||0;
+    });
+    updateEVRemain();
+    resetBulkRecommendView('努力値おすすめを反映しました。今の努力値を基準に、必要ならもう一度「耐久調整」で候補を出せます。');
+    recalcReal();
+    return;
+  }
+}
+function getPokeEvStep(){ return isPokeChampions() ? 1 : 4; }
+function getPokeEvMax(){ return isPokeChampions() ? 32 : 252; }
+function getBulkSliderPercent(){ return parseInt(document.getElementById('bulk-ratio')?.value,10) || 0; }
+function updateBulkRatioLabel(){
+  const phys=getBulkSliderPercent();
+  const spec=100-phys;
+  const a=document.getElementById('bulk-ratio-phys');
+  const b=document.getElementById('bulk-ratio-spec');
+  if(a) a.textContent=`物理 ${phys}%`;
+  if(b) b.textContent=`特殊 ${spec}%`;
+}
+function normalizeBulkEv(value){
+  const step=getPokeEvStep();
+  const max=getPokeEvMax();
+  let v=Math.max(0, Math.min(max, parseInt(value,10) || 0));
+  if(step>1) v = Math.floor(v/step)*step;
+  return v;
+}
+function resetBulkRecommendView(message){
+  const body=document.getElementById('bulk-candidate-body');
+  if(body) body.innerHTML='<tr><td colspan="7" style="color:var(--text2);">耐久調整後、ここに上位候補を表示します。</td></tr>';
+  const summary=document.getElementById('bulk-summary');
+  if(summary) summary.textContent=message || '今入力している努力値を基準に、そのままおすすめ候補だけ表示します。努力値は自動変更しません。';
+  lastBulkCandidates=[];
+}
+function getBulkNatureCandidates(pokeName, physRatio){
+  const row=getRankingRowForPokemon(pokeName, rankingAssistMode);
+  const current=document.getElementById('f-nature')?.value || 'がんばりや';
+  const preferPhysical = (currentPokeData?.atk || 0) >= (currentPokeData?.spa || 0);
+  const preferredDef = preferPhysical ? ['わんぱく','ずぶとい'] : ['ずぶとい','わんぱく'];
+  const preferredSpd = preferPhysical ? ['しんちょう','おだやか'] : ['おだやか','しんちょう'];
+  const arr=[];
+  const add=(name)=>{ if(name && NATURES[name] && !arr.includes(name)) arr.push(name); };
+  add(current);
+  if(row && Array.isArray(row.natures)) row.natures.forEach(item=>add(parseRankingNatureEntry(item).name));
+  if(physRatio >= 0.6){ preferredDef.forEach(add); preferredSpd.forEach(add); }
+  else if(physRatio <= 0.4){ preferredSpd.forEach(add); preferredDef.forEach(add); }
+  else { preferredDef.forEach(add); preferredSpd.forEach(add); add('がんばりや'); }
+  add('がんばりや');
+  return arr;
+}
+function getRealStatsForBulk(ev, natureName){
+  const p=currentPokeData;
+  const lv=parseInt(document.getElementById('f-lv').value,10)||50;
+  const iv=parseInt(document.getElementById('iv-num').value,10)||31;
+  const nat=NATURES[natureName] || NATURES['がんばりや'];
+  const champ=isPokeChampions();
+  return {
+    hp:calcHP(p.hp, iv, ev.hp, lv, champ),
+    atk:calcStat(p.atk, iv, ev.atk, lv, nat.atk||1, champ),
+    def:calcStat(p.def, iv, ev.def, lv, nat.def||1, champ),
+    spa:calcStat(p.spa, iv, ev.spa, lv, nat.spa||1, champ),
+    spd:calcStat(p.spd, iv, ev.spd, lv, nat.spd||1, champ),
+    spe:calcStat(p.spe, iv, ev.spe, lv, nat.spe||1, champ)
+  };
+}
+function calcWeightedBulkScore(real, physRatio){
+  return real.hp * ((real.def * physRatio) + (real.spd * (1 - physRatio)));
+}
+function describeBulkHpTuning(hpStat){
+  const tags=[];
+  if(hpStat % 2 === 1) tags.push('奇数HP');
+  if(hpStat % 16 === 15) tags.push('16n-1');
+  return tags.length ? tags.join(' / ') : '—';
+}
+function formatBulkEvCell(ev){
+  return `<div class="bulk-ev-cell"><strong>H${ev.hp} A${ev.atk} B${ev.def}</strong><span class="bulk-subline">C${ev.spa} D${ev.spd} S${ev.spe}</span></div>`;
+}
+function formatBulkRealCell(real){
+  return `<div class="bulk-real-cell"><strong>H${real.hp} B${real.def}</strong><span class="bulk-subline">D${real.spd}</span></div>`;
+}
+async function runBulkRecommend(){
+  if(!currentPokeData){ alert('先にポケモンを選択してください'); return; }
+  const limit=isPokeChampions() ? 66 : 510;
+  const step=getPokeEvStep();
+  const max=getPokeEvMax();
+  const currentEv=getEVs();
+  const physRatio=getBulkSliderPercent()/100;
+  const summary=document.getElementById('bulk-summary');
+  const body=document.getElementById('bulk-candidate-body');
+  if(summary) summary.textContent='今の努力値を基準に、おすすめ候補を計算中です...';
+  if(body) body.innerHTML='<tr><td colspan="7" style="color:var(--text2);">おすすめ候補を計算中です...</td></tr>';
+  await ensureRankingDataLoaded(rankingAssistMode);
+
+  const baseEv={
+    hp:normalizeBulkEv(currentEv.hp),
+    atk:normalizeBulkEv(currentEv.atk),
+    def:normalizeBulkEv(currentEv.def),
+    spa:normalizeBulkEv(currentEv.spa),
+    spd:normalizeBulkEv(currentEv.spd),
+    spe:normalizeBulkEv(currentEv.spe)
+  };
+  const baseTotal=baseEv.hp+baseEv.atk+baseEv.def+baseEv.spa+baseEv.spd+baseEv.spe;
+  if(baseTotal > limit){
+    if(summary) summary.textContent=`現在の努力値合計が上限を超えています（現在 ${baseTotal} / 上限 ${limit}）。先に努力値を見直してください。`;
+    if(body) body.innerHTML='<tr><td colspan="7" style="color:var(--accent2);">現在の努力値合計が上限を超えているため、候補を作れませんでした。</td></tr>';
+    lastBulkCandidates=[];
+    return;
+  }
+
+  const remaining=limit-baseTotal;
+  const candidates=[];
+  const natures=getBulkNatureCandidates(currentPokeData.name, physRatio);
+  for(const nature of natures){
+    for(let addHp=0; addHp<=remaining; addHp+=step){
+      if(baseEv.hp + addHp > max) continue;
+      for(let addDef=0; addDef<=remaining-addHp; addDef+=step){
+        if(baseEv.def + addDef > max) continue;
+        const left=remaining-addHp-addDef;
+        const addSpd=step>1 ? Math.floor(left/step)*step : left;
+        if(baseEv.spd + addSpd > max) continue;
+        const ev={
+          hp:baseEv.hp + addHp,
+          atk:baseEv.atk,
+          def:baseEv.def + addDef,
+          spa:baseEv.spa,
+          spd:baseEv.spd + addSpd,
+          spe:baseEv.spe
+        };
+        const used=ev.hp+ev.atk+ev.def+ev.spa+ev.spd+ev.spe;
+        if(used > limit) continue;
+        const real=getRealStatsForBulk(ev, nature);
+        const score=calcWeightedBulkScore(real, physRatio);
+        candidates.push({nature, ev, real, score, used, hpTune:describeBulkHpTuning(real.hp)});
+      }
+    }
+  }
+
+  candidates.sort((a,b)=> b.score-a.score || b.used-a.used || b.real.hp-a.real.hp || b.real.def-a.real.def || b.real.spd-a.real.spd);
+  const unique=[];
+  const seen=new Set();
+  for(const cand of candidates){
+    const key=[cand.nature,cand.ev.hp,cand.ev.atk,cand.ev.def,cand.ev.spa,cand.ev.spd,cand.ev.spe].join('/');
+    if(seen.has(key)) continue;
+    seen.add(key);
+    unique.push(cand);
+    if(unique.length>=12) break;
+  }
+  lastBulkCandidates=unique;
+  if(!unique.length){
+    if(summary) summary.textContent='現在の努力値を基準に候補を作れませんでした。努力値や比率を見直してください。';
+    if(body) body.innerHTML='<tr><td colspan="7" style="color:var(--accent2);">候補を作れませんでした。</td></tr>';
+    return;
+  }
+  const best=unique[0];
+  if(summary){
+    summary.innerHTML=`現在の努力値 <strong style="color:var(--text);">${baseEv.hp}-${baseEv.atk}-${baseEv.def}-${baseEv.spa}-${baseEv.spd}-${baseEv.spe}</strong> を基準に判定しました。残り <strong style="color:var(--accent3);">${remaining}</strong> を耐久へ回すなら、まずは <strong style="color:var(--accent3);">${escapeHtml(best.nature)}</strong> / 努力値 <strong style="color:var(--accent);">${best.ev.hp}-${best.ev.atk}-${best.ev.def}-${best.ev.spa}-${best.ev.spd}-${best.ev.spe}</strong> が伸びやすいです。${Math.round(physRatio*100)}% : ${Math.round((1-physRatio)*100)}% の受け比率で、上位候補を下に並べています。`;
+  }
+  if(body){
+    body.innerHTML=unique.map((cand,idx)=>`<tr>
+      <td>${idx+1}</td>
+      <td>${escapeHtml(cand.nature)}</td>
+      <td>${formatBulkEvCell(cand.ev)}</td>
+      <td>${formatBulkRealCell(cand.real)}</td>
+      <td>${Math.round(cand.score).toLocaleString('ja-JP')}</td>
+      <td>${cand.hpTune==='—' ? '<span class="assist-tag">—</span>' : cand.hpTune.split(' / ').map(tag=>`<span class="assist-tag ${tag==='16n-1'?'warn':'good'}">${tag}</span>`).join(' ')}</td>
+      <td><button type="button" class="assist-secondary-btn" onclick="applyBulkCandidate(${idx})">反映</button></td>
+    </tr>`).join('');
+  }
+}
+function applyBulkCandidate(idx){
+  const cand=lastBulkCandidates[idx];
+  if(!cand) return;
+  document.getElementById('f-nature').value=cand.nature;
+  ['hp','atk','def','spa','spd','spe'].forEach(stat=>{
+    document.getElementById('ev-'+stat+'-r').value=cand.ev[stat]||0;
+    document.getElementById('ev-'+stat).value=cand.ev[stat]||0;
+  });
+  updateEVRemain();
+  resetBulkRecommendView('おすすめ候補を反映しました。今の努力値を基準に、必要ならもう一度「耐久調整」で候補を出せます。');
+  recalcReal();
+  refreshPokemonAssist(false);
+}
+function refreshPokemonAssist(forceSyncBulk){
+  renderRankingAssist();
+  updateBulkRatioLabel();
+  if(forceSyncBulk) resetBulkRecommendView();
 }
 
 // POKEMON_DATA: 外部JSONから読み込み (loadGameData)
@@ -1027,10 +1535,8 @@ function onPokeModeChange() {
   const max   = champ ? 32  : 252;
   const step  = champ ? 1   : 4;
   const limit = champ ? 66  : 510;
-  // タイトル更新
   const title = document.getElementById('ev-title');
   if(title) title.textContent = champ ? '努力値（合計上限66）' : '努力値（合計上限510）';
-  // 全スライダーのmax/step更新
   ['hp','atk','def','spa','spd','spe'].forEach(s => {
     const r = document.getElementById('ev-'+s+'-r');
     const n = document.getElementById('ev-'+s);
@@ -1038,6 +1544,8 @@ function onPokeModeChange() {
     if(n){ n.max=max; if(parseInt(n.value)>max) n.value=0; }
   });
   updateEVRemain();
+  updateBulkRatioLabel();
+  resetBulkRecommendView();
   recalcReal();
 }
 
@@ -1047,6 +1555,7 @@ function syncEV(stat,val) {
   document.getElementById('ev-'+stat+'-r').value=v;
   document.getElementById('ev-'+stat).value=v;
   updateEVRemain();
+  resetBulkRecommendView();
   recalcReal();
 }
 function updateEVRemain() {
@@ -1168,6 +1677,7 @@ function selectPoke(name) {
   }).join('');
   }
   recalcReal();
+  refreshPokemonAssist(true);
 }
 
 // ===== 技検索 =====
@@ -1540,6 +2050,11 @@ function newPokemon() {
   document.getElementById('nickname').value='';
   document.getElementById('f-lv').value=50;
   document.getElementById('f-nature').value='がんばりや';
+  const classic=document.getElementById('poke-mode-classic');
+  const champions=document.getElementById('poke-mode-champions');
+  if(classic) classic.checked=false;
+  if(champions) champions.checked=true;
+  onPokeModeChange();
   renderAbilityOptions('', '');
   renderMoveQuick('');
   document.getElementById('f-item').value='';
@@ -1556,6 +2071,7 @@ function newPokemon() {
   updateEVRemain();
   renderMoves();
   renderMoveQuick(currentPokeData ? currentPokeData.name : '');
+  refreshPokemonAssist(true);
   renderRegList(document.getElementById('reg-search').value);
 }
 
@@ -1616,6 +2132,12 @@ function loadPokemon(id) {
   document.getElementById('iv-range').value=rec.iv||31;
   document.getElementById('iv-num').value=rec.iv||31;
   document.getElementById('iv-disp').textContent=rec.iv||31;
+  const classic=document.getElementById('poke-mode-classic');
+  const champions=document.getElementById('poke-mode-champions');
+  const isChampionsSaved=String(rec.gameMode||'classic').toLowerCase()==='champions';
+  if(classic) classic.checked=!isChampionsSaved;
+  if(champions) champions.checked=isChampionsSaved;
+  onPokeModeChange();
   ['hp','atk','def','spa','spd','spe'].forEach(k=>{
     const v=rec.ev?rec.ev[k]||0:0;
     document.getElementById('ev-'+k+'-r').value=v;
@@ -1629,6 +2151,7 @@ function loadPokemon(id) {
     document.getElementById('base-stats-box').style.display='none';
     document.getElementById('real-grid').innerHTML='';
   }
+  refreshPokemonAssist(true);
   renderRegList(document.getElementById('reg-search').value);
 }
 
@@ -1682,8 +2205,8 @@ function markPokemonMobileSections(){
   if(!sections.length) return;
   sections.forEach(sec=>sec.classList.remove('mobile-section-basic','mobile-section-effort','mobile-section-moves'));
   [sections[0], sections[1]].forEach(sec=>sec && sec.classList.add('mobile-section-basic'));
-  [sections[2], sections[3]].forEach(sec=>sec && sec.classList.add('mobile-section-effort'));
-  [sections[4], sections[5]].forEach(sec=>sec && sec.classList.add('mobile-section-moves'));
+  [sections[2], sections[3], sections[5]].forEach(sec=>sec && sec.classList.add('mobile-section-effort'));
+  [sections[4], sections[6], sections[7]].forEach(sec=>sec && sec.classList.add('mobile-section-moves'));
 }
 function switchPokemonMobileTab(tab){
   const safe = ['list','basic','effort','moves'].includes(tab) ? tab : 'list';
@@ -1705,6 +2228,8 @@ function switchPokemonMobileTabIfMobile(tab){
 // ===== 初期化 =====
 window.onload = async () => {
   await loadGameData();
+  onPokeModeChange();
+  updateBulkRatioLabel();
   markPokemonMobileSections();
   if(!document.body.classList.contains('pokemon-mobile-tab-list') && !document.body.classList.contains('pokemon-mobile-tab-basic') && !document.body.classList.contains('pokemon-mobile-tab-effort') && !document.body.classList.contains('pokemon-mobile-tab-moves')) switchPokemonMobileTab('list');
   setupItemMasterList();
@@ -1729,6 +2254,13 @@ window.onload = async () => {
   setupMoveSearch();
   renderMoves();
   renderRegList();
+  refreshPokemonAssist(true);
+
+  if(window.requestIdleCallback){
+    requestIdleCallback(()=>{ ensurePokemonMovesLoaded(); ensureRankingDataLoaded('single'); });
+  } else {
+    setTimeout(()=>{ ensurePokemonMovesLoaded(); ensureRankingDataLoaded('single'); }, 250);
+  }
 
   // ボタンバインド（関数定義後に実行）
   const btnNew = document.getElementById('btn-new-pokemon');
@@ -1736,6 +2268,9 @@ window.onload = async () => {
   if(btnNew)  btnNew.addEventListener('click', newPokemon);
   document.querySelectorAll('#btn-save-pokemon,#btn-save-pokemon-top').forEach(btn=>btn.addEventListener('click', savePokemon));
   if(btnDel)  btnDel.addEventListener('click', deleteCurrent);
+
+  const natureSel=document.getElementById('f-nature');
+  if(natureSel) natureSel.addEventListener('change', ()=>{ recalcReal(); renderRankingAssist(); });
 
   // reg-search
   const regSearch = document.getElementById('reg-search');
@@ -1829,5 +2364,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
 
 </script>
+
+<script src="updates-widget.js"></script>
 </body>
 </html>

@@ -437,7 +437,7 @@ function emptyOppSlot(){ return {pokeName:'', poke:null, source:'free', sourceLa
 function normalizePokemonMoves(raw){ if(raw && raw.pokemon && typeof raw.pokemon==='object') return raw.pokemon; if(raw && typeof raw==='object' && !Array.isArray(raw)) return raw; return {}; }
 function normalizeBelongings(raw){ if(Array.isArray(raw)) return raw; if(raw && Array.isArray(raw.items)) return raw.items; return []; }
 function parseMaybeJson(txt){ try{return JSON.parse(txt);}catch(_e){} const t=String(txt||'').trim(); const s1=t.indexOf('['), e1=t.lastIndexOf(']'); if(s1>=0&&e1>s1){ try{return JSON.parse(t.slice(s1,e1+1));}catch(_e){} } const s2=t.indexOf('{'), e2=t.lastIndexOf('}'); if(s2>=0&&e2>s2){ try{return JSON.parse(t.slice(s2,e2+1));}catch(_e){} } throw new Error('invalid_json'); }
-async function fetchJsonFlexible(url, fallback){ try{ const r = await fetch(url + (url.includes('?') ? '&' : '?') + 'v=' + Date.now(), {cache:'no-store'}); if(!r.ok) throw new Error('fetch_failed'); const txt = (await r.text()).replace(/^\uFEFF/, '').trim(); if(!txt) return fallback; return parseMaybeJson(txt); } catch(e){ return fallback; } }
+async function fetchJsonFlexible(url, fallback){ try{ const r = await fetch(url, {cache:'no-cache'}); if(!r.ok) throw new Error('fetch_failed'); const txt = (await r.text()).replace(/^\uFEFF/, '').trim(); if(!txt) return fallback; return parseMaybeJson(txt); } catch(e){ return fallback; } }
 async function loadGameData(){
   if(_dataLoaded) return;
   const [pd, md, ad, abd, pmd, bd, sd] = await Promise.all([
