@@ -288,12 +288,84 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;margin:4p
 /* パーティ管理 新CSS */
 .party-layout{display:grid;grid-template-columns:200px 1fr;gap:16px;align-items:start;}
 @media(max-width:700px){.party-layout{grid-template-columns:1fr;}}
-.party-top-grid,.party-mid-grid,.party-coverage-grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(320px,0.92fr);gap:16px;align-items:start;margin-bottom:16px;}
-@media(max-width:920px){.party-top-grid,.party-mid-grid,.party-coverage-grid{grid-template-columns:1fr;}}
+.party-top-grid,.party-mid-grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(340px,0.92fr);gap:16px;align-items:start;margin-bottom:16px;}
+@media(max-width:920px){.party-top-grid,.party-mid-grid{grid-template-columns:1fr;}}
 .party-slot-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
 @media(max-width:560px){.party-slot-list{grid-template-columns:repeat(2,minmax(0,1fr));}}
-.party-side-stack{display:flex;flex-direction:column;gap:14px;}
-.party-side-panel{margin-top:0 !important;}
+.party-workspace{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:14px;}
+.party-workspace-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.party-workspace-tab-btn{border:1px solid var(--border);background:var(--bg2);color:var(--text2);padding:8px 14px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:1px;font-family:'Noto Sans JP',sans-serif;cursor:pointer;transition:all 0.18s;}
+.party-workspace-tab-btn:hover{border-color:var(--accent);color:var(--accent);}
+.party-workspace-tab-btn.active{border-color:var(--accent);background:rgba(0,200,240,0.12);color:var(--accent);}
+.party-workspace-panel{display:none;}
+.party-workspace-panel.active{display:block;}
+.party-workspace .cov-wrap,.party-workspace .add-section{margin-top:0;border-radius:16px;}
+.party-workspace .add-section{padding:0;border:none;background:transparent;}
+.party-workspace .add-section-title{margin-bottom:10px;}
+.party-workspace .party-coverage-grid{display:grid;grid-template-columns:1fr;gap:12px;}
+.party-workspace .party-coverage-grid .cov-wrap{padding:14px;}
+.party-recommend-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+.party-ranking-mode{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.party-ranking-mode-btn{border:1px solid var(--border);background:var(--bg2);color:var(--text2);padding:8px 12px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:1px;font-family:'Noto Sans JP',sans-serif;cursor:pointer;transition:all 0.18s;}
+.party-ranking-mode-btn:hover{border-color:var(--accent);color:var(--accent);}
+.party-ranking-mode-btn.active{border-color:var(--accent3);background:rgba(255,200,0,0.14);color:var(--accent3);}
+.party-ranking-meta{font-size:10px;color:var(--text2);line-height:1.7;}
+.recommend-summary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px;}
+@media(max-width:560px){.recommend-summary-grid{grid-template-columns:1fr;}}
+.recommend-summary-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:12px 14px;}
+.recommend-summary-title{font-size:10px;color:var(--text2);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;}
+.recommend-summary-main{font-size:13px;font-weight:700;line-height:1.8;color:var(--text);}
+.recommend-summary-sub{font-size:10px;color:var(--text2);line-height:1.7;margin-top:6px;}
+.recommend-group-wrap{display:flex;flex-direction:column;gap:12px;}
+.recommend-group{background:rgba(7,9,15,0.42);border:1px solid var(--border);border-radius:16px;padding:12px;}
+.recommend-group-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.recommend-group-title{font-size:13px;font-weight:700;color:var(--text);}
+.recommend-group-note{font-size:10px;color:var(--text2);line-height:1.7;}
+.recommend-group-list{display:flex;flex-direction:column;gap:8px;}
+.recommend-card{background:var(--bg2);border:1px solid var(--border);padding:12px 14px;border-radius:14px;transition:all 0.18s;cursor:pointer;}
+.recommend-card:hover{border-color:var(--accent);transform:translateY(-1px);}
+.recommend-card.disabled{opacity:0.55;cursor:default;}
+.recommend-head{display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap;}
+.recommend-rank{font-family:'Bebas Neue',sans-serif;font-size:24px;line-height:1;color:var(--accent);}
+.recommend-score{margin-left:auto;font-size:10px;color:var(--text2);font-family:'JetBrains Mono',monospace;}
+.recommend-role-badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;background:rgba(255,200,0,0.14);border:1px solid var(--border2);font-size:9px;color:var(--accent3);letter-spacing:1px;font-weight:700;}
+.recommend-targets,.recommend-reasons,.recommend-moves{font-size:10px;color:var(--text2);margin-top:6px;line-height:1.8;}
+.recommend-targets strong,.recommend-reasons strong,.recommend-moves strong{color:var(--text);font-weight:700;}
+.recommend-move-line{margin-top:4px;padding-top:4px;border-top:1px dashed var(--border2);}
+.recommend-move-line:first-of-type{margin-top:6px;}
+.recommend-add-btn{margin-top:10px;padding:8px 12px;background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:999px;font-size:11px;cursor:pointer;transition:all 0.18s;}
+.recommend-add-btn:hover{background:rgba(0,200,240,0.08);}
+.recommend-add-btn:disabled{border-color:var(--border2);color:var(--text2);cursor:default;background:transparent;}
+.party-threat-list{display:flex;flex-direction:column;gap:8px;max-height:540px;overflow:auto;padding-right:2px;}
+.party-threat-row{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:10px;align-items:center;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:10px 12px;}
+.party-threat-row.is-heavy{border-color:rgba(255,90,90,0.38);background:linear-gradient(135deg,rgba(255,90,90,0.06),rgba(10,14,24,0.95));}
+.party-threat-rank{font-family:'Bebas Neue',sans-serif;font-size:24px;line-height:1;color:var(--accent3);text-align:center;}
+.party-threat-main{min-width:0;display:flex;flex-direction:column;gap:4px;}
+.party-threat-name{font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.party-threat-meta{font-size:10px;color:var(--text2);line-height:1.7;}
+.party-threat-badges{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+.party-threat-badge{display:inline-flex;align-items:center;padding:4px 9px;border-radius:999px;border:1px solid var(--border2);font-size:9px;font-weight:700;letter-spacing:1px;white-space:nowrap;}
+.party-threat-badge.attack-4,.party-threat-badge.attack-2{border-color:rgba(0,200,240,0.36);color:var(--accent);background:rgba(0,200,240,0.1);}
+.party-threat-badge.attack-1{border-color:rgba(255,200,0,0.3);color:var(--accent3);background:rgba(255,200,0,0.1);}
+.party-threat-badge.attack-0{border-color:rgba(255,90,90,0.34);color:var(--accent2);background:rgba(255,90,90,0.08);}
+.party-threat-badge.def-good{border-color:rgba(0,255,150,0.35);color:var(--green);background:rgba(0,255,150,0.08);}
+.party-threat-badge.def-mid{border-color:rgba(255,200,0,0.3);color:var(--accent3);background:rgba(255,200,0,0.08);}
+.party-threat-badge.def-bad{border-color:rgba(255,90,90,0.34);color:var(--accent2);background:rgba(255,90,90,0.08);}
+@media(max-width:560px){.party-threat-row{grid-template-columns:34px minmax(0,1fr);} .party-threat-badges{grid-column:1 / -1;justify-content:flex-start;padding-left:44px;}}
+.party-config-inline{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.party-config-inline select{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:10px;font-size:11px;outline:none;}
+.party-register-status{margin:8px 0 10px;padding:10px 12px;border:1px solid var(--border);background:var(--bg2);border-radius:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.party-register-status-main{font-size:10px;color:var(--text2);line-height:1.8;}
+.party-register-status-main strong{color:var(--text);font-size:11px;}
+.party-register-status-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.party-inline-btn{padding:7px 12px;border-radius:999px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-size:10px;cursor:pointer;transition:all 0.18s;}
+.party-inline-btn:hover{background:rgba(0,200,240,0.08);}
+.direct-card-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.direct-card-meta{display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap;}
+.direct-register-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:9px;border:1px solid var(--border2);color:var(--text2);}
+.direct-register-badge.registered{color:var(--green);border-color:rgba(0,255,150,0.35);background:rgba(0,255,150,0.08);}
+.direct-register-btn{padding:4px 8px;border-radius:999px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-size:9px;cursor:pointer;}
+.direct-register-btn:hover{background:rgba(0,200,240,0.08);}
 .party-slot-btn{
   padding:12px 14px;cursor:pointer;display:flex;align-items:flex-start;gap:10px;
   transition:all 0.18s;position:relative;border:1px solid var(--border);background:var(--panel);border-radius:14px;min-height:82px;
@@ -310,15 +382,6 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;margin:4p
 .party-slot-remove:hover{color:var(--accent2);}
 .party-slot-info{padding-right:12px;}
 .party-slot-name{line-height:1.45;}
-.recommend-card{background:var(--bg2);border:1px solid var(--border);padding:12px 14px;border-radius:14px;transition:all 0.18s;cursor:pointer;}
-.recommend-card:hover{border-color:var(--accent);transform:translateY(-1px);}
-.recommend-card.disabled{opacity:0.55;cursor:default;}
-.recommend-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.recommend-rank{font-family:'Bebas Neue',sans-serif;font-size:24px;line-height:1;color:var(--accent);}
-.recommend-score{margin-left:auto;font-size:10px;color:var(--text2);font-family:'JetBrains Mono',monospace;}
-.recommend-add-btn{margin-top:10px;padding:8px 12px;background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:999px;font-size:11px;cursor:pointer;transition:all 0.18s;}
-.recommend-add-btn:hover{background:rgba(0,200,240,0.08);}
-.recommend-add-btn:disabled{border-color:var(--border2);color:var(--text2);cursor:default;background:transparent;}
 .party-section-box{background:var(--panel);border:1px solid var(--border);padding:14px;border-radius:16px;}
 .party-section-box .sec{margin-bottom:12px;}
 .party-editor{background:var(--panel);border:1px solid var(--border);padding:18px;}
@@ -344,6 +407,15 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;margin:4p
 .party-action-btn.danger{border-color:var(--accent2);color:var(--accent2);}
 .party-save-btn{padding:9px 20px;background:linear-gradient(135deg,var(--green),#007a40);border:none;color:#000;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;cursor:pointer;transition:all 0.18s;}
 .party-save-btn:hover{opacity:0.85;}
+.party-top-actions{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.party-save-meta{display:flex;flex-direction:column;gap:4px;min-width:220px;flex:1 1 240px;}
+.party-name-input{width:100%;background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:9px 12px;border-radius:12px;font-size:12px;outline:none;}
+.party-name-input:focus{border-color:var(--accent);}
+.party-save-status{font-size:10px;color:var(--text2);line-height:1.4;}
+.party-save-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.party-save-overwrite.is-hidden{display:none!important;}
+.party-mobile-new{background:linear-gradient(135deg,#55607a,#2c3445);color:#fff;}
+.party-mobile-overwrite{background:linear-gradient(135deg,var(--accent),#008bd0);color:#00131d;}
 .saved-parties-section{margin-bottom:14px;border:1px solid var(--border);padding:14px;background:var(--panel);}
 .saved-parties-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
 .saved-parties-note{font-size:10px;color:var(--text2);line-height:1.7;}
@@ -449,8 +521,9 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
   }
   .mobile-party-tab-btn.active{border-color:var(--accent);background:rgba(0,200,240,.12);color:var(--accent);}
   .party-top-actions{gap:8px!important;margin-bottom:10px!important;}
-  .party-top-actions .party-save-btn,
-  .party-top-actions .party-action-btn{display:none;}
+  .party-top-actions .party-save-meta,
+  .party-top-actions .party-save-actions{width:100%;}
+  .party-top-actions .party-save-actions{order:3;}
   .party-top-actions a{margin-left:0!important;flex:1;text-align:center;}
   .party-top-grid{display:block;margin-bottom:12px;}
   .party-section-box,.saved-parties-section,.party-editor,.cov-wrap,.add-section{border-radius:16px;}
@@ -459,23 +532,28 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
   .party-slot-num{font-size:16px;width:13px;}
   .party-slot-name{font-size:11px;}
   .party-slot-types{display:none;}
-  .party-mid-grid,.party-coverage-grid{display:block;margin-bottom:12px;}
-  .party-mid-grid > div:first-child,.party-side-stack,.party-coverage-grid,.saved-parties-section{display:none;}
-  body.party-mobile-tab-six .party-mid-grid,
-  body.party-mobile-tab-six .party-coverage-grid{display:none;}
+  .party-mid-grid{display:block;margin-bottom:12px;}
+  .party-mid-grid > div:first-child,.party-workspace,.saved-parties-section{display:none;}
+  .party-workspace{padding:12px;}
+  .party-workspace-tabs{display:none;}
+  body.party-mobile-tab-six .party-mid-grid{display:none;}
   body.party-mobile-tab-six .saved-parties-section{display:block;margin-top:12px;}
   body.party-mobile-tab-edit .party-mid-grid{display:block;}
   body.party-mobile-tab-edit .party-mid-grid > div:first-child{display:block;}
   body.party-mobile-tab-add .party-mid-grid{display:block;}
-  body.party-mobile-tab-add .party-side-stack{display:block;}
-  body.party-mobile-tab-coverage .party-coverage-grid{display:block;}
+  body.party-mobile-tab-add .party-workspace{display:block;}
+  body.party-mobile-tab-add .party-workspace-panel[data-party-workspace-panel="add"]{display:block;}
+  body.party-mobile-tab-coverage .party-mid-grid{display:block;}
+  body.party-mobile-tab-coverage .party-workspace{display:block;}
+  body.party-mobile-tab-coverage .party-workspace-panel[data-party-workspace-panel="coverage"]{display:block;}
   .party-editor-header{position:sticky;top:112px;z-index:65;background:rgba(15,20,35,.96);backdrop-filter:blur(18px);border:1px solid var(--border);border-radius:16px;padding:12px;margin:-2px -2px 12px;}
+  .recommend-summary-grid{grid-template-columns:1fr;}
   .party-editor-pokename{font-size:17px;}
   #party-editor-content input,#party-editor-content select,#party-editor-content textarea,
   #party-reg-search,#direct-poke-search{font-size:16px!important;}
   #party-reg-list,#direct-poke-list{max-height:calc(100vh - 280px)!important;}
   .party-mobile-bottom-actions{
-    position:fixed;left:10px;right:10px;bottom:10px;z-index:120;display:grid;grid-template-columns:1fr 1fr;gap:8px;
+    position:fixed;left:10px;right:10px;bottom:10px;z-index:120;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;
     background:rgba(7,9,15,.96);border:1px solid var(--border);border-radius:18px;padding:10px;box-shadow:0 -10px 34px rgba(0,0,0,.35);backdrop-filter:blur(18px);
   }
   .party-mobile-bottom-actions button{border:none;border-radius:14px;padding:12px 10px;font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:800;cursor:pointer;}
@@ -547,12 +625,20 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
       <button type="button" class="mobile-party-tab-btn" data-party-mobile-tab="coverage" onclick="switchPartyMobileTab('coverage')">相性</button>
     </div>
     <!-- ヘッダーバー -->
-    <div class="party-top-actions" style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+    <div class="party-top-actions">
       <span style="font-size:11px;color:var(--text2);">登録済みポケモンから選んでパーティを編成</span>
-      <a href="pokemon.html" style="margin-left:auto;padding:6px 14px;border:1px solid var(--accent);color:var(--accent);font-size:11px;text-decoration:none;letter-spacing:1px;transition:all 0.18s;" onmouseover="this.style.background='rgba(0,200,240,0.07)'" onmouseout="this.style.background='transparent'">＋ ポケモンを登録</a>
-      <button class="party-save-btn" onclick="savePartyLocal()">💾 保存</button>
-      <button class="party-action-btn" onclick="refreshSavedPartiesPanel()">↻ 保存一覧を更新</button>
-      <button class="party-action-btn primary" onclick="exportPartyImage()">📷 構築画像を保存</button>
+      <div class="party-save-meta">
+        <input type="text" id="party-save-name" class="party-name-input" placeholder="新規パーティ" oninput="markPartySaveNameDirty()">
+        <div id="party-save-status" class="party-save-status">新規作成中です。6体を入れたらそのまま保存できます。</div>
+      </div>
+      <div class="party-save-actions">
+        <button class="party-action-btn" type="button" onclick="startNewParty()">🆕 新規作成</button>
+        <button class="party-save-btn" type="button" onclick="savePartyLocal('new')">💾 新規保存</button>
+        <button class="party-action-btn primary party-save-overwrite is-hidden" id="party-save-overwrite-btn" type="button" onclick="savePartyLocal('overwrite')">↺ 上書き保存</button>
+      </div>
+      <a href="pokemon.html" style="padding:6px 14px;border:1px solid var(--accent);color:var(--accent);font-size:11px;text-decoration:none;letter-spacing:1px;transition:all 0.18s;" onmouseover="this.style.background='rgba(0,200,240,0.07)'" onmouseout="this.style.background='transparent'">＋ ポケモンを登録</a>
+      <button class="party-action-btn" type="button" onclick="refreshSavedPartiesPanel()">↻ 保存一覧を更新</button>
+      <button class="party-action-btn primary" type="button" onclick="exportPartyImage()">📷 構築画像を保存</button>
     </div>
 
     <div class="party-top-grid">
@@ -588,13 +674,18 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
           <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
             <span style="font-size:9px;color:var(--text2);">ゲーム:</span>
             <label style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:11px;">
-              <input type="radio" name="pe-mode" id="pe-mode-classic" value="classic" checked onchange="onPeModeChange()">
+              <input type="radio" name="pe-mode" id="pe-mode-classic" value="classic" onchange="onPeModeChange()">
               <span style="color:var(--text);">従来作（最大252）</span>
             </label>
             <label style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:11px;">
-              <input type="radio" name="pe-mode" id="pe-mode-champ" value="champions" onchange="onPeModeChange()">
+              <input type="radio" name="pe-mode" id="pe-mode-champ" value="champions" checked onchange="onPeModeChange()">
               <span style="color:var(--accent3);">Champions（最大32）</span>
             </label>
+          </div>
+
+          <div id="party-register-status" class="party-register-status">
+            <div class="party-register-status-main">登録状況を確認中です。</div>
+            <div class="party-register-status-actions"></div>
           </div>
 
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;">
@@ -602,13 +693,14 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
               <div style="font-size:9px;color:var(--text2);margin-bottom:2px;">レベル</div>
               <input type="number" id="pe-lv" value="50" min="1" max="100" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:4px 6px;font-size:11px;outline:none;" oninput="updateRealStats()">
             </div>
-            <div>
+            <div id="pe-iv-wrap">
               <div style="font-size:9px;color:var(--text2);margin-bottom:2px;">個体値</div>
               <div style="display:flex;gap:4px;align-items:center;">
                 <input type="range" id="pe-iv-range" min="0" max="31" value="31" style="flex:1;accent-color:var(--accent);" oninput="pe_syncIV(this.value)">
                 <span id="pe-iv-disp" style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--accent3);width:20px;">31</span>
                 <input type="hidden" id="pe-iv" value="31">
               </div>
+              <div id="pe-iv-fixed-note" style="display:none;font-size:10px;color:var(--text2);margin-top:4px;">Championsでは個体値31固定です。</div>
             </div>
             <div>
               <div style="font-size:9px;color:var(--text2);margin-bottom:2px;">性格</div>
@@ -685,73 +777,105 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
         </div>
       </div>
 
-      <div class="party-side-stack">
-        <div class="cov-wrap party-side-panel">
+      <div class="party-workspace">
+        <div class="party-workspace-tabs" aria-label="PC用表示切替">
+          <button type="button" class="party-workspace-tab-btn active" data-party-workspace-tab="recommend" onclick="switchPartyWorkspace('recommend')">おすすめ</button>
+          <button type="button" class="party-workspace-tab-btn" data-party-workspace-tab="add" onclick="switchPartyWorkspace('add')">追加</button>
+          <button type="button" class="party-workspace-tab-btn" data-party-workspace-tab="coverage" onclick="switchPartyWorkspace('coverage')">相性</button>
+        </div>
+
+        <div class="party-workspace-panel active" data-party-workspace-panel="recommend">
           <div class="sec">おすすめ表示</div>
-          <div style="font-size:10px;color:var(--text2);margin-bottom:8px;">現在の構築で足りない打点と受け先を、主に内定ポケモンから提案します。候補を押すとそのままパーティに追加できます。</div>
-          <div id="party-recommend-summary" class="note" style="padding:0 0 8px;"></div>
-          <div id="party-recommend-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+          <div class="party-recommend-toolbar">
+            <div class="party-ranking-mode">
+              <span style="font-size:10px;color:var(--text2);letter-spacing:2px;">参照ランキング</span>
+              <button type="button" class="party-ranking-mode-btn" data-party-ranking-mode="single" onclick="setPartyRankingMode('single')">シングル</button>
+              <button type="button" class="party-ranking-mode-btn" data-party-ranking-mode="double" onclick="setPartyRankingMode('double')">ダブル</button>
+            </div>
+            <div class="party-config-inline">
+              <label style="font-size:10px;color:var(--text2);letter-spacing:1px;">使いたいメガ枠
+                <select id="party-mega-target" onchange="setPartyMegaTarget(this.value)">
+                  <option value="0">0体</option>
+                  <option value="1">1体</option>
+                  <option value="2">2体</option>
+                  <option value="3">3体</option>
+                  <option value="4">4体</option>
+                  <option value="5">5体</option>
+                  <option value="6">6体</option>
+                </select>
+              </label>
+              <div id="party-ranking-meta" class="party-ranking-meta"></div>
+            </div>
+          </div>
+          <div style="font-size:10px;color:var(--text2);margin-bottom:10px;line-height:1.8;">ランキング上位20匹の代表型を参照して、今の構築で重い相手と、殴り返しやすい候補を総合・対物理・対特殊で出します。</div>
+          <div id="party-recommend-summary" class="recommend-summary-grid"></div>
+          <div id="party-recommend-list" class="recommend-group-wrap"></div>
         </div>
 
-        <div class="add-section party-side-panel">
-          <div class="add-section-title">登録済みから選ぶ</div>
-          <div style="display:flex;gap:0;margin-bottom:10px;border-bottom:1px solid var(--border);">
-            <button id="tab-btn-reg" onclick="switchAddTab('reg')" style="flex:1;padding:8px;background:var(--accent);color:#000;border:none;font-family:'Noto Sans JP',sans-serif;font-size:11px;font-weight:700;cursor:pointer;">登録済みから選ぶ</button>
-            <button id="tab-btn-direct" onclick="switchAddTab('direct')" style="flex:1;padding:8px;background:var(--bg2);color:var(--text2);border:none;font-family:'Noto Sans JP',sans-serif;font-size:11px;cursor:pointer;">名前/タイプから選ぶ</button>
-          </div>
-
-          <div id="tab-reg">
-            <input type="text" id="party-reg-search" placeholder="絞り込み..." style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:7px 10px;font-size:12px;outline:none;margin-bottom:8px;" oninput="renderRegPokeList(this.value)">
-            <div id="party-reg-list" style="max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;"></div>
-          </div>
-
-          <div id="tab-direct" style="display:none;">
-            <div style="display:flex;gap:6px;margin-bottom:6px;">
-              <div style="flex:1;">
-                <div style="font-size:9px;color:var(--text2);margin-bottom:2px;">タイプ1</div>
-                <select id="direct-type1" onchange="onDirectTypeChange()" style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:5px 8px;font-size:11px;font-family:'Noto Sans JP',sans-serif;outline:none;"><option value="">すべて</option><option value="ノーマル">ノーマル</option><option value="ほのお">ほのお</option><option value="みず">みず</option><option value="でんき">でんき</option><option value="くさ">くさ</option><option value="こおり">こおり</option><option value="かくとう">かくとう</option><option value="どく">どく</option><option value="じめん">じめん</option><option value="ひこう">ひこう</option><option value="エスパー">エスパー</option><option value="むし">むし</option><option value="いわ">いわ</option><option value="ゴースト">ゴースト</option><option value="ドラゴン">ドラゴン</option><option value="あく">あく</option><option value="はがね">はがね</option><option value="フェアリー">フェアリー</option></select>
-              </div>
-              <div style="flex:1;">
-                <div style="font-size:9px;color:var(--text2);margin-bottom:2px;">タイプ2</div>
-                <select id="direct-type2" onchange="onDirectTypeChange()" style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:5px 8px;font-size:11px;font-family:'Noto Sans JP',sans-serif;outline:none;"><option value="">すべて</option><option value="ノーマル">ノーマル</option><option value="ほのお">ほのお</option><option value="みず">みず</option><option value="でんき">でんき</option><option value="くさ">くさ</option><option value="こおり">こおり</option><option value="かくとう">かくとう</option><option value="どく">どく</option><option value="じめん">じめん</option><option value="ひこう">ひこう</option><option value="エスパー">エスパー</option><option value="むし">むし</option><option value="いわ">いわ</option><option value="ゴースト">ゴースト</option><option value="ドラゴン">ドラゴン</option><option value="あく">あく</option><option value="はがね">はがね</option><option value="フェアリー">フェアリー</option></select>
-              </div>
+        <div class="party-workspace-panel" data-party-workspace-panel="add">
+          <div class="add-section party-side-panel">
+            <div class="add-section-title">登録済みから選ぶ</div>
+            <div style="display:flex;gap:0;margin-bottom:10px;border-bottom:1px solid var(--border);">
+              <button id="tab-btn-reg" onclick="switchAddTab('reg')" style="flex:1;padding:8px;background:var(--accent);color:#000;border:none;font-family:'Noto Sans JP',sans-serif;font-size:11px;font-weight:700;cursor:pointer;">登録済みから選ぶ</button>
+              <button id="tab-btn-direct" onclick="switchAddTab('direct')" style="flex:1;padding:8px;background:var(--bg2);color:var(--text2);border:none;font-family:'Noto Sans JP',sans-serif;font-size:11px;cursor:pointer;">名前/タイプ＋登録確認</button>
             </div>
-            <div style="position:relative;margin-bottom:6px;">
-              <input type="text" id="direct-poke-search" placeholder="ポケモン名で絞り込み..." style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:7px 10px;font-size:12px;outline:none;" oninput="renderDirectPokeList()">
-            </div>
-            <label style="display:flex;align-items:center;gap:6px;margin-bottom:8px;cursor:pointer;font-size:11px;color:var(--text3);">
-              <input type="checkbox" id="direct-season-only" onchange="renderDirectPokeList()" style="accent-color:var(--accent3);">
-              <span>使用可能ポケモンのみ表示</span>
-            </label>
-            <div id="direct-poke-list" style="max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:3px;"></div>
-          </div>
 
-          <div style="font-size:10px;color:var(--text2);margin-top:8px;">クリックでパーティに追加。パーティが6体の場合は追加できません。</div>
+            <div id="tab-reg">
+              <input type="text" id="party-reg-search" placeholder="絞り込み..." style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:7px 10px;font-size:12px;outline:none;margin-bottom:8px;" oninput="renderRegPokeList(this.value)">
+              <div id="party-reg-list" style="max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;"></div>
+            </div>
+
+            <div id="tab-direct" style="display:none;">
+              <div style="display:flex;gap:6px;margin-bottom:6px;">
+                <div style="flex:1;">
+                  <div style="font-size:9px;color:var(--text2);margin-bottom:2px;">タイプ1</div>
+                  <select id="direct-type1" onchange="onDirectTypeChange()" style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:5px 8px;font-size:11px;font-family:'Noto Sans JP',sans-serif;outline:none;"><option value="">すべて</option><option value="ノーマル">ノーマル</option><option value="ほのお">ほのお</option><option value="みず">みず</option><option value="でんき">でんき</option><option value="くさ">くさ</option><option value="こおり">こおり</option><option value="かくとう">かくとう</option><option value="どく">どく</option><option value="じめん">じめん</option><option value="ひこう">ひこう</option><option value="エスパー">エスパー</option><option value="むし">むし</option><option value="いわ">いわ</option><option value="ゴースト">ゴースト</option><option value="ドラゴン">ドラゴン</option><option value="あく">あく</option><option value="はがね">はがね</option><option value="フェアリー">フェアリー</option></select>
+                </div>
+                <div style="flex:1;">
+                  <div style="font-size:9px;color:var(--text2);margin-bottom:2px;">タイプ2</div>
+                  <select id="direct-type2" onchange="onDirectTypeChange()" style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:5px 8px;font-size:11px;font-family:'Noto Sans JP',sans-serif;outline:none;"><option value="">すべて</option><option value="ノーマル">ノーマル</option><option value="ほのお">ほのお</option><option value="みず">みず</option><option value="でんき">でんき</option><option value="くさ">くさ</option><option value="こおり">こおり</option><option value="かくとう">かくとう</option><option value="どく">どく</option><option value="じめん">じめん</option><option value="ひこう">ひこう</option><option value="エスパー">エスパー</option><option value="むし">むし</option><option value="いわ">いわ</option><option value="ゴースト">ゴースト</option><option value="ドラゴン">ドラゴン</option><option value="あく">あく</option><option value="はがね">はがね</option><option value="フェアリー">フェアリー</option></select>
+                </div>
+              </div>
+              <div style="position:relative;margin-bottom:6px;">
+                <input type="text" id="direct-poke-search" placeholder="ポケモン名で絞り込み..." style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:7px 10px;font-size:12px;outline:none;" oninput="renderDirectPokeList()">
+              </div>
+              <label style="display:flex;align-items:center;gap:6px;margin-bottom:8px;cursor:pointer;font-size:11px;color:var(--text3);">
+                <input type="checkbox" id="direct-season-only" onchange="renderDirectPokeList()" style="accent-color:var(--accent3);">
+                <span>使用可能ポケモンのみ表示</span>
+              </label>
+              <div id="direct-poke-list" style="max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:3px;"></div>
+            </div>
+
+            <div style="font-size:10px;color:var(--text2);margin-top:8px;">クリックでパーティに追加できます。未登録のポケモンは、その場でポケモン登録へ進むボタンも出します。</div>
+          </div>
+        </div>
+
+        <div class="party-workspace-panel" data-party-workspace-panel="coverage">
+          <div class="party-coverage-grid">
+            <div class="cov-wrap">
+              <div class="sec">環境上位20への通り</div>
+              <div id="cov-attack-note" style="font-size:10px;color:var(--text2);margin-bottom:8px;">パーティ全体でランキング上位20にどこまで打点と受け先を持てるか</div>
+              <div id="cov-chart-atk"></div>
+            </div>
+
+            <div class="cov-wrap">
+              <div class="sec">防御相性タイプ</div>
+              <div style="font-size:10px;color:var(--text2);margin-bottom:8px;">各タイプの技に対するパーティ全体の耐性。選択中の特性による無効（ふゆう・どしょく・もらいび等）も反映します。</div>
+              <div id="cov-chart-def"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-
-    <div class="party-coverage-grid">
-      <div class="cov-wrap">
-        <div class="sec">攻撃相性タイプ</div>
-        <div style="font-size:10px;color:var(--text2);margin-bottom:8px;">登録した技で各タイプに抜群を取れるか</div>
-        <div id="cov-chart-atk"></div>
-      </div>
-
-      <div class="cov-wrap">
-        <div class="sec">防御相性タイプ</div>
-        <div style="font-size:10px;color:var(--text2);margin-bottom:8px;">各タイプの技に対するパーティ全体の耐性。選択中の特性による無効（ふゆう・どしょく・もらいび等）も反映します。</div>
-        <div id="cov-chart-def"></div>
-      </div>
-    </div>
-  </div>
   </div>
 
 </div>
 
 <div class="party-mobile-bottom-actions" aria-label="スマホ用固定操作">
-  <button type="button" class="party-mobile-save" onclick="savePartyLocal()">💾 保存</button>
-  <button type="button" class="party-mobile-image" onclick="exportPartyImage()">📷 画像保存</button>
+  <button type="button" class="party-mobile-new" onclick="startNewParty()">🆕 新規</button>
+  <button type="button" class="party-mobile-save" onclick="savePartyLocal('new')">💾 新規保存</button>
+  <button type="button" class="party-mobile-overwrite" id="party-mobile-overwrite-btn" onclick="savePartyLocal('overwrite')" style="display:none;">↺ 上書き</button>
+  <button type="button" class="party-mobile-image" onclick="exportPartyImage()">📷 画像</button>
 </div>
 <datalist id="item-master-list"></datalist>
 
@@ -775,6 +899,16 @@ let ITEMS_DATA   = [];
 let POKEMON_MOVES = {};
 let pokeIndex    = [];
 let moveIndex    = [];
+let MOVE_LOOKUP  = {};
+let PARTY_RANKING_DATA = {single:{rows:[],updatedAt:''}, double:{rows:[],updatedAt:''}};
+let PARTY_RANKING_MODE = localStorage.getItem('pokeedge_party_ranking_mode') || 'single';
+let PARTY_MEGA_TARGET = Math.max(0, Math.min(6, parseInt(localStorage.getItem('pokeedge_party_mega_target') || '1', 10) || 1));
+const PARTY_DRAFT_KEY = 'pokeedge_party_draft_v1';
+let _partyCoverageTimer = null;
+let _partyDraftTimer = null;
+let PARTY_EDITOR_QUICK_MOVES = [];
+let PARTY_WORKSPACE_TAB = 'recommend';
+let CURRENT_PARTY_SOURCE = null;
 let _dataLoaded  = false;
 let _pokemonMovesLoaded = false;
 let _pokemonMovesPromise = null;
@@ -793,6 +927,76 @@ async function ensurePokemonMovesLoaded(){
   return _pokemonMovesPromise;
 }
 
+function normalizeRankingPayload(payload, battleType){
+  const rows = payload && Array.isArray(payload.rows) ? payload.rows : [];
+  const updatedAt = payload && payload.updatedAt ? String(payload.updatedAt) : '';
+  return {battleType, updatedAt, rows};
+}
+function normalizeMoveLookupName(name){
+  return String(name||'').replace(/[\s　]+/g,'').trim();
+}
+function getMoveMetaByName(name){
+  return MOVE_LOOKUP[normalizeMoveLookupName(name)] || null;
+}
+function isPartyChampionsMode(){
+  return !!document.getElementById('pe-mode-champ')?.checked;
+}
+function syncPartyModeVisuals(){
+  const champ = isPartyChampionsMode();
+  const ivWrap = document.getElementById('pe-iv-wrap');
+  const ivNote = document.getElementById('pe-iv-fixed-note');
+  if(ivWrap) ivWrap.style.display = champ ? 'none' : '';
+  if(ivNote) ivNote.style.display = champ ? '' : 'none';
+  if(champ){
+    const ivInput = document.getElementById('pe-iv');
+    const ivRange = document.getElementById('pe-iv-range');
+    const ivDisp = document.getElementById('pe-iv-disp');
+    if(ivInput) ivInput.value = 31;
+    if(ivRange) ivRange.value = 31;
+    if(ivDisp) ivDisp.textContent = '31';
+  }
+}
+function getEffectiveMoveRecordForCoverage(member, move){
+  if(!member || !move) return null;
+  const meta = getMoveMetaByName(move.name);
+  const known = getKnownMoveEntryForPokemon(member.poke && member.poke.name, move.name);
+  const type = String(move.type || known?.type || meta?.type || '').trim();
+  const category = String(move.category || known?.category || meta?.category || '').trim();
+  const power = Number(move.power || known?.power || meta?.power || 0);
+  if(!type || !category || category === '変化' || power <= 0) return null;
+  return {
+    name: String(move.name || '').trim(),
+    type,
+    category,
+    power
+  };
+}
+function getRegisteredMoveEffectAgainstTypes(move, defendTypes){
+  if(!move || !move.type) return 1;
+  const types = Array.isArray(defendTypes) ? defendTypes.filter(Boolean) : [];
+  if(!types.length) return 1;
+  const moveName = String(move.name || '').trim();
+  return types.reduce((mult, defType)=>{
+    let eff = TYPE_EFF[move.type]?.[defType];
+    if(eff === undefined) eff = 1;
+    if(moveName === 'フリーズドライ' && defType === 'みず') eff = 2;
+    return mult * eff;
+  }, 1);
+}
+function getCoverageSourceMembers(){
+  return party.filter(Boolean);
+}
+function parseUsageEntry(entry){
+  const raw = String(entry||'').trim();
+  const m = raw.match(/^(.*?)(?:\s*\(([-\d.]+)%\))?$/);
+  return {
+    name: m ? String(m[1]||'').trim() : raw,
+    percent: m && m[2] != null ? Number(m[2]) : 0
+  };
+}
+function getRankingDataset(mode){
+  return PARTY_RANKING_DATA[mode === 'double' ? 'double' : 'single'] || {rows:[],updatedAt:''};
+}
 
 // ===== 特殊フォルムの登録名統一 =====
 const AEGISLASH_BASE_NAME = 'ギルガルド';
@@ -936,12 +1140,14 @@ function getAegislashForms(){ return getSpecialForms(AEGISLASH_BASE_NAME); }
 async function loadGameData() {
   if(_dataLoaded) return;
   try {
-    const [pd, md, ad, sd, idata] = await Promise.all([
+    const [pd, md, ad, sd, idata, rankingSingle, rankingDouble] = await Promise.all([
       fetchDataJson('pokemon.json', []),
       fetchDataJson('moves.json', []),
       fetchDataJson('abilities.json', {}),
       fetchDataJson('season.json', {seasons:[]}),
       fetchDataJson('belongings.json', []),
+      fetchDataJson('season_ranking_single.json', {rows:[], updatedAt:''}),
+      fetchDataJson('season_ranking_double.json', {rows:[], updatedAt:''}),
     ]);
     POKEMON_DATA = ensureSpecialFormDisplayPokemon((Array.isArray(pd)?pd:[]).map(markSpecialFormEntry));
     MOVES_DATA   = md;
@@ -950,6 +1156,11 @@ async function loadGameData() {
     ITEMS_DATA   = Array.isArray(idata) ? idata : [];
     pokeIndex    = POKEMON_DATA.map((p,i)=>Object.assign({_i:i},p));
     moveIndex    = MOVES_DATA.map((m,i)=>Object.assign({_i:i},m));
+    MOVE_LOOKUP  = Object.fromEntries(moveIndex.map(m=>[normalizeMoveLookupName(m.name), m]));
+    PARTY_RANKING_DATA = {
+      single: normalizeRankingPayload(rankingSingle, 'single'),
+      double: normalizeRankingPayload(rankingDouble, 'double')
+    };
     _dataLoaded  = true;
   } catch(e) {
     console.error('データ読み込みエラー:', e);
@@ -990,6 +1201,123 @@ function getPokemonKnownMoves(pokeName){
     if(row && Array.isArray(row.moves) && row.moves.length) return row.moves;
   }
   return [];
+}
+
+function getKnownMoveEntryForPokemon(pokeName, moveName){
+  const safeName = String(moveName || '').trim();
+  if(!safeName) return null;
+  for(const lookupName of getLookupNamesForPokemon(pokeName)){
+    const row = POKEMON_MOVES && POKEMON_MOVES[lookupName];
+    if(!row || !Array.isArray(row.moves)) continue;
+    const found = row.moves.find(mv => String(mv && mv.name || '').trim() === safeName);
+    if(found) return found;
+  }
+  return null;
+}
+function findRankingRowForPokemon(pokeName, mode=PARTY_RANKING_MODE){
+  const dataset = getRankingDataset(mode);
+  const rows = Array.isArray(dataset && dataset.rows) ? dataset.rows : [];
+  const lookupNames = new Set(getLookupNamesForPokemon(pokeName).map(v=>String(v||'').trim()).filter(Boolean));
+  const groupKey = getRecommendationGroupKey(pokeName);
+  return rows.find(row=>{
+    const rowNames = [row && row.name, row && row.siteName].map(v=>String(v||'').trim()).filter(Boolean);
+    if(rowNames.some(v=>lookupNames.has(v))) return true;
+    return rowNames.some(v=>getRecommendationGroupKey(v) === groupKey);
+  }) || null;
+}
+function getMoveDescriptionText(moveEntry, moveMeta){
+  const raw = String((moveEntry && moveEntry.description) || (moveMeta && moveMeta.effect) || (moveMeta && moveMeta.notes) || '').trim();
+  if(!raw) return '通常の攻撃技。';
+  return raw.length > 58 ? `${raw.slice(0, 58)}…` : raw;
+}
+function inferCandidateAttackBiasFromStats(candidate){
+  const atk = Number(candidate && candidate.atk || 0);
+  const spa = Number(candidate && candidate.spa || 0);
+  if(atk >= spa + 20) return 'physical';
+  if(spa >= atk + 20) return 'special';
+  return 'mixed';
+}
+function normalizeCandidateMoveRecord(candidate, moveName, extra={}){
+  const safeName = String(moveName || '').trim();
+  if(!safeName) return null;
+  const knownEntry = getKnownMoveEntryForPokemon(candidate && candidate.name, safeName);
+  const meta = getMoveMetaByName(safeName);
+  const category = String((knownEntry && knownEntry.category) || (meta && meta.category) || '').trim();
+  const type = String((knownEntry && knownEntry.type) || (meta && meta.type) || '').trim();
+  const power = Number((knownEntry && knownEntry.power) || (meta && meta.power)) || 0;
+  if(!type || !category || category === '変化' || power <= 0) return null;
+  return {
+    name: safeName,
+    type,
+    category,
+    power,
+    accuracy: Number((knownEntry && knownEntry.accuracy) || (meta && meta.accuracy)) || 0,
+    usagePercent: Number(extra && extra.usagePercent) || 0,
+    sourceLabel: String((extra && extra.sourceLabel) || '').trim(),
+    description: getMoveDescriptionText(knownEntry, meta)
+  };
+}
+function isRecommendedAttackMove(candidate, move, opts={}){
+  if(!candidate || !move) return false;
+  const power = Number(move.power || 0);
+  const usage = Number(move.usagePercent || 0);
+  if(move.category === '変化' || power <= 0) return false;
+  const stabTypes = new Set([candidate.type1, candidate.type2].filter(Boolean));
+  const isStab = stabTypes.has(move.type);
+  const statBias = inferCandidateAttackBiasFromStats(candidate);
+  const expectedCategory = statBias === 'physical' ? '物理' : (statBias === 'special' ? '特殊' : '');
+  if(expectedCategory && move.category !== expectedCategory) return false;
+  if(isStab){
+    if(power >= 60) return true;
+    return usage >= 18 && power >= 40;
+  }
+  if(usage < 8) return false;
+  if(power >= 90) return true;
+  return usage >= 15 && power >= 70;
+}
+function getCandidateUsableMoves(candidate, rankingMode=PARTY_RANKING_MODE){
+  if(!candidate) return [];
+  const stabTypes = new Set([candidate.type1, candidate.type2].filter(Boolean));
+  const statBias = inferCandidateAttackBiasFromStats(candidate);
+  const scoreMove = (move)=>{
+    const isStab = stabTypes.has(move.type);
+    const classMatch = statBias === 'mixed' ? 1 : (move.category === (statBias === 'physical' ? '物理' : '特殊') ? 1 : 0);
+    const usage = Number(move.usagePercent || 0);
+    const power = Number(move.power || 0);
+    const accuracy = Number(move.accuracy || 0);
+    return (
+      (usage * 1000000) +
+      (classMatch * 100000) +
+      (isStab ? 10000 : 0) +
+      (power * 100) +
+      accuracy
+    );
+  };
+  const rankingMoves = [];
+  const seenRanking = new Set();
+  const rankingRow = findRankingRowForPokemon(candidate.name, rankingMode);
+  (((rankingRow && rankingRow.moves) || []).slice(0, 10)).forEach(entry=>{
+    const parsed = parseUsageEntry(entry);
+    const move = normalizeCandidateMoveRecord(candidate, parsed.name, {usagePercent: parsed.percent || 0, sourceLabel: 'ランキング'});
+    if(!move || seenRanking.has(move.name) || !isRecommendedAttackMove(candidate, move, {preferRanking:true})) return;
+    seenRanking.add(move.name);
+    rankingMoves.push(move);
+  });
+  if(rankingMoves.length){
+    return rankingMoves.sort((a,b)=>scoreMove(b) - scoreMove(a)).slice(0, 4);
+  }
+  const fallbackMoves = [];
+  const seenFallback = new Set();
+  (getPokemonKnownMoves(candidate.name) || []).forEach(entry=>{
+    const move = normalizeCandidateMoveRecord(candidate, entry && entry.name, {sourceLabel: 'pokemon_moves'});
+    if(!move || seenFallback.has(move.name) || !isRecommendedAttackMove(candidate, move)) return;
+    seenFallback.add(move.name);
+    fallbackMoves.push(move);
+  });
+  return fallbackMoves.sort((a,b)=>scoreMove(b) - scoreMove(a)).slice(0, 4);
+}
+function buildCandidateMoveDetails(candidate, rankingMode=PARTY_RANKING_MODE){
+  return getCandidateUsableMoves(candidate, rankingMode).slice(0, 3);
 }
 const PARTY_ALL_TYPES = ['ノーマル','ほのお','みず','でんき','くさ','こおり','かくとう','どく','じめん','ひこう','エスパー','むし','いわ','ゴースト','ドラゴン','あく','はがね','フェアリー'];
 const MOVE_TYPE_TO_POKE_TYPE = {
@@ -1056,8 +1384,295 @@ function isMegaCandidateName(name) {
 function getRecommendationGroupKey(name) {
   const raw = String(name||'').trim();
   if(!raw) return raw;
+  const specialBase = getSpecialFormBaseName(raw);
+  if(specialBase) return specialBase;
   if(!/^メガ/.test(raw)) return raw;
   return raw.replace(/^メガ/,'').replace(/[XYZ]$/,'');
+}
+function isMegaCapableName(name){
+  const raw = String(name||'').trim();
+  if(!raw) return false;
+  if(isMegaFormName(raw)) return true;
+  return getMegaFormsForBase(raw).length > 0;
+}
+function countPartyMegaCapableMembers(members){
+  return (members || []).filter(member=>member && member.poke && isMegaCapableName(member.poke.name)).length;
+}
+function setPartyMegaTarget(value){
+  PARTY_MEGA_TARGET = Math.max(0, Math.min(6, parseInt(value, 10) || 0));
+  localStorage.setItem('pokeedge_party_mega_target', String(PARTY_MEGA_TARGET));
+  syncPartyMegaTargetUI();
+  updateCoverage();
+}
+function syncPartyMegaTargetUI(){
+  const el = document.getElementById('party-mega-target');
+  if(el) el.value = String(PARTY_MEGA_TARGET);
+}
+function findRegisteredPokemonByName(name){
+  const key = getRecommendationGroupKey(name);
+  const regs = getRegisteredPokes();
+  return regs.find(rec=>{
+    const recName = normalizeAegislashDisplayName(rec && (rec.pokeName || rec.displayName) || '');
+    return getRecommendationGroupKey(recName) === key;
+  }) || null;
+}
+function findRegisteredPokemonMatchesByName(name){
+  const key = getRecommendationGroupKey(name);
+  return getRegisteredPokes().filter(rec=>{
+    const recName = normalizeAegislashDisplayName(rec && (rec.pokeName || rec.displayName) || '');
+    return getRecommendationGroupKey(recName) === key;
+  });
+}
+function makePokemonRegisterId(){
+  return 'party_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+}
+
+function buildPartyStoredMember(member){
+  if(!member || !member.poke) return null;
+  return {
+    pokeName: member.poke.name,
+    pokeNo: member.poke.no,
+    type1: member.poke.type1,
+    type2: member.poke.type2,
+    lv: member.lv || 50,
+    nature: normalizeNatureName(member.nature),
+    ability: member.ability || '',
+    iv: member.iv || 31,
+    ev: Object.assign({hp:0,atk:0,def:0,spa:0,spd:0,spe:0}, member.ev || {}),
+    moves: (member.moves || []).slice(0,4).map(mv=>{
+      const meta = getMoveMetaByName(mv && mv.name || '');
+      return {
+        name: mv && mv.name || '',
+        type: mv && mv.type || meta?.type || '',
+        power: mv && mv.power || meta?.power || '',
+        category: mv && mv.category || meta?.category || '',
+        hits: mv && mv.hits || meta?.hits || '1',
+        notes: mv && (mv.notes || mv.effect) || meta?.notes || meta?.effect || ''
+      };
+    }).filter(mv=>mv.name),
+    item: normalizeItemName(member.item),
+    memo: member.memo || '',
+    gameMode: member.gameMode || 'champions',
+    regId: member._regId || ''
+  };
+}
+function buildPartyRuntimeMember(saved){
+  const pokeName = normalizeAegislashDisplayName(saved && saved.pokeName || '');
+  const poke = findPokemonByDisplayName(pokeName) || {name:pokeName,no:saved && saved.pokeNo || '',type1:saved && saved.type1 || '',type2:saved && saved.type2 || '',hp:0,atk:0,def:0,spa:0,spd:0,spe:0};
+  return {
+    _regId: saved && (saved.regId || saved._regId) || '',
+    poke,
+    lv: saved && saved.lv || 50,
+    nature: normalizeNatureName(saved && saved.nature || ''),
+    ability: saved && saved.ability || (getAbilityOptions(poke.name)[0] || ''),
+    iv: saved && saved.iv || 31,
+    ev: Object.assign({hp:0,atk:0,def:0,spa:0,spd:0,spe:0}, saved && saved.ev || {}),
+    moves: Array.isArray(saved && saved.moves) ? saved.moves : [],
+    item: saved && saved.item || '',
+    memo: saved && saved.memo || '',
+    gameMode: saved && saved.gameMode || 'champions'
+  };
+}
+function setCurrentPartySourceMeta(meta){
+  CURRENT_PARTY_SOURCE = meta && meta.id ? {id:String(meta.id), name:(meta.name || 'パーティ')} : null;
+  syncPartySaveControls();
+}
+function setPartySaveNameValue(value){
+  const input = document.getElementById('party-save-name');
+  if(!input) return;
+  input.value = value || '';
+  input.dataset.dirty = '0';
+}
+function markPartySaveNameDirty(){
+  const input = document.getElementById('party-save-name');
+  if(input) input.dataset.dirty = '1';
+}
+function getPartySaveName(defaultName='マイパーティ'){
+  const input = document.getElementById('party-save-name');
+  const raw = input ? input.value : '';
+  const name = (raw || '').trim();
+  if(name) return name;
+  if(input) {
+    input.value = defaultName;
+    input.dataset.dirty = '0';
+  }
+  return defaultName;
+}
+function syncPartySaveControls(){
+  const status = document.getElementById('party-save-status');
+  const overwriteBtn = document.getElementById('party-save-overwrite-btn');
+  const mobileOverwriteBtn = document.getElementById('party-mobile-overwrite-btn');
+  const hasSource = !!(CURRENT_PARTY_SOURCE && CURRENT_PARTY_SOURCE.id);
+  if(status){
+    status.textContent = hasSource
+      ? `読込中の「${CURRENT_PARTY_SOURCE.name || 'パーティ'}」を編集中です。上書き保存か新規保存を選べます。`
+      : '新規作成中です。今の6体をそのまま新規保存できます。';
+  }
+  if(overwriteBtn) overwriteBtn.classList.toggle('is-hidden', !hasSource);
+  if(mobileOverwriteBtn) mobileOverwriteBtn.style.display = hasSource ? '' : 'none';
+}
+function createPartySavePayload(name){
+  return {
+    name,
+    date: new Date().toLocaleDateString('ja-JP'),
+    members: party.filter(m=>m).map(buildPartyStoredMember).filter(Boolean)
+  };
+}
+function startNewParty(force=false){
+  const hasMembers = party.some(Boolean);
+  if(hasMembers && !force){
+    const ok = confirm('今の編集中パーティを空にして、新しく作り直しますか？');
+    if(!ok) return;
+  }
+  party = [];
+  selectedSlot = -1;
+  setCurrentPartySourceMeta(null);
+  setPartySaveNameValue('');
+  renderPartySlotList();
+  const emptyEl = document.getElementById('party-editor-empty');
+  const contentEl = document.getElementById('party-editor-content');
+  if(emptyEl) emptyEl.style.display='block';
+  if(contentEl) contentEl.style.display='none';
+  schedulePartyDraftSave();
+  switchPartyMobileTabIfMobile('six');
+}
+
+function savePartyDraftNow(){
+  try {
+    const payload = {
+      selectedSlot,
+      saveName: document.getElementById('party-save-name')?.value || '',
+      sourceMeta: CURRENT_PARTY_SOURCE ? {id:CURRENT_PARTY_SOURCE.id, name:CURRENT_PARTY_SOURCE.name || ''} : null,
+      members: party.filter(Boolean).map(buildPartyStoredMember).filter(Boolean)
+    };
+    localStorage.setItem(PARTY_DRAFT_KEY, JSON.stringify(payload));
+  } catch(e) {
+    console.warn('party draft save failed', e);
+  }
+}
+function schedulePartyDraftSave(){
+  clearTimeout(_partyDraftTimer);
+  _partyDraftTimer = setTimeout(savePartyDraftNow, 120);
+}
+function restorePartyDraft(){
+  try {
+    const raw = localStorage.getItem(PARTY_DRAFT_KEY);
+    if(!raw) return false;
+    const data = JSON.parse(raw);
+    const members = Array.isArray(data && data.members) ? data.members : [];
+    if(!members.length) return false;
+    party = members.map(buildPartyRuntimeMember).filter(m=>m && m.poke && m.poke.name);
+    setCurrentPartySourceMeta(data && data.sourceMeta && data.sourceMeta.id ? data.sourceMeta : null);
+    setPartySaveNameValue(data && data.saveName || (CURRENT_PARTY_SOURCE && CURRENT_PARTY_SOURCE.name) || '');
+    renderPartySlotList();
+    renderRegPokeList(document.getElementById('party-reg-search')?.value||'');
+    const restoreIndex = Math.max(0, Math.min(party.length - 1, parseInt(data && data.selectedSlot, 10) || 0));
+    if(party.length) selectSlot(restoreIndex);
+    return true;
+  } catch(e) {
+    console.warn('party draft restore failed', e);
+    return false;
+  }
+}
+function openPartyRegisteredPanel(){
+  switchPartyWorkspace('add');
+  switchAddTab('reg');
+  renderRegPokeList(document.getElementById('party-reg-search')?.value||'');
+  switchPartyMobileTabIfMobile('add');
+  const input = document.getElementById('party-reg-search');
+  if(input) input.focus();
+}
+async function registerCurrentPartyPokemon(){
+  if(selectedSlot < 0 || !party[selectedSlot] || !party[selectedSlot].poke){
+    alert('先にパーティのポケモンを選択してください');
+    return;
+  }
+  pe_save();
+  const member = party[selectedSlot];
+  const pokeName = normalizeAegislashDisplayName(member.poke.name || '');
+  const regs = getRegisteredPokes();
+  const existing = member._regId ? regs.find(rec=>rec.id===member._regId) : null;
+  const storedMember = buildPartyStoredMember(member);
+  const record = {
+    id: existing?.id || makePokemonRegisterId(),
+    pokeName,
+    displayName: existing?.displayName || pokeName,
+    nickname: existing?.nickname || '',
+    type1: member.poke.type1 || '',
+    type2: member.poke.type2 || '',
+    lv: member.lv || 50,
+    nature: normalizeNatureName(member.nature),
+    ability: member.ability || '',
+    item: normalizeItemName(member.item),
+    iv: member.iv || 31,
+    ev: Object.assign({hp:0,atk:0,def:0,spa:0,spd:0,spe:0}, member.ev || {}),
+    gameMode: member.gameMode || 'champions',
+    moves: storedMember ? storedMember.moves : [],
+    memo: member.memo || '',
+    updatedAt: new Date().toLocaleDateString('ja-JP'),
+  };
+  const next = Array.isArray(regs) ? regs.slice() : [];
+  const idx = next.findIndex(rec=>rec.id===record.id);
+  if(idx >= 0) next[idx] = record;
+  else next.unshift(record);
+  try {
+    localStorage.setItem(LS_REG_KEY, JSON.stringify(next));
+  } catch(e) {
+    console.warn('pokemon register local save failed', e);
+  }
+  if(typeof savePokemonData === 'function'){
+    Promise.resolve(savePokemonData(next)).catch(err=>console.warn('pokemon register cloud sync failed', err));
+  }
+  member._regId = record.id;
+  renderPartyRegisterStatus();
+  renderRegPokeList(document.getElementById('party-reg-search')?.value||'');
+  schedulePartyDraftSave();
+  alert(existing ? 'この個体の登録内容を更新しました' : 'パーティの内容を別個体としてポケモン登録へ追加しました');
+}
+function promptRegisterPokemon(name){
+  const normalized = normalizeAegislashDisplayName(name || '');
+  const key = getRecommendationGroupKey(normalized);
+  const targetIndex = party.findIndex(member=>member && member.poke && getRecommendationGroupKey(member.poke.name) === key);
+  if(targetIndex >= 0){
+    selectSlot(targetIndex);
+    registerCurrentPartyPokemon();
+    return;
+  }
+  alert('先にそのポケモンをパーティへ追加してから登録してください');
+}
+
+function renderPartyRegisterStatus(){
+  const wrap = document.getElementById('party-register-status');
+  if(!wrap) return;
+  const main = wrap.querySelector('.party-register-status-main');
+  const actions = wrap.querySelector('.party-register-status-actions');
+  if(selectedSlot < 0 || !party[selectedSlot] || !party[selectedSlot].poke){
+    main.textContent = '登録状況を確認中です。';
+    actions.innerHTML = '';
+    return;
+  }
+  const member = party[selectedSlot];
+  const linkedRecord = member._regId ? getRegisteredPokes().find(rec=>rec.id===member._regId) : null;
+  const sameSpecies = findRegisteredPokemonMatchesByName(member.poke.name);
+  if(linkedRecord){
+    main.innerHTML = `<strong>登録済み個体:</strong> ${escapePartyHtml(linkedRecord.displayName || linkedRecord.pokeName || member.poke.name)}<br>このスロットは既存の登録個体に紐づいています。保存するとこの個体を更新します。`;
+    actions.innerHTML = `<button type="button" class="party-inline-btn" onclick="openPartyRegisteredPanel()">登録済み一覧を見る</button><button type="button" class="party-inline-btn" onclick="memberToNewIndividual()">別個体として追加</button>`;
+    return;
+  }
+  if(sameSpecies.length){
+    main.innerHTML = `<strong>同じポケモンの登録あり:</strong> ${sameSpecies.length}件<br>今の内容は上書きせず、別個体として追加できます。`;
+    actions.innerHTML = `<button type="button" class="party-inline-btn" onclick="registerCurrentPartyPokemon()">別個体として登録</button><button type="button" class="party-inline-btn" onclick="openPartyRegisteredPanel()">登録済み一覧を見る</button>`;
+    return;
+  }
+  main.innerHTML = `<strong>未登録:</strong> ${escapePartyHtml(member.poke.name)}<br>今のパーティ内容のまま、このページ内でポケモン登録へ追加できます。`;
+  actions.innerHTML = `<button type="button" class="party-inline-btn" onclick="registerCurrentPartyPokemon()">この内容でポケモン登録へ追加</button>`;
+}
+function memberToNewIndividual(){
+  if(selectedSlot < 0 || !party[selectedSlot]) return;
+  delete party[selectedSlot]._regId;
+  renderPartyRegisterStatus();
+  schedulePartyDraftSave();
+  registerCurrentPartyPokemon();
 }
 
 function preferRecommendationCandidate(nextCandidate, currentCandidate) {
@@ -1074,19 +1689,20 @@ function preferRecommendationCandidate(nextCandidate, currentCandidate) {
 function getCandidateAttackTypes(candidate) {
   const seen = new Set();
   const result = [];
-  const knownMoves = getPokemonKnownMoves(candidate.name) || [];
-  knownMoves.forEach(mv => {
-    const power = Number(mv && mv.power);
+  getCandidateUsableMoves(candidate, PARTY_RANKING_MODE).forEach(mv => {
     const moveType = String(mv && mv.type || '').trim();
-    if(!moveType || !Number.isFinite(power) || power <= 0) return;
-    if(seen.has(moveType)) return;
-    seen.add(moveType);
-    result.push(moveType);
+    const moveName = String(mv && mv.name || '').trim();
+    if(!moveType) return;
+    const key = `${moveName}__${moveType}`;
+    if(seen.has(key)) return;
+    seen.add(key);
+    result.push({name: moveName, type: moveType});
   });
   [candidate.type1, candidate.type2].filter(Boolean).forEach(tp => {
-    if(!seen.has(tp)) {
-      seen.add(tp);
-      result.push(tp);
+    const key = `__fallback__${tp}`;
+    if(!seen.has(key)) {
+      seen.add(key);
+      result.push({name:'', type:tp});
     }
   });
   return result;
@@ -1109,13 +1725,51 @@ function renderPeAbilityOptions(pokeName, selected){
   sel.innerHTML = ['<option value="">特性を選択</option>'].concat(options.map(name=>`<option value="${name}">${name}</option>`)).join('');
   sel.value = current && options.includes(current) ? current : '';
 }
+function getPartyEditorQuickMoves(pokeName, rankingMode=PARTY_RANKING_MODE){
+  const rankingRow = findRankingRowForPokemon(pokeName, rankingMode);
+  const rankingMoves = [];
+  const seen = new Set();
+  (((rankingRow && rankingRow.moves) || []).slice(0, 12)).forEach(entry=>{
+    const parsed = parseUsageEntry(entry);
+    const moveName = String(parsed && parsed.name || '').trim();
+    if(!moveName || seen.has(moveName)) return;
+    seen.add(moveName);
+    const knownEntry = getKnownMoveEntryForPokemon(pokeName, moveName);
+    const meta = getMoveMetaByName(moveName);
+    rankingMoves.push({
+      name: moveName,
+      type: String((knownEntry && knownEntry.type) || (meta && meta.type) || '').trim(),
+      power: Number((knownEntry && knownEntry.power) || (meta && meta.power)) || 0,
+      category: String((knownEntry && knownEntry.category) || (meta && meta.category) || '').trim(),
+      usagePercent: Number(parsed && parsed.percent) || 0,
+      sourceLabel: 'ランキング'
+    });
+  });
+  if(rankingMoves.length) return rankingMoves;
+  const fallback = [];
+  (getPokemonKnownMoves(pokeName) || []).forEach(entry=>{
+    const moveName = String(entry && entry.name || '').trim();
+    if(!moveName || fallback.find(x=>x.name===moveName)) return;
+    const meta = getMoveMetaByName(moveName);
+    fallback.push({
+      name: moveName,
+      type: String((entry && entry.type) || (meta && meta.type) || '').trim(),
+      power: Number((entry && entry.power) || (meta && meta.power)) || 0,
+      category: String((entry && entry.category) || (meta && meta.category) || '').trim(),
+      usagePercent: 0,
+      sourceLabel: 'pokemon_moves'
+    });
+  });
+  return fallback.slice(0, 24);
+}
 function renderPeMoveQuick(pokeName){
   const wrap=document.getElementById('pe-move-quick');
   const note=document.getElementById('pe-move-quick-note');
   if(!wrap || !note) return;
+  PARTY_EDITOR_QUICK_MOVES = [];
   if(!pokeName){
     wrap.innerHTML='';
-    note.textContent='ポケモンを選ぶと、登録候補の技をここから追加できます。';
+    note.textContent='ポケモンを選ぶと、ランキング上位技を優先してここから追加できます。';
     return;
   }
   if(!_pokemonMovesLoaded){
@@ -1127,19 +1781,26 @@ function renderPeMoveQuick(pokeName){
     });
     return;
   }
-  const moves=getPokemonKnownMoves(pokeName);
+  const moves=getPartyEditorQuickMoves(pokeName, PARTY_RANKING_MODE);
+  PARTY_EDITOR_QUICK_MOVES = moves.slice();
   if(!moves.length){
     wrap.innerHTML='<span class="quick-chip subtle">候補技データなし</span>';
     note.textContent='候補技データがない場合は、下の検索欄から追加してください。';
     return;
   }
-  wrap.innerHTML = moves.slice(0,24).map((m,idx)=>`<button type="button" class="quick-chip" onclick="addKnownPartyMove(${idx})">${m.name}</button>`).join('');
-  note.textContent='よく使う候補技を上に出しています。タップでそのまま追加できます。';
+  wrap.innerHTML = moves.slice(0,24).map((m,idx)=>{
+    const usageLabel = m.usagePercent ? ` <span style="font-size:10px;color:var(--accent3);">${m.usagePercent.toFixed(1)}%</span>` : '';
+    const typeLabel = m.type ? `<span class="type-pill tp-${m.type}" style="font-size:8px;">${m.type}</span>` : '';
+    return `<button type="button" class="quick-chip" title="${escapePartyHtml((m.sourceLabel || '候補') + (m.category ? ' / ' + m.category : '') + (m.power ? ' / 威力' + m.power : ''))}" onclick="addKnownPartyMove(${idx})">${typeLabel}${escapePartyHtml(m.name)}${usageLabel}</button>`;
+  }).join('');
+  const fromRanking = moves.some(m=>m.sourceLabel==='ランキング');
+  note.textContent = fromRanking
+    ? `ランキング${PARTY_RANKING_MODE === 'double' ? 'ダブル' : 'シングル'}の上位技を優先表示しています。足りない分だけ候補技で補完します。`
+    : 'ランキング未掲載のため、候補技データから追加できます。';
 }
 function addKnownPartyMove(idx){
   if(selectedSlot<0||!party[selectedSlot]) return;
-  const moves=getPokemonKnownMoves(party[selectedSlot].poke.name);
-  const m=moves[idx];
+  const m=PARTY_EDITOR_QUICK_MOVES[idx];
   if(!m) return;
   const list=party[selectedSlot].moves;
   if(list.length>=4){alert('技は4つまでです');return;}
@@ -1206,10 +1867,17 @@ const TYPE_EFF = {
   'ノーマル':{'いわ':0.5,'はがね':0.5,'ゴースト':0},
 };
 
-function getTypeEff(movetype, defTypes) {
+function getTypeEff(movetype, defTypes, moveName='') {
   let e = 1;
   const chart = TYPE_EFF[movetype] || {};
-  defTypes.forEach(t => { if(chart[t] !== undefined) e *= chart[t]; });
+  const isFreezeDry = String(moveName||'').trim() === 'フリーズドライ';
+  defTypes.forEach(t => {
+    if(isFreezeDry && t === 'みず') {
+      e *= 2;
+      return;
+    }
+    if(chart[t] !== undefined) e *= chart[t];
+  });
   return e;
 }
 
@@ -1720,7 +2388,7 @@ function judgeMove() {
     const opt = sel.selectedOptions[0];
     if(!opt||!opt.value) return;
     const m = MOVES_DATA[parseInt(opt.value)];
-    const eff = getTypeEff(m.type, defTypes);
+    const eff = getTypeEff(m.type, defTypes, m.name);
     results.push({...m, eff, score: m.power * m.hits * eff});
   });
   if(!results.length) { alert('技を選択してください'); return; }
@@ -1746,6 +2414,27 @@ let party = []; // 最大6匹（null不使用）
 let selectedSlot = -1;
 
 
+function switchPartyWorkspace(tab){
+  const safe = ['recommend','add','coverage'].includes(tab) ? tab : 'recommend';
+  PARTY_WORKSPACE_TAB = safe;
+  document.querySelectorAll('[data-party-workspace-tab]').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.partyWorkspaceTab === safe);
+  });
+  document.querySelectorAll('[data-party-workspace-panel]').forEach(panel=>{
+    panel.classList.toggle('active', panel.dataset.partyWorkspacePanel === safe);
+  });
+}
+function setPartyRankingMode(mode){
+  const safe = mode === 'double' ? 'double' : 'single';
+  PARTY_RANKING_MODE = safe;
+  localStorage.setItem('pokeedge_party_ranking_mode', safe);
+  document.querySelectorAll('[data-party-ranking-mode]').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.partyRankingMode === safe);
+  });
+  if(selectedSlot>=0 && party[selectedSlot] && party[selectedSlot].poke) renderPeMoveQuick(party[selectedSlot].poke.name);
+  updateCoverage();
+}
+
 // ===== スマホ用: パーティ管理タブ切り替え =====
 function switchPartyMobileTab(tab){
   const safe = ['six','edit','add','coverage'].includes(tab) ? tab : 'six';
@@ -1754,6 +2443,9 @@ function switchPartyMobileTab(tab){
   document.querySelectorAll('[data-party-mobile-tab]').forEach(btn=>{
     btn.classList.toggle('active', btn.dataset.partyMobileTab === safe);
   });
+  if(safe === 'add') switchPartyWorkspace('add');
+  if(safe === 'coverage') switchPartyWorkspace('coverage');
+  if(safe === 'edit' && !window.matchMedia('(max-width:820px)').matches) switchPartyWorkspace(PARTY_WORKSPACE_TAB);
   if(window.matchMedia && window.matchMedia('(max-width:820px)').matches){
     const tabs = document.getElementById('mobile-party-tabs');
     if(tabs) tabs.scrollIntoView({block:'nearest'});
@@ -1770,11 +2462,12 @@ function addToParty(p) {
   party.push({
     poke: Object.assign({}, p, {name: normalizeAegislashDisplayName(p.name)}), lv:50, nature:'がんばりや', ability:abilities[0]||'', iv:31,
     ev:{hp:0,atk:0,def:0,spa:0,spd:0,spe:0},
-    moves:[], item:'', memo:'', gameMode:'classic'
+    moves:[], item:'', memo:'', gameMode:'champions'
   });
   renderPartySlotList();
   renderRegPokeList();
   selectSlot(party.length - 1);
+  schedulePartyDraftSave();
 }
 
 // 登録済みポケモン（pokemon.htmlのLS）をパーティタブに表示
@@ -1827,12 +2520,20 @@ function renderDirectPokeList() {
     return;
   }
   el.innerHTML = pokes.map(p => {
+    const safeName = escapePartyHtml(p.name);
     const t1 = p.type1 ? `<span class="type-pill tp-${p.type1}" style="font-size:8px;">${p.type1}</span>` : '';
     const t2 = p.type2 ? `<span class="type-pill tp-${p.type2}" style="font-size:8px;">${p.type2}</span>` : '';
-    return `<div class="direct-card" onclick="addToPartyDirect('${p.name}')">
-      <span class="direct-card-no">#${String(p.no||'').padStart(3,'0')}</span>
-      <span class="direct-card-name">${p.name}</span>
-      ${t1}${t2}
+    const registeredMatches = findRegisteredPokemonMatchesByName(p.name);
+    const status = registeredMatches.length
+      ? `<span class="direct-register-badge registered">登録${registeredMatches.length}件</span>`
+      : `<span class="direct-register-badge">未登録</span><button type="button" class="direct-register-btn" onclick="event.stopPropagation();promptRegisterPokemon('${safeName}')">追加後に登録</button>`;
+    return `<div class="direct-card" onclick="addToPartyDirect('${safeName}')">
+      <div class="direct-card-head">
+        <span class="direct-card-no">#${String(p.no||'').padStart(3,'0')}</span>
+        <span class="direct-card-name">${safeName}</span>
+        ${t1}${t2}
+      </div>
+      <div class="direct-card-meta">${status}</div>
     </div>`;
   }).join('');
 }
@@ -1909,6 +2610,7 @@ function addRegPoke(id) {
   renderRegPokeList(document.getElementById('party-reg-search')?.value||'');
   selectSlot(party.length - 1);
   switchPartyMobileTabIfMobile('edit');
+  schedulePartyDraftSave();
 }
 
 function renderPartySlotList() {
@@ -1935,18 +2637,22 @@ function renderPartySlotList() {
   }).join('');
   updateCoverage();
   updateEvSummary();
+  renderPartyRegisterStatus();
+  syncPartySaveControls();
 }
 
 function removeFromParty(i) {
   party.splice(i, 1);
   if(selectedSlot >= party.length) selectedSlot = party.length - 1;
   renderPartySlotList();
+  schedulePartyDraftSave();
   if(selectedSlot >= 0 && party[selectedSlot]) {
     selectSlot(selectedSlot);
   } else {
     selectedSlot = -1;
     (document.getElementById('party-editor-empty')||{style:{}}).style.display='block';
     (document.getElementById('party-editor-content')||{style:{}}).style.display='none';
+    renderPartyRegisterStatus();
   }
 }
 
@@ -1977,16 +2683,23 @@ function selectSlot(i) {
   document.getElementById('pe-item').value = normalizeItemName(m.item||'');
   document.getElementById('pe-memo').value = m.memo||'';
   // ゲームモード復元
-  const champ = m.gameMode === 'champions';
+  const champ = (m.gameMode || 'champions') === 'champions';
   if(document.getElementById('pe-mode-classic')) document.getElementById('pe-mode-classic').checked = !champ;
   if(document.getElementById('pe-mode-champ'))   document.getElementById('pe-mode-champ').checked   =  champ;
+  syncPartyModeVisuals();
   onPeModeChange();
   renderPeMoves(m.moves);
   updateRealStats();
   updateEvRemain();
+  renderPartyRegisterStatus();
 }
 
 function pe_syncIV(val) {
+  if(isPartyChampionsMode()){
+    syncPartyModeVisuals();
+    updatePartyMember();
+    return;
+  }
   const v = Math.min(31,Math.max(0,parseInt(val)||0));
   document.getElementById('pe-iv').value = v;
   document.getElementById('pe-iv-range').value = v;
@@ -2031,9 +2744,9 @@ function updateRealStats() {
   const m = party[selectedSlot];
   const p = m.poke;
   const lv = parseInt(document.getElementById('pe-lv').value)||50;
-  const iv = parseInt(document.getElementById('pe-iv').value)||31;
+  const champ = isPartyChampionsMode();
+  const iv = champ ? 31 : (parseInt(document.getElementById('pe-iv').value)||31);
   const nat = PERSONALITIES[document.getElementById('pe-nature').value]||{atk:1,def:1,spa:1,spd:1,spe:1};
-  const champ = document.getElementById('pe-mode-champ')?.checked;
   const ev = {
     hp: parseInt(document.getElementById('pe-ev-hp').value)||0,
     atk:parseInt(document.getElementById('pe-ev-atk').value)||0,
@@ -2077,7 +2790,7 @@ function updatePartyMember() {
   const m = party[selectedSlot];
   m.lv     = parseInt(document.getElementById('pe-lv').value)||50;
   m.nature = document.getElementById('pe-nature').value;
-  m.iv     = parseInt(document.getElementById('pe-iv').value)||31;
+  m.iv     = isPartyChampionsMode() ? 31 : (parseInt(document.getElementById('pe-iv').value)||31);
   m.ev     = {
     hp: parseInt(document.getElementById('pe-ev-hp').value)||0,
     atk:parseInt(document.getElementById('pe-ev-atk').value)||0,
@@ -2092,6 +2805,7 @@ function updatePartyMember() {
   updateRealStats();
   updateEvRemain();
   updateEvSummary();
+  schedulePartyDraftSave();
 }
 
 // 技管理
@@ -2102,7 +2816,7 @@ function pe_save() {
   const m = party[selectedSlot];
   m.lv     = parseInt(document.getElementById('pe-lv').value)||50;
   m.nature = document.getElementById('pe-nature').value;
-  m.iv     = parseInt(document.getElementById('pe-iv').value)||31;
+  m.iv     = isPartyChampionsMode() ? 31 : (parseInt(document.getElementById('pe-iv').value)||31);
   m.ev = {
     hp:  parseInt(document.getElementById('pe-ev-hp').value)||0,
     atk: parseInt(document.getElementById('pe-ev-atk').value)||0,
@@ -2117,10 +2831,11 @@ function pe_save() {
   m.gameMode = document.getElementById('pe-mode-champ')?.checked ? 'champions' : 'classic';
   updateEvSummary();
   updateCoverage();
+  schedulePartyDraftSave();
 }
 
 function onPeModeChange() {
-  const champ = document.getElementById('pe-mode-champ')?.checked;
+  const champ = isPartyChampionsMode();
   const max = champ ? 32 : 252;
   const step = champ ? 1 : 4;
   ['hp','atk','def','spa','spd','spe'].forEach(k => {
@@ -2132,6 +2847,7 @@ function onPeModeChange() {
     if(r) r.value = safe;
     if(n) n.value = safe;
   });
+  syncPartyModeVisuals();
   pe_save();
   updateEvRemain();
   updateRealStats();
@@ -2161,6 +2877,7 @@ function clearPartyMove(i) {
   party[selectedSlot].moves.splice(i,1);
   renderPeMoves(party[selectedSlot].moves);
   updateCoverage();
+  schedulePartyDraftSave();
 }
 
 function setupPeMoveSearch() {
@@ -2197,36 +2914,48 @@ function addPartyMove(idx) {
   document.getElementById('pe-move-search').value='';
   document.getElementById('pe-move-drop').classList.remove('show');
   updateCoverage();
+  schedulePartyDraftSave();
 }
 
 // ローカル保存
-async function savePartyLocal() {
-  const name = prompt('パーティ名を入力してください', 'マイパーティ');
-  if(!name) return;
+async function savePartyLocal(mode='new') {
   if(party.length===0){alert('ポケモンを追加してください');return;}
-  const partyData = {
-    name,
-    date: new Date().toLocaleDateString('ja-JP'),
-    members: party.filter(m=>m).map(m =>({
-      pokeName: m.poke.name, pokeNo: m.poke.no,
-      type1: m.poke.type1, type2: m.poke.type2,
-      lv:m.lv, nature:m.nature, ability:m.ability||'', iv:m.iv, ev:m.ev,
-      moves:m.moves, item:m.item, memo:m.memo, gameMode:m.gameMode||'classic'
-    }))
-  };
-  await saveParty(name, partyData);
-  await renderSavedPartyList();
-  alert(`「${name}」を保存しました！`);
+  pe_save();
+  const overwriteMode = mode === 'overwrite' && CURRENT_PARTY_SOURCE && CURRENT_PARTY_SOURCE.id;
+  const defaultName = overwriteMode ? (CURRENT_PARTY_SOURCE.name || 'パーティ') : 'マイパーティ';
+  const name = getPartySaveName(defaultName);
+  const partyData = createPartySavePayload(name);
+  let result = null;
+  if(overwriteMode){
+    result = await updateParty(CURRENT_PARTY_SOURCE.id, name, partyData);
+    alert(`「${name}」を上書き保存しました！`);
+  } else {
+    result = await saveParty(name, partyData);
+    alert(`「${name}」を新規保存しました！`);
+  }
+  if(result && result.id){
+    setCurrentPartySourceMeta({id:result.id, name:result.name || name});
+    setPartySaveNameValue(result.name || name);
+  } else if(overwriteMode) {
+    setCurrentPartySourceMeta({id:CURRENT_PARTY_SOURCE.id, name});
+    setPartySaveNameValue(name);
+  } else {
+    setPartySaveNameValue(name);
+  }
+  savePartyDraftNow();
+  renderSavedPartyListFast();
+  if(typeof isLoggedIn === 'function' && isLoggedIn()) {
+    setTimeout(()=>{ renderSavedPartyList().catch(err=>console.warn('party refresh failed', err)); }, 30);
+  }
 }
 
 function showSavedParties() {
   refreshSavedPartiesPanel();
 }
 
-async function renderSavedPartyList() {
+function renderSavedPartyListRecords(saved) {
   const el = document.getElementById('saved-party-list');
-  el.innerHTML = '<div style="font-size:11px;color:var(--text2);padding:8px;">読み込み中...</div>';
-  const saved = await loadParties();
+  if(!el) return;
   if(!saved.length){el.innerHTML='<div style="font-size:11px;color:var(--text2);padding:8px;">保存済みパーティはありません</div>';return;}
   el.innerHTML = saved.map((s,i)=>{
     const d = s.data || s;
@@ -2248,25 +2977,42 @@ async function renderSavedPartyList() {
     </div>`;
   }).join('');
 }
+function renderSavedPartyListFast() {
+  if(typeof loadLocalPartiesRaw !== 'function' || typeof normalizePartyRecord !== 'function' || typeof dedupePartyRecords !== 'function') return;
+  const localSaved = dedupePartyRecords(loadLocalPartiesRaw().map(normalizePartyRecord));
+  renderSavedPartyListRecords(localSaved);
+}
+async function renderSavedPartyList() {
+  const el = document.getElementById('saved-party-list');
+  if(el) el.innerHTML = '<div style="font-size:11px;color:var(--text2);padding:8px;">読み込み中...</div>';
+  const saved = await loadParties();
+  renderSavedPartyListRecords(saved);
+}
 
 async function loadPartyById(id) {
   const saved = await loadParties();
   const s = saved.find(p=>(p.id||'').toString()===id.toString()) || saved[parseInt(id)];
   if(!s) return;
   const d = s.data || s;
+  setCurrentPartySourceMeta({id:s.id || id, name:s.name || d.name || 'パーティ'});
+  setPartySaveNameValue(s.name || d.name || 'パーティ');
   party = (d.members||[]).map(m=>{
     const poke = pokeIndex.find(x=>x.name===m.pokeName)||{name:m.pokeName,no:m.pokeNo,type1:m.type1,type2:m.type2,hp:0,atk:0,def:0,spa:0,spd:0,spe:0};
-    return {poke, lv:m.lv||50, nature:normalizeNatureName(m.nature), ability:m.ability || (getAbilityOptions(poke.name)[0]||''), iv:m.iv||31, ev:m.ev||{hp:0,atk:0,def:0,spa:0,spd:0,spe:0}, moves:m.moves||[], item:m.item||'', memo:m.memo||'', gameMode:m.gameMode||'classic'};
+    return {poke, lv:m.lv||50, nature:normalizeNatureName(m.nature), ability:m.ability || (getAbilityOptions(poke.name)[0]||''), iv:m.iv||31, ev:m.ev||{hp:0,atk:0,def:0,spa:0,spd:0,spe:0}, moves:m.moves||[], item:m.item||'', memo:m.memo||'', gameMode:m.gameMode||'champions'};
   });
   selectedSlot = -1;
   renderPartySlotList();
   if(party.length) selectSlot(0);
+  schedulePartyDraftSave();
   alert(`「${s.name||d.name}」を読み込みました`);
 }
 
 async function deletePartyById(id) {
   if(!confirm('このパーティを削除しますか？')) return;
   await deleteParty(id);
+  if(CURRENT_PARTY_SOURCE && String(CURRENT_PARTY_SOURCE.id) === String(id)) {
+    setCurrentPartySourceMeta(null);
+  }
   renderSavedPartyList();
 }
 
@@ -2274,59 +3020,125 @@ function loadParty(i) {
   const saved = JSON.parse(localStorage.getItem('pokeedge_parties')||'[]');
   const s = saved[i];
   if(!s) return;
+  setCurrentPartySourceMeta({id:s.id || i, name:s.name || 'パーティ'});
+  setPartySaveNameValue(s.name || 'パーティ');
   party = s.members.map(m=>{
     const poke = pokeIndex.find(x=>x.name===m.pokeName) || {name:m.pokeName,no:m.pokeNo,type1:m.type1,type2:m.type2,hp:0,atk:0,def:0,spa:0,spd:0,spe:0};
-    return {poke, lv:m.lv||50, nature:normalizeNatureName(m.nature), ability:m.ability || (getAbilityOptions(poke.name)[0]||''), iv:m.iv||31, ev:m.ev||{hp:0,atk:0,def:0,spa:0,spd:0,spe:0}, moves:m.moves||[], item:m.item||'', memo:m.memo||'', gameMode:m.gameMode||'classic'};
+    return {poke, lv:m.lv||50, nature:normalizeNatureName(m.nature), ability:m.ability || (getAbilityOptions(poke.name)[0]||''), iv:m.iv||31, ev:m.ev||{hp:0,atk:0,def:0,spa:0,spd:0,spe:0}, moves:m.moves||[], item:m.item||'', memo:m.memo||'', gameMode:m.gameMode||'champions'};
   });
   selectedSlot = -1;
   renderPartySlotList();
   if(party.length) selectSlot(0);
+  schedulePartyDraftSave();
   alert(`「${s.name}」を読み込みました`);
 }
 
 
 // renderPartyGrid は後方互換のために残す
 function renderPartyGrid() { renderPartySlotList(); }
-function updateCoverage() {
+function updateCoverageNow() {
   const allTypes = PARTY_ALL_TYPES.slice();
 
   const atkMap = {};
-  allTypes.forEach(t => atkMap[t] = 0);
+  const atkDetailMap = {};
+  allTypes.forEach(t => { atkMap[t] = 0; atkDetailMap[t] = []; });
 
-  party.filter(m=>m).forEach(m => {
-    (m.moves||[]).forEach(mv => {
+  const coverageMembers = getCoverageSourceMembers();
+  coverageMembers.forEach(member => {
+    (member.moves||[]).forEach(rawMove => {
+      const mv = getEffectiveMoveRecordForCoverage(member, rawMove);
       if(!mv) return;
-      const power = Number(mv.power);
-      if(!Number.isFinite(power) || power <= 0) return;
-      const moveType = mv.type;
-      const chart = TYPE_EFF[moveType] || {};
-      const pokeTypes = [m.poke.type1, m.poke.type2].filter(Boolean);
-      const hasStab = pokeTypes.includes(MOVE_TYPE_TO_POKE_TYPE[moveType] || moveType);
+      const pokeTypes = [member.poke?.type1, member.poke?.type2].filter(Boolean);
+      const hasStab = pokeTypes.includes(MOVE_TYPE_TO_POKE_TYPE[mv.type] || mv.type);
       allTypes.forEach(defT => {
-        const eff = chart[defT] !== undefined ? chart[defT] : 1;
-        if(eff >= 2) {
-          atkMap[defT] = Math.max(atkMap[defT]||0, hasStab ? 3 : 2);
-        } else if(eff === 1) {
-          atkMap[defT] = Math.max(atkMap[defT]||0, hasStab ? 1.5 : 1);
+        const eff = getRegisteredMoveEffectAgainstTypes(mv, [defT]);
+        let score = 0;
+        if(eff >= 2) score = hasStab ? 3 : 2;
+        else if(eff === 1) score = hasStab ? 1.5 : 1;
+        if(score <= 0) return;
+        if(score > (atkMap[defT] || 0)){
+          atkMap[defT] = score;
+          atkDetailMap[defT] = [mv.name || ''];
+        } else if(score === (atkMap[defT] || 0)){
+          const list = Array.isArray(atkDetailMap[defT]) ? atkDetailMap[defT] : [];
+          if(mv.name && !list.includes(mv.name)) list.push(mv.name);
+          atkDetailMap[defT] = list;
         }
       });
     });
   });
 
   const atkChartEl = document.getElementById('cov-chart-atk');
-  if(atkChartEl) {
-    const atkMax = Math.max(...allTypes.map(t => atkMap[t]||0), 1);
-    atkChartEl.innerHTML = allTypes.map(t => {
-      const score = atkMap[t]||0;
-      const pct = Math.round((score/atkMax)*100);
-      const color = score>=3?'var(--accent)':score>=2?'var(--accent3)':score>0?'var(--text3)':'var(--border2)';
-      const label = score>=3?'抜群+STAB':score>=2?'抜群':score>1?'等倍STAB':score>0?'等倍':'未対応';
-      return `<div class="cov-row">
-        <div class="cov-label">${t}</div>
-        <div class="cov-bar-bg"><div class="cov-bar-fg" style="width:${Math.max(pct,score>0?3:0)}%;background:${color};"></div></div>
-        <div style="font-size:9px;color:${color};width:56px;text-align:right;">${label}</div>
-      </div>`;
-    }).join('');
+  const atkNoteEl = document.getElementById('cov-attack-note');
+  const dataset = getRankingDataset(PARTY_RANKING_MODE);
+  const topThreatRows = (dataset.rows || []).slice(0, 20);
+  if(atkNoteEl){
+    atkNoteEl.textContent = 'パーティ全体でランキング上位20にどこまで打点と受け先を持てるか';
+  }
+  if(atkChartEl){
+    if(!coverageMembers.length){
+      atkChartEl.innerHTML = '<div style="font-size:11px;color:var(--text2);line-height:1.9;">パーティを追加すると、ランキング上位20に対する通りを表示します。</div>';
+    } else if(!topThreatRows.length){
+      atkChartEl.innerHTML = '<div style="font-size:11px;color:var(--text2);line-height:1.9;">参照ランキングが見つからないため表示できません。</div>';
+    } else {
+      const threatProfiles = topThreatRows.map(buildThreatProfile).filter(profile=>profile && profile.name);
+      const dangerRows = threatProfiles.map(profile=>{
+        const overall = evaluateThreatAgainstCurrentParty(profile, coverageMembers);
+        const responders = coverageMembers.map(member=>{
+          if(!member || !member.poke) return null;
+          const defenseValue = getWeightedDefenseValue(member, profile);
+          const attackEff = getWeightedAttackEff(getThreatCandidateAttackTypes(member), profile.threatTypes);
+          const speed = Number(member.poke && member.poke.spe || 0);
+          const threatSpeed = Number(profile.threatPokemon && profile.threatPokemon.spe || 0);
+          let score = attackEff >= 4 ? 3.6 : attackEff >= 2 ? 2.7 : attackEff > 1 ? 1.4 : attackEff === 1 ? 0.5 : 0;
+          if(defenseValue <= 0.45) score += 1.6;
+          else if(defenseValue <= 0.75) score += 1.05;
+          else if(defenseValue <= 1) score += 0.5;
+          else if(defenseValue >= 1.35) score -= 0.8;
+          if(threatSpeed && speed >= threatSpeed) score += 0.25;
+          return {member, defenseValue, attackEff, score};
+        }).filter(Boolean).sort((a,b)=>b.score - a.score || a.defenseValue - b.defenseValue || b.attackEff - a.attackEff);
+
+        const bestNames = responders.filter(row=>row.score > 0.45).slice(0, 2).map(row=>row.member.poke && row.member.poke.name).filter(Boolean);
+        let attackLabel = '打点薄め';
+        let attackClass = 'attack-0';
+        if(overall.offenseEff >= 4){ attackLabel = '4倍打点あり'; attackClass = 'attack-4'; }
+        else if(overall.offenseEff >= 2){ attackLabel = '抜群打点あり'; attackClass = 'attack-2'; }
+        else if(overall.offenseEff > 1){ attackLabel = '等倍打点あり'; attackClass = 'attack-1'; }
+
+        let defenseLabel = '受け先薄め';
+        let defenseClass = 'def-bad';
+        if(overall.defenseValue <= 0.75){ defenseLabel = '受け先あり'; defenseClass = 'def-good'; }
+        else if(overall.defenseValue <= 1.05){ defenseLabel = '受け先は一応あり'; defenseClass = 'def-mid'; }
+
+        return {
+          rank: profile.rank,
+          name: profile.name,
+          concernScore: overall.concernScore,
+          attackLabel,
+          attackClass,
+          defenseLabel,
+          defenseClass,
+          bestNames
+        };
+      }).sort((a,b)=>a.rank - b.rank || b.concernScore - a.concernScore);
+
+      atkChartEl.innerHTML = `<div class="party-threat-list">${dangerRows.map((row, idx)=>{
+        const isHeavy = idx < 5 && row.defenseClass === 'def-bad';
+        const responderText = row.bestNames.length ? row.bestNames.join(' / ') : '返し枠が薄め';
+        return `<div class="party-threat-row${isHeavy ? ' is-heavy' : ''}">
+          <div class="party-threat-rank">${row.rank}</div>
+          <div class="party-threat-main">
+            <div class="party-threat-name">${escapePartyHtml(row.name)}</div>
+            <div class="party-threat-meta">返しやすい枠: ${escapePartyHtml(responderText)}</div>
+          </div>
+          <div class="party-threat-badges">
+            <span class="party-threat-badge ${row.attackClass}">${escapePartyHtml(row.attackLabel)}</span>
+            <span class="party-threat-badge ${row.defenseClass}">${escapePartyHtml(row.defenseLabel)}</span>
+          </div>
+        </div>`;
+      }).join('')}</div>`;
+    }
   }
 
   const defWeakCount = {};
@@ -2388,138 +3200,402 @@ function updateCoverage() {
   renderPartyRecommendations(atkMap, defWeakCount, defResCount, defImmCount);
 }
 
+function updateCoverage() {
+  clearTimeout(_partyCoverageTimer);
+  _partyCoverageTimer = setTimeout(updateCoverageNow, 40);
+}
+
+function getThreatCandidateAttackTypes(memberOrCandidate) {
+  const poke = memberOrCandidate && memberOrCandidate.poke ? memberOrCandidate.poke : memberOrCandidate;
+  if(!poke) return [];
+  const seen = new Set();
+  const result = [];
+  const explicitMoves = memberOrCandidate && Array.isArray(memberOrCandidate.moves) ? memberOrCandidate.moves : [];
+  explicitMoves.forEach(mv=>{
+    const moveType = String(mv && mv.type || '').trim();
+    const moveName = String(mv && mv.name || '').trim();
+    const power = Number(mv && mv.power);
+    const key = `${moveName}__${moveType}`;
+    if(!moveType || !Number.isFinite(power) || power <= 0 || seen.has(key)) return;
+    seen.add(key);
+    result.push({name: moveName, type: moveType});
+  });
+  if(result.length) return result;
+  return getCandidateAttackTypes(poke);
+}
+function inferCandidateAttackClass(candidate){
+  const usableMoves = getCandidateUsableMoves(candidate, PARTY_RANKING_MODE);
+  let physicalWeight = 0;
+  let specialWeight = 0;
+  usableMoves.forEach(mv=>{
+    const power = Number(mv && mv.power) || 0;
+    const usage = Number(mv && mv.usagePercent) || 0;
+    const weight = Math.max(power, 30) * (usage > 0 ? usage : 1);
+    if(mv.category === '物理') physicalWeight += weight;
+    else if(mv.category === '特殊') specialWeight += weight;
+  });
+  if(physicalWeight > specialWeight * 1.18) return 'physical';
+  if(specialWeight > physicalWeight * 1.18) return 'special';
+  return inferCandidateAttackBiasFromStats(candidate);
+}
+function getCandidateOffenseStat(candidate){
+  const attackClass = inferCandidateAttackClass(candidate);
+  const atk = Number(candidate && candidate.atk || 0);
+  const spa = Number(candidate && candidate.spa || 0);
+  if(attackClass === 'physical') return atk;
+  if(attackClass === 'special') return spa;
+  return Math.max(atk, spa);
+}
+function getCandidateSpeedScore(candidate){
+  const spe = Number(candidate && candidate.spe || 0);
+  if(spe >= 135) return 1.25;
+  if(spe >= 120) return 1.0;
+  if(spe >= 105) return 0.75;
+  if(spe >= 90) return 0.48;
+  if(spe >= 75) return 0.25;
+  return 0;
+}
+function getCandidateRoleLabel(candidate){
+  const attackClass = inferCandidateAttackClass(candidate);
+  if(attackClass === 'physical') return '物理打点';
+  if(attackClass === 'special') return '特殊打点';
+  return '両打点';
+}
+function inferThreatClassFromNature(row){
+  const first = parseUsageEntry((row && row.natures && row.natures[0]) || '').name;
+  if(/A↑/.test(first)) return 'physical';
+  if(/C↑/.test(first)) return 'special';
+  return 'mixed';
+}
+function buildThreatProfile(row){
+  const threatPokemon = findPokemonByDisplayName(row && (row.name || row.siteName) || '');
+  const threatTypes = threatPokemon ? [threatPokemon.type1, threatPokemon.type2].filter(Boolean) : [];
+  const moveProfiles = ((row && row.moves) || []).slice(0,4).map(parseUsageEntry).map(entry=>{
+    const meta = getMoveMetaByName(entry.name);
+    const type = String((meta && meta.type) || '').trim();
+    const category = String((meta && meta.category) || '').trim();
+    const power = Number(meta && meta.power) || 0;
+    if(!type || power <= 0) return null;
+    return {name: entry.name, type, category, power, weight: entry.percent > 0 ? entry.percent : 1};
+  }).filter(Boolean);
+
+  let physicalWeight = 0;
+  let specialWeight = 0;
+  const attackTypeMap = {};
+  moveProfiles.forEach(move=>{
+    if(move.category === '物理') physicalWeight += move.weight;
+    else if(move.category === '特殊') specialWeight += move.weight;
+    attackTypeMap[move.type] = (attackTypeMap[move.type] || 0) + move.weight;
+  });
+
+  let threatClass = 'mixed';
+  if(physicalWeight > specialWeight * 1.2) threatClass = 'physical';
+  else if(specialWeight > physicalWeight * 1.2) threatClass = 'special';
+  else if((physicalWeight + specialWeight) === 0) threatClass = inferThreatClassFromNature(row);
+
+  const rankedAttackTypes = Object.entries(attackTypeMap).sort((a,b)=>b[1]-a[1]).map(([type, weight])=>({type, weight}));
+  const topAttackTypes = rankedAttackTypes.slice(0,3);
+  return {
+    row,
+    rank: Number(row && row.rank) || 999,
+    name: String((row && row.name) || '').trim(),
+    threatPokemon,
+    threatTypes,
+    moveProfiles,
+    rankedAttackTypes,
+    topAttackTypes,
+    threatClass,
+    rankWeight: Math.max(1, 22 - (Number(row && row.rank) || 21))
+  };
+}
+function getProfileRelevantBulk(candidate, threatClass){
+  const def = Number(candidate && candidate.def || 0);
+  const spd = Number(candidate && candidate.spd || 0);
+  if(threatClass === 'physical') return def;
+  if(threatClass === 'special') return spd;
+  return (def + spd) / 2;
+}
+function getWeightedDefenseValue(subject, threatProfile){
+  const candidate = subject && subject.poke ? subject.poke : subject;
+  const defTypes = [candidate && candidate.type1, candidate && candidate.type2].filter(Boolean);
+  if(!defTypes.length || !threatProfile || !threatProfile.topAttackTypes.length) return 1.05;
+  const abilities = subject && subject.poke ? [subject.ability || ''] : (getAbilityOptions(candidate && candidate.name) || []).slice();
+  if(!abilities.includes('')) abilities.push('');
+  let bestEff = Infinity;
+  abilities.forEach(ability=>{
+    let totalWeight = 0;
+    let totalEff = 0;
+    threatProfile.topAttackTypes.forEach(entry=>{
+      const eff = getAdjustedTypeEff(entry.type, defTypes, ability);
+      totalWeight += entry.weight;
+      totalEff += eff * entry.weight;
+    });
+    const avg = totalWeight ? (totalEff / totalWeight) : 1;
+    if(avg < bestEff) bestEff = avg;
+  });
+  const bulk = getProfileRelevantBulk(candidate, threatProfile.threatClass);
+  const bulkFactor = Math.max(0, Math.min(0.42, (bulk - 80) / 140));
+  return Math.max(0, bestEff - bulkFactor);
+}
+function getWeightedAttackEff(attackTypes, threatTypes){
+  if(!threatTypes || !threatTypes.length || !attackTypes || !attackTypes.length) return 1;
+  let best = 0;
+  attackTypes.forEach(entry=>{
+    const rawType = typeof entry === 'string' ? entry : (entry && entry.type);
+    const moveName = typeof entry === 'string' ? '' : String(entry && entry.name || '').trim();
+    const moveType = POKE_TYPE_TO_MOVE_TYPE[rawType] || rawType;
+    const eff = getTypeEff(moveType, threatTypes, moveName);
+    if(eff > best) best = eff;
+  });
+  return best;
+}
+function evaluateThreatAgainstCurrentParty(threatProfile, members){
+  const defaultWorst = {concernScore: threatProfile.rankWeight * 2.4, defenseValue: 2, offenseEff: 0.5};
+  if(!members.length) return Object.assign({threat: threatProfile}, defaultWorst);
+  let bestDefenseValue = Infinity;
+  let bestOffenseEff = 1;
+  members.forEach(member=>{
+    if(!member || !member.poke) return;
+    const defenseValue = getWeightedDefenseValue(member, threatProfile);
+    if(defenseValue < bestDefenseValue) bestDefenseValue = defenseValue;
+    const attackEff = getWeightedAttackEff(getThreatCandidateAttackTypes(member), threatProfile.threatTypes);
+    if(attackEff > bestOffenseEff) bestOffenseEff = attackEff;
+  });
+  const defenseConcern = bestDefenseValue >= 1.35 ? 1.8 : bestDefenseValue >= 1.05 ? 1.25 : bestDefenseValue >= 0.8 ? 0.8 : bestDefenseValue >= 0.55 ? 0.45 : 0.15;
+  const offenseConcern = bestOffenseEff >= 4 ? 0.05 : bestOffenseEff >= 2 ? 0.28 : bestOffenseEff > 1 ? 0.65 : 1.1;
+  return {
+    threat: threatProfile,
+    defenseValue: bestDefenseValue,
+    offenseEff: bestOffenseEff,
+    concernScore: threatProfile.rankWeight * (defenseConcern + offenseConcern)
+  };
+}
+function evaluateCandidateAgainstThreat(candidate, threatProfile){
+  const defenseValue = getWeightedDefenseValue(candidate, threatProfile);
+  const attackTypes = getThreatCandidateAttackTypes(candidate);
+  const attackEff = getWeightedAttackEff(attackTypes, threatProfile.threatTypes);
+  const bulk = getProfileRelevantBulk(candidate, threatProfile.threatClass);
+  const offenseStat = getCandidateOffenseStat(candidate);
+  const speedScore = getCandidateSpeedScore(candidate);
+  const attackClass = inferCandidateAttackClass(candidate);
+
+  let defenseScore = 0;
+  if(defenseValue <= 0.3) defenseScore = 1.2;
+  else if(defenseValue <= 0.55) defenseScore = 0.9;
+  else if(defenseValue <= 0.85) defenseScore = 0.55;
+  else if(defenseValue <= 1.0) defenseScore = 0.25;
+  if(bulk >= 105) defenseScore += 0.12;
+  else if(bulk >= 92) defenseScore += 0.06;
+
+  let attackScore = 0;
+  if(attackEff >= 4) attackScore = 2.3;
+  else if(attackEff >= 2) attackScore = 1.7;
+  else if(attackEff > 1) attackScore = 0.6;
+
+  let offenseStatScore = 0;
+  if(offenseStat >= 145) offenseStatScore = 1.15;
+  else if(offenseStat >= 130) offenseStatScore = 0.9;
+  else if(offenseStat >= 115) offenseStatScore = 0.68;
+  else if(offenseStat >= 100) offenseStatScore = 0.42;
+  else if(offenseStat >= 85) offenseStatScore = 0.18;
+
+  let initiativeScore = speedScore;
+  const threatSpeed = Number(threatProfile && threatProfile.threatPokemon && threatProfile.threatPokemon.spe || 0);
+  if(threatSpeed && Number(candidate && candidate.spe || 0) >= threatSpeed) initiativeScore += 0.3;
+
+  let roleBonus = 0;
+  if(threatProfile.threatClass === 'physical' && attackClass === 'physical') roleBonus += 0.08;
+  if(threatProfile.threatClass === 'special' && attackClass === 'special') roleBonus += 0.08;
+  if(attackClass === 'mixed') roleBonus += 0.06;
+
+  const primaryAttackType = threatProfile.topAttackTypes[0] ? (MOVE_TYPE_TO_POKE_TYPE[threatProfile.topAttackTypes[0].type] || threatProfile.topAttackTypes[0].type) : '';
+  let defenseReason = '';
+  if(primaryAttackType){
+    const abilities = getAbilityOptions(candidate.name) || [];
+    defenseReason = abilities.map(ab=>getAbilityImmunityReason(ab, primaryAttackType)).find(Boolean) || '';
+    if(!defenseReason){
+      if(defenseValue <= 0.45) defenseReason = `${primaryAttackType}に強め`;
+      else if(defenseValue <= 0.75) defenseReason = `${primaryAttackType}を受けて動きやすい`;
+    }
+  }
+  let attackReason = '';
+  if(attackEff >= 2 && threatProfile.threatTypes.length){
+    const bestType = attackTypes.map(entry=>{
+      const rawType = typeof entry === 'string' ? entry : (entry && entry.type);
+      const moveName = typeof entry === 'string' ? '' : String(entry && entry.name || '').trim();
+      return {entry, eff:getTypeEff(POKE_TYPE_TO_MOVE_TYPE[rawType] || rawType, threatProfile.threatTypes, moveName)};
+    }).sort((a,b)=>b.eff-a.eff)[0];
+    const bestLabel = bestType && bestType.entry ? (typeof bestType.entry === 'string' ? bestType.entry : (bestType.entry.name || bestType.entry.type || '')) : '';
+    if(bestType && bestType.eff >= 2) attackReason = `${bestLabel}で殴れる`;
+  }
+  let statReason = '';
+  if(offenseStat >= 130) statReason = `${getCandidateRoleLabel(candidate)}の火力が高い`;
+  else if(Number(candidate && candidate.spe || 0) >= 120) statReason = `素早さで圧力をかけやすい`;
+  const offenseFloor = attackScore + offenseStatScore + initiativeScore;
+  return {
+    candidate,
+    threat: threatProfile,
+    weightedScore: threatProfile.rankWeight * (defenseScore + offenseFloor + roleBonus),
+    defenseValue,
+    attackEff,
+    offenseFloor,
+    reason: [defenseReason, attackReason, statReason].filter(Boolean).join(' / ')
+  };
+}
+function buildRecommendationRow(candidate, threatEvaluations){
+  const total = threatEvaluations.reduce((sum,row)=>sum + row.weightedScore, 0);
+  const physicalScore = threatEvaluations.filter(row=>row.threat.threatClass === 'physical').reduce((sum,row)=>sum + row.weightedScore, 0);
+  const specialScore = threatEvaluations.filter(row=>row.threat.threatClass === 'special').reduce((sum,row)=>sum + row.weightedScore, 0);
+  const mixedScore = threatEvaluations.filter(row=>row.threat.threatClass === 'mixed').reduce((sum,row)=>sum + row.weightedScore, 0);
+  const offenseTotal = threatEvaluations.reduce((sum,row)=>sum + (row.offenseFloor || 0), 0);
+  const matchedThreats = threatEvaluations.filter(row=>row.weightedScore >= 2.8 && row.attackEff >= 2).sort((a,b)=>b.weightedScore-a.weightedScore).slice(0,3);
+  const reasonText = matchedThreats.map(row=>row.reason).filter(Boolean).slice(0,2).join(' / ');
+  const recommendedMoves = buildCandidateMoveDetails(candidate, PARTY_RANKING_MODE);
+  return {
+    candidate,
+    total,
+    physicalScore,
+    specialScore,
+    mixedScore,
+    offenseTotal,
+    matchedThreatNames: matchedThreats.map(row=>row.threat.name),
+    reasonText,
+    roleLabel: getCandidateRoleLabel(candidate),
+    recommendedMoves
+  };
+}
+function renderRecommendationGroup(title, note, rows, scoreKey, limit, isFull){
+  const picked = rows.filter(row=>row[scoreKey] > 0).sort((a,b)=>b[scoreKey] - a[scoreKey] || b.offenseTotal - a.offenseTotal || b.total - a.total || a.candidate.name.localeCompare(b.candidate.name,'ja')).slice(0, limit);
+  if(!picked.length) {
+    return `<div class="recommend-group"><div class="recommend-group-head"><div><div class="recommend-group-title">${escapePartyHtml(title)}</div><div class="recommend-group-note">${escapePartyHtml(note)}</div></div></div><div class="recommend-group-note">殴り返しやすい候補が見つからないため、別の役割が必要そうです。</div></div>`;
+  }
+  return `<div class="recommend-group"><div class="recommend-group-head"><div><div class="recommend-group-title">${escapePartyHtml(title)}</div><div class="recommend-group-note">${escapePartyHtml(note)}</div></div></div><div class="recommend-group-list">${picked.map((row, idx)=>{
+    const c = row.candidate;
+    const t1 = c.type1 ? `<span class="type-pill tp-${c.type1}">${c.type1}</span>` : '';
+    const t2 = c.type2 ? `<span class="type-pill tp-${c.type2}">${c.type2}</span>` : '';
+    const safeName = escapePartyHtml(c.name);
+    const targets = row.matchedThreatNames.length ? row.matchedThreatNames.join(' / ') : '上位20全体に殴り返し候補';
+    const scoreValue = Math.round(row[scoreKey] * 10) / 10;
+    return `<div class="recommend-card${isFull ? ' disabled' : ''}" ${isFull ? '' : `onclick="addRecommendedPokemon('${safeName}')"`}>
+      <div class="recommend-head">
+        <div class="recommend-rank" style="color:${idx===0?'var(--accent3)':'var(--accent)'};">${idx+1}</div>
+        <div style="display:flex;flex-direction:column;gap:4px;min-width:0;flex:1;">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <div style="font-size:13px;font-weight:700;color:var(--text);">${safeName}</div>
+            <span class="recommend-role-badge">${escapePartyHtml(row.roleLabel)}</span>
+            <div>${t1}${t2}</div>
+          </div>
+        </div>
+        <div class="recommend-score">${escapePartyHtml(title)} ${scoreValue}</div>
+      </div>
+      <div class="recommend-targets"><strong>強めの相手:</strong> ${escapePartyHtml(targets)}</div>
+      <div class="recommend-reasons"><strong>補完理由:</strong> ${escapePartyHtml(row.reasonText || '上位20に対して受けるだけでなく打点でも返しやすい候補です。')}</div>
+      <div class="recommend-moves"><strong>候補技:</strong>${(row.recommendedMoves || []).map(move=>`<div class="recommend-move-line">${escapePartyHtml(move.name)}（${escapePartyHtml(move.category)} / ${escapePartyHtml(move.type)} / 威力${escapePartyHtml(move.power)}${move.usagePercent ? ` / 採用率${escapePartyHtml((Math.round(move.usagePercent * 10) / 10).toFixed(1))}%` : ''}）<br>${escapePartyHtml(move.description)}</div>`).join('')}</div>
+      <button type="button" class="recommend-add-btn" ${isFull ? 'disabled' : `onclick="event.stopPropagation();addRecommendedPokemon('${safeName}')"`}>${isFull ? 'パーティが埋まっています' : 'このポケモンを追加'}</button>
+    </div>`;
+  }).join('')}</div></div>`;
+}
 function renderPartyRecommendations(atkMap, defWeakCount, defResCount, defImmCount) {
   const summaryEl = document.getElementById('party-recommend-summary');
   const listEl = document.getElementById('party-recommend-list');
+  const metaEl = document.getElementById('party-ranking-meta');
   if(!summaryEl || !listEl) return;
 
+  const dataset = getRankingDataset(PARTY_RANKING_MODE);
+  const rows = (dataset.rows || []).slice(0,20);
+  const modeLabel = PARTY_RANKING_MODE === 'double' ? 'ダブル' : 'シングル';
+
   const members = party.filter(Boolean);
+  const currentMegaCount = countPartyMegaCapableMembers(members);
+  const megaTarget = PARTY_MEGA_TARGET;
+  const megaRemain = Math.max(0, megaTarget - currentMegaCount);
+  if(metaEl){
+    metaEl.innerHTML = `上位20参照 / <span style="color:var(--accent3);">${modeLabel}</span>${dataset.updatedAt ? ` / 更新 ${escapePartyHtml(dataset.updatedAt)}` : ''} / メガ枠 ${currentMegaCount}/${megaTarget}`;
+  }
+
   if(!members.length) {
-    summaryEl.textContent = 'ポケモンを追加すると、足りない打点と受け先から補完候補を提案します。';
+    summaryEl.innerHTML = `<div class="recommend-summary-card"><div class="recommend-summary-title">おすすめ表示</div><div class="recommend-summary-main">ポケモンを追加すると、ランキング上位20に重い相手と殴り返しやすい候補を表示します。</div></div>`;
+    listEl.innerHTML = '';
+    return;
+  }
+  if(!rows.length) {
+    summaryEl.innerHTML = `<div class="recommend-summary-card"><div class="recommend-summary-title">ランキング参照</div><div class="recommend-summary-main">参照用データが見つかりませんでした。</div></div>`;
     listEl.innerHTML = '';
     return;
   }
 
+  const threatProfiles = rows.map(buildThreatProfile).filter(profile=>profile.name);
+  const threatEvaluations = threatProfiles.map(profile=>evaluateThreatAgainstCurrentParty(profile, members)).sort((a,b)=>b.concernScore - a.concernScore);
+  const heavyThreats = threatEvaluations.slice(0,5);
+  const physicalThreats = threatProfiles.filter(profile=>profile.threatClass === 'physical').length;
+  const specialThreats = threatProfiles.filter(profile=>profile.threatClass === 'special').length;
+  const mixedThreats = threatProfiles.filter(profile=>profile.threatClass === 'mixed').length;
   const offensiveNeeds = PARTY_ALL_TYPES.filter(t => (atkMap[t]||0) < 2);
-  const defensiveNeeds = PARTY_ALL_TYPES.filter(t => {
-    const weak = defWeakCount[t] || 0;
-    const res  = defResCount[t] || 0;
-    const imm  = defImmCount[t] || 0;
-    return weak >= 2 || (weak >= 1 && res === 0 && imm === 0);
-  });
+
+  summaryEl.innerHTML = `
+    <div class="recommend-summary-card">
+      <div class="recommend-summary-title">重い相手 TOP5</div>
+      <div class="recommend-summary-main">${escapePartyHtml(heavyThreats.map(row=>row.threat.name).join(' / ') || '大きな偏りなし')}</div>
+      <div class="recommend-summary-sub">今の6体で受け先・殴り返しの両方が不足しやすい相手です。</div>
+    </div>
+    <div class="recommend-summary-card">
+      <div class="recommend-summary-title">欲しい役割</div>
+      <div class="recommend-summary-main">${escapePartyHtml(physicalThreats > specialThreats ? '物理相手に後投げ後も殴れる候補が欲しい' : specialThreats > physicalThreats ? '特殊相手に圧を返せる候補が欲しい' : '両方に打点を持てる補完が欲しい')}</div>
+      <div class="recommend-summary-sub">環境内訳: 物理${physicalThreats} / 特殊${specialThreats} / 混合${mixedThreats}</div>
+    </div>
+    <div class="recommend-summary-card">
+      <div class="recommend-summary-title">攻撃面の穴</div>
+      <div class="recommend-summary-main">${escapePartyHtml(offensiveNeeds.length ? offensiveNeeds.slice(0,6).join(' / ') : '大きな不足なし')}</div>
+      <div class="recommend-summary-sub">返しの打点が薄くなりやすいタイプです。</div>
+    </div>
+    <div class="recommend-summary-card">
+      <div class="recommend-summary-title">メガ枠状況</div>
+      <div class="recommend-summary-main">${escapePartyHtml(currentMegaCount ? `${currentMegaCount}体編成中` : '未採用')}</div>
+      <div class="recommend-summary-sub">${megaRemain > 0 ? `あと${megaRemain}体までメガ候補を含めます。` : '上限に達しているため、追加のメガ候補は外しています。'}</div>
+    </div>`;
 
   const currentNames = new Set(members.map(m => m.poke && m.poke.name).filter(Boolean));
   const currentGroupKeys = new Set(Array.from(currentNames).map(getRecommendationGroupKey));
-  let sourceLabel = '現在の表示中ポケモン';
   let pool = [];
   if(SEASON_DATA && Array.isArray(SEASON_DATA['内定']) && SEASON_DATA['内定'].length) {
-    sourceLabel = '内定ポケモン';
     const usable = new Set(SEASON_DATA['内定']);
-    pool = pokeIndex.filter(p => usable.has(p.name));
+    pool = pokeIndex.filter(p => isVisiblePokemon(p) && usable.has(p.name));
   } else {
     pool = getSeasonFilteredPokes();
   }
 
+  const allowMegaCandidates = currentMegaCount < megaTarget;
   const unique = new Map();
   pool.forEach(p => {
     if(!p || !p.name) return;
     const key = getRecommendationGroupKey(p.name);
     if(currentGroupKeys.has(key)) return;
+    if(!allowMegaCandidates && isMegaCapableName(p.name)) return;
     const existing = unique.get(key);
-    if(!existing || preferRecommendationCandidate(p, existing)) {
-      unique.set(key, p);
-    }
+    if(!existing || preferRecommendationCandidate(p, existing)) unique.set(key, p);
   });
   const candidates = Array.from(unique.values());
-
-  const offenseText = offensiveNeeds.length ? offensiveNeeds.slice(0,6).join(' / ') : '大きな不足なし';
-  const defenseText = defensiveNeeds.length ? defensiveNeeds.slice(0,6).join(' / ') : '大きな不安なし';
-  summaryEl.innerHTML = `候補参照: <span style="color:var(--accent3);">${escapePartyHtml(sourceLabel)}</span> / 打点で不足しやすいタイプ: <span style="color:var(--text);">${escapePartyHtml(offenseText)}</span> / 受けで不安なタイプ: <span style="color:var(--text);">${escapePartyHtml(defenseText)}</span>`;
-
   if(!candidates.length) {
-    listEl.innerHTML = '<div class="note" style="padding:0;">候補ポケモンが見つかりませんでした。</div>';
+    listEl.innerHTML = '<div class="recommend-group"><div class="recommend-group-note">今のメガ枠条件では候補ポケモンが見つかりませんでした。</div></div>';
     return;
   }
 
-  const recommendations = candidates.map(candidate => {
-    const attackTypes = getCandidateAttackTypes(candidate);
-    const offenseReasons = [];
-    let offenseScore = 0;
-    offensiveNeeds.forEach(targetType => {
-      let bestType = '';
-      let bestEff = 0;
-      attackTypes.forEach(atkType => {
-        const moveType = POKE_TYPE_TO_MOVE_TYPE[atkType] || atkType;
-        const eff = getTypeEff(moveType, [targetType]);
-        if(eff > bestEff) {
-          bestEff = eff;
-          bestType = atkType;
-        }
-      });
-      if(bestEff >= 2 && bestType) {
-        offenseScore += 4;
-        offenseReasons.push(`${targetType}に${bestType}打点`);
-      }
-    });
+  const recommendationRows = candidates.map(candidate=>{
+    const evaluations = threatProfiles.map(profile=>evaluateCandidateAgainstThreat(candidate, profile));
+    return buildRecommendationRow(candidate, evaluations);
+  }).filter(row=>row.total > 0 && row.offenseTotal >= 4.2 && row.recommendedMoves && row.recommendedMoves.length);
 
-    const defenseReasons = [];
-    let defenseScore = 0;
-    defensiveNeeds.forEach(atkType => {
-      const bestEff = getCandidateBestDefEff(candidate, atkType);
-      if(bestEff === 0) {
-        defenseScore += 5;
-        const abilityReason = (getAbilityOptions(candidate.name) || []).map(ab => getAbilityImmunityReason(ab, atkType)).find(Boolean);
-        defenseReasons.push(abilityReason || `${atkType}無効`);
-      } else if(bestEff <= 0.5) {
-        defenseScore += 3;
-        defenseReasons.push(`${atkType}半減`);
-      }
-    });
-
-    const stabTypes = [candidate.type1, candidate.type2].filter(Boolean);
-    let varietyBonus = 0;
-    stabTypes.forEach(tp => {
-      if(offensiveNeeds.includes(tp)) varietyBonus += 1;
-    });
-    const total = defenseScore + offenseScore + varietyBonus;
-
-    return {
-      candidate,
-      total,
-      offenseScore,
-      defenseScore,
-      offenseReasons: Array.from(new Set(offenseReasons)).slice(0,3),
-      defenseReasons: Array.from(new Set(defenseReasons)).slice(0,3)
-    };
-  }).filter(row => row.total > 0)
-    .sort((a,b) => b.total - a.total || b.defenseScore - a.defenseScore || b.offenseScore - a.offenseScore || a.candidate.name.localeCompare(b.candidate.name,'ja'))
-    .slice(0,8);
-
-  if(!recommendations.length) {
-    listEl.innerHTML = '<div class="note" style="padding:0;">今の条件では、タイプ相性ベースで強く出せる補完候補が見つかりませんでした。</div>';
+  if(!recommendationRows.length) {
+    listEl.innerHTML = '<div class="recommend-group"><div class="recommend-group-note">今の条件では、上位20に対して殴り返しまで含めて改善幅の大きい候補が見つかりませんでした。</div></div>';
     return;
   }
 
   const isFull = party.length >= 6;
-  listEl.innerHTML = recommendations.map((row, idx) => {
-    const c = row.candidate;
-    const t1 = c.type1 ? `<span class="type-pill tp-${c.type1}">${c.type1}</span>` : '';
-    const t2 = c.type2 ? `<span class="type-pill tp-${c.type2}">${c.type2}</span>` : '';
-    const attackText = row.offenseReasons.length ? row.offenseReasons.join(' / ') : '大きな打点補完は少なめ';
-    const defenseText = row.defenseReasons.length ? row.defenseReasons.join(' / ') : '大きな受け補完は少なめ';
-    const safeName = escapePartyHtml(c.name);
-    return `<div class="recommend-card${isFull ? ' disabled' : ''}" ${isFull ? '' : `onclick="addRecommendedPokemon('${safeName}')"`}>
-      <div class="recommend-head">
-        <div class="recommend-rank" style="color:${idx===0?'var(--accent3)':'var(--accent)'};">${idx+1}</div>
-        <div style="font-size:13px;font-weight:700;color:var(--text);">${safeName}</div>
-        <div>${t1}${t2}</div>
-        <div class="recommend-score">DEF ${row.defenseScore} / ATK ${row.offenseScore}</div>
-      </div>
-      <div style="font-size:10px;color:var(--text2);margin-top:6px;line-height:1.7;">受け補完: <span style="color:var(--text);">${escapePartyHtml(defenseText)}</span></div>
-      <div style="font-size:10px;color:var(--text2);margin-top:4px;line-height:1.7;">打点補完: <span style="color:var(--text);">${escapePartyHtml(attackText)}</span></div>
-      <button type="button" class="recommend-add-btn" ${isFull ? 'disabled' : `onclick="event.stopPropagation();addRecommendedPokemon('${safeName}')"`}>${isFull ? 'パーティが埋まっています' : 'このポケモンを追加'}</button>
-    </div>`;
-  }).join('');
+  listEl.innerHTML = [
+    renderRecommendationGroup('総合補完', '重い相手全体に対して、打点込みで改善幅が大きい候補です。', recommendationRows, 'total', 4, isFull),
+    renderRecommendationGroup('対物理', '物理寄りの上位ポケモンへ、受けてから殴り返しやすい候補です。', recommendationRows, 'physicalScore', 3, isFull),
+    renderRecommendationGroup('対特殊', '特殊寄りの上位ポケモンへ、行動保証と返しの打点を持ちやすい候補です。', recommendationRows, 'specialScore', 3, isFull)
+  ].join('');
 }
 
 // saveParty: supabase-sync.jsで定義
@@ -2557,7 +3633,13 @@ function onStatChange(){ recalcAtk(); recalcDef(); }
 
 window.onload = async () => {
   await initAuth();
+  await loadGameData();
   initSeasonFilter();
+  switchPartyWorkspace('recommend');
+  document.querySelectorAll('[data-party-ranking-mode]').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.partyRankingMode === PARTY_RANKING_MODE);
+  });
+  syncPartyMegaTargetUI();
 
   // シーズンフィルター初期化
   const sfWrap = document.getElementById('season-filter-wrap');
@@ -2572,7 +3654,6 @@ window.onload = async () => {
     });
   }
 
-  await loadGameData();
   setupItemMasterList();
   if(window.requestIdleCallback){
     requestIdleCallback(()=>{
@@ -2605,7 +3686,7 @@ setupIfExists('atk2-search','atk2-drop');
 if(el('pe-move-search')) setupPeMoveSearch();
 
 // パーティ管理
-if(el('party-slot-list')){ switchPartyMobileTab('six'); renderPartySlotList(); renderRegPokeList(); renderSavedPartyList(); }
+if(el('party-slot-list')){ switchPartyMobileTab('six'); syncPartySaveControls(); renderPartySlotList(); renderRegPokeList(); renderSavedPartyListFast(); renderSavedPartyList(); if(!restorePartyDraft()) renderPartySlotList(); }
 
 // ダメージ計算スライダー（要素が存在するページのみ）
 ['atk-lv','def-lv'].forEach(id=>{
@@ -2920,6 +4001,7 @@ window.exportPartyImage = exportPartyImage;
 
 document.addEventListener('DOMContentLoaded',()=>{ renderRegPokeList(); renderPartySlotList(); });
 };
+window.addEventListener('beforeunload', savePartyDraftNow);
 
 </script>
 <script>

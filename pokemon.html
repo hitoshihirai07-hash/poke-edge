@@ -608,7 +608,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
       </div>
 
       <!-- 個体値 -->
-      <div class="section">
+      <div class="section" id="poke-iv-section">
         <div class="sec-title">個体値（0〜31）</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
           <div>
@@ -624,6 +624,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
           </div>
         </div>
       </div>
+      <div id="poke-iv-fixed-note" class="section" style="display:none;font-size:11px;color:var(--text2);line-height:1.8;">Championsでは個体値31固定です。</div>
 
       <!-- 努力値 -->
       <div class="section">
@@ -761,6 +762,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 
       <div class="pokemon-actions" style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap;">
         <button class="save-btn" id="btn-save-pokemon" style="flex:1;min-width:160px;">💾 保存</button>
+        <button type="button" id="btn-save-pokemon-duplicate" style="padding:10px 16px;background:transparent;border:1px solid var(--accent3);color:var(--accent3);font-family:'Noto Sans JP',sans-serif;font-size:11px;cursor:pointer;letter-spacing:1px;">🧬 別個体として保存</button>
         <button type="button" class="save-btn" id="btn-export-pokemon-image" onclick="exportPokemonCardImage()" style="flex:1;min-width:220px;background:linear-gradient(135deg,var(--accent3),#b88400);color:#000;">📷 型紹介画像を保存</button>
         <button id="btn-delete-pokemon" style="padding:10px 16px;background:transparent;border:1px solid var(--accent2);color:var(--accent2);font-family:'Noto Sans JP',sans-serif;font-size:11px;cursor:pointer;letter-spacing:1px;">削除</button>
       </div>
@@ -1311,7 +1313,7 @@ function getBulkNatureCandidates(pokeName, physRatio){
 function getRealStatsForBulk(ev, natureName){
   const p=currentPokeData;
   const lv=parseInt(document.getElementById('f-lv').value,10)||50;
-  const iv=parseInt(document.getElementById('iv-num').value,10)||31;
+  const iv=isPokeChampions() ? 31 : (parseInt(document.getElementById('iv-num').value,10)||31);
   const nat=NATURES[natureName] || NATURES['がんばりや'];
   const champ=isPokeChampions();
   return {
@@ -1529,6 +1531,14 @@ function syncIV(val) {
 function isPokeChampions() {
   return document.getElementById('poke-mode-champions')?.checked || false;
 }
+function syncPokeModeVisuals() {
+  const champ = isPokeChampions();
+  const ivSection = document.getElementById('poke-iv-section');
+  const ivNote = document.getElementById('poke-iv-fixed-note');
+  if(ivSection) ivSection.style.display = champ ? 'none' : '';
+  if(ivNote) ivNote.style.display = champ ? '' : 'none';
+  if(champ) syncIV(31);
+}
 
 function onPokeModeChange() {
   const champ = isPokeChampions();
@@ -1543,6 +1553,7 @@ function onPokeModeChange() {
     if(r){ r.max=max; r.step=step; if(parseInt(r.value)>max) r.value=0; }
     if(n){ n.max=max; if(parseInt(n.value)>max) n.value=0; }
   });
+  syncPokeModeVisuals();
   updateEVRemain();
   updateBulkRatioLabel();
   resetBulkRecommendView();
@@ -1572,7 +1583,7 @@ function recalcReal() {
   if(!currentPokeData) return;
   const p=currentPokeData;
   const lv=parseInt(document.getElementById('f-lv').value)||50;
-  const iv=parseInt(document.getElementById('iv-num').value)||31;
+  const iv=isPokeChampions() ? 31 : (parseInt(document.getElementById('iv-num').value)||31);
   const nat=NATURES[document.getElementById('f-nature').value]||{atk:1,def:1,spa:1,spd:1,spe:1};
   const ev=getEVs();
   const pokeChamp = isPokeChampions();
@@ -1792,7 +1803,7 @@ function getCurrentRealStatsForExport(){
   if(!currentPokeData) return null;
   const p=currentPokeData;
   const lv=parseInt(document.getElementById('f-lv').value)||50;
-  const iv=parseInt(document.getElementById('iv-num').value)||31;
+  const iv=isPokeChampions() ? 31 : (parseInt(document.getElementById('iv-num').value)||31);
   const nat=NATURES[document.getElementById('f-nature').value]||{atk:1,def:1,spa:1,spd:1,spe:1};
   const ev=getEVs();
   const champ=isPokeChampions();
@@ -2036,10 +2047,22 @@ function renderRegList(filter) {
   }).join('');
 }
 
+function makePokemonRecordId(){
+  return 'poke_' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+}
+function savePokemonAsDuplicate(){
+  if(!currentPokeData && !document.getElementById('poke-search').value){
+    alert('ポケモンを選択してください');
+    return;
+  }
+  currentId = makePokemonRecordId();
+  savePokemon();
+}
+
 // ===== 新規作成 =====
 function newPokemon() {
   switchPokemonMobileTabIfMobile('basic');
-  currentId = 'new_'+Date.now();
+  currentId = makePokemonRecordId();
   currentPokeData = null;
   currentMoves = [];
   document.getElementById('edit-empty').style.display='none';
@@ -2084,7 +2107,7 @@ async function savePokemon() {
   const pokeName=normalizeAegislashDisplayName(currentPokeData?currentPokeData.name:(document.getElementById('poke-search').value||''));
   const displayName=nickname||pokeName||'名称未設定';
   const record={
-    id: currentId,
+    id: currentId || makePokemonRecordId(),
     pokeName,
     displayName,
     nickname,
@@ -2094,7 +2117,7 @@ async function savePokemon() {
     nature: normalizeNatureName(document.getElementById('f-nature').value),
     ability: document.getElementById('f-ability') ? document.getElementById('f-ability').value : '',
     item: normalizeItemName(document.getElementById('f-item').value),
-    iv:  parseInt(document.getElementById('iv-num').value)||31,
+    iv:  isPokeChampions() ? 31 : (parseInt(document.getElementById('iv-num').value)||31),
     ev:  getEVs(),
     gameMode: isPokeChampions() ? 'champions' : 'classic',
     moves: [...currentMoves],
@@ -2129,12 +2152,13 @@ function loadPokemon(id) {
   renderAbilityOptions(rec.pokeName||'', rec.ability || '');
   document.getElementById('f-item').value=normalizeItemName(rec.item||'');
   document.getElementById('f-memo').value=rec.memo||'';
-  document.getElementById('iv-range').value=rec.iv||31;
-  document.getElementById('iv-num').value=rec.iv||31;
-  document.getElementById('iv-disp').textContent=rec.iv||31;
+  const safeIv = isChampionsSaved ? 31 : (rec.iv||31);
+  document.getElementById('iv-range').value=safeIv;
+  document.getElementById('iv-num').value=safeIv;
+  document.getElementById('iv-disp').textContent=safeIv;
   const classic=document.getElementById('poke-mode-classic');
   const champions=document.getElementById('poke-mode-champions');
-  const isChampionsSaved=String(rec.gameMode||'classic').toLowerCase()==='champions';
+  const isChampionsSaved=String(rec.gameMode||'champions').toLowerCase()==='champions';
   if(classic) classic.checked=!isChampionsSaved;
   if(champions) champions.checked=isChampionsSaved;
   onPokeModeChange();
@@ -2265,7 +2289,9 @@ window.onload = async () => {
   // ボタンバインド（関数定義後に実行）
   const btnNew = document.getElementById('btn-new-pokemon');
   const btnDel = document.getElementById('btn-delete-pokemon');
+  const btnDuplicate = document.getElementById('btn-save-pokemon-duplicate');
   if(btnNew)  btnNew.addEventListener('click', newPokemon);
+  if(btnDuplicate) btnDuplicate.addEventListener('click', savePokemonAsDuplicate);
   document.querySelectorAll('#btn-save-pokemon,#btn-save-pokemon-top').forEach(btn=>btn.addEventListener('click', savePokemon));
   if(btnDel)  btnDel.addEventListener('click', deleteCurrent);
 
