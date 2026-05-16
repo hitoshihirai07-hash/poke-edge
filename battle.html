@@ -101,7 +101,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(7,9,15,.96);backdrop-fi
     <a class="nav-btn" href="index.html">トップ</a>
     <a class="nav-btn" href="calc.html">ダメージ計算</a>
     <a class="nav-btn" href="endure.html">耐久調整</a>
-    <a class="nav-btn" href="move.html">技選択判定</a>
+    <a class="nav-btn" href="move.html">クイック技ダメージ</a>
     <a class="nav-btn active" href="battle.html">バトル</a>
     <a class="nav-btn" href="party.html">パーティ管理</a>
     <a class="nav-btn" href="pokemon.html">ポケモン登録</a>
@@ -117,8 +117,8 @@ header{position:sticky;top:0;z-index:100;background:rgba(7,9,15,.96);backdrop-fi
   <button class="hamburger" id="hamburger" onclick="toggleNav()" aria-label="メニュー"><span></span><span></span><span></span></button>
   <div class="nav-overlay" id="nav-overlay" onclick="closeNav()"></div>
 </header>
-<aside class="side-dock"><div class="side-card"><div class="side-title">ツール移動</div><div class="side-links"><a class="side-link" href="calc.html">ダメージ計算</a><a class="side-link" href="endure.html">耐久調整</a><a class="side-link" href="move.html">技選択判定</a><a class="side-link active" href="battle.html">バトルシミュレーション</a><a class="side-link" href="party.html">パーティ管理</a><a class="side-link" href="pokemon.html">ポケモン登録</a><a class="side-link" href="items.html">アイテム</a><a class="side-link" href="scope.html">バトルアナライザー</a><a class="side-link" href="season.html">使用可能ポケモン</a><a class="side-link" href="speed.html">素早さライン</a><a class="side-link" href="blog.html">記事一覧</a><a class="side-link" href="policy.html">サイト情報</a></div></div></aside>
-<nav class="mobile-tool-nav" aria-label="スマホ用ページ移動"><div class="mobile-tool-nav-title">ツール移動</div><div class="mobile-tool-scroll"><a class="mobile-tool-link" href="index.html">TOP</a><a class="mobile-tool-link" href="calc.html">ダメ計</a><a class="mobile-tool-link" href="endure.html">耐久</a><a class="mobile-tool-link" href="move.html">技判定</a><a class="mobile-tool-link active" href="battle.html" aria-current="page">バトル</a><a class="mobile-tool-link" href="party.html">パーティ</a><a class="mobile-tool-link" href="pokemon.html">登録</a><a class="mobile-tool-link" href="season.html">使用可能</a><a class="mobile-tool-link" href="speed.html">素早さ</a><a class="mobile-tool-link" href="scope.html">アナライザー</a><a class="mobile-tool-link" href="items.html">アイテム</a><a class="mobile-tool-link" href="blog.html">記事</a><a class="mobile-tool-link" href="policy.html">情報</a></div></nav>
+<aside class="side-dock"><div class="side-card"><div class="side-title">ツール移動</div><div class="side-links"><a class="side-link" href="calc.html">ダメージ計算</a><a class="side-link" href="endure.html">耐久調整</a><a class="side-link" href="move.html">クイック技ダメージ</a><a class="side-link active" href="battle.html">バトルシミュレーション</a><a class="side-link" href="party.html">パーティ管理</a><a class="side-link" href="pokemon.html">ポケモン登録</a><a class="side-link" href="items.html">アイテム</a><a class="side-link" href="scope.html">バトルアナライザー</a><a class="side-link" href="season.html">使用可能ポケモン</a><a class="side-link" href="speed.html">素早さライン</a><a class="side-link" href="blog.html">記事一覧</a><a class="side-link" href="policy.html">サイト情報</a></div></div></aside>
+<nav class="mobile-tool-nav" aria-label="スマホ用ページ移動"><div class="mobile-tool-nav-title">ツール移動</div><div class="mobile-tool-scroll"><a class="mobile-tool-link" href="index.html">TOP</a><a class="mobile-tool-link" href="calc.html">ダメ計</a><a class="mobile-tool-link" href="endure.html">耐久</a><a class="mobile-tool-link" href="move.html">クイック</a><a class="mobile-tool-link active" href="battle.html" aria-current="page">バトル</a><a class="mobile-tool-link" href="party.html">パーティ</a><a class="mobile-tool-link" href="pokemon.html">登録</a><a class="mobile-tool-link" href="season.html">使用可能</a><a class="mobile-tool-link" href="speed.html">素早さ</a><a class="mobile-tool-link" href="scope.html">アナライザー</a><a class="mobile-tool-link" href="items.html">アイテム</a><a class="mobile-tool-link" href="blog.html">記事</a><a class="mobile-tool-link" href="policy.html">情報</a></div></nav>
 
 <main class="page">
   <section class="hero">
@@ -576,12 +576,31 @@ async function refreshBattleAnalysisAccess(options={}){
   return status;
 }
 
+function getBattleStoredSeasonLabel(){
+  if(window.pokeEdgeRankingSeason && typeof pokeEdgeRankingSeason.getStored === 'function') return pokeEdgeRankingSeason.getStored() || '';
+  return '';
+}
+function resolveBattleSeasonLabel(labels, preferred){
+  if(window.pokeEdgeRankingSeason && typeof pokeEdgeRankingSeason.resolve === 'function') return pokeEdgeRankingSeason.resolve(labels, preferred || getBattleStoredSeasonLabel());
+  return String(preferred || (labels||[])[0] || '').trim();
+}
+function getBattleRankingFilePath(seasonLabel){
+  if(window.pokeEdgeRankingSeason && typeof pokeEdgeRankingSeason.file === 'function') return pokeEdgeRankingSeason.file('season_ranking_single', seasonLabel);
+  const raw = String(seasonLabel || '').trim();
+  const m = raw.match(/(\d+)/);
+  const num = m ? parseInt(m[1], 10) : 0;
+  return num && num !== 1 ? `season_ranking_single_s${num}.json` : 'season_ranking_single.json';
+}
+
 async function init(){
-  const [pd,md,sd,bd,pm,rankSingle,abMap,abData,partyList]=await Promise.all([fetchJson('pokemon.json',[]),fetchJson('moves.json',[]),fetchJson('season.json',{seasons:[]}),fetchJson('belongings.json',[]),fetchJson('pokemon_moves.json',{pokemon:{}}),fetchJson('season_ranking_single.json',{rows:[]}),fetchJson('abilities.json',{}),fetchJson('abilities_data.json',[]),fetchJson('party_list.json',{parties:[]})]);
+  const [pd,md,sd,bd,pm,abMap,abData,partyList]=await Promise.all([fetchJson('pokemon.json',[]),fetchJson('moves.json',[]),fetchJson('season.json',{seasons:[]}),fetchJson('belongings.json',[]),fetchJson('pokemon_moves.json',{pokemon:{}}),fetchJson('abilities.json',{}),fetchJson('abilities_data.json',[]),fetchJson('party_list.json',{parties:[]})]);
+  const seasonKey=resolveBattleSeasonLabel(sd.seasons||[], getBattleStoredSeasonLabel()) || (sd.seasons&&sd.seasons[0]) || '内定';
+  const rankSingle = await fetchJson(getBattleRankingFilePath(seasonKey), {rows:[]});
   state.pokemon=normalizePokemon(pd);state.moves=normalizeMoves(md);state.movesByName=new Map(state.moves.map(m=>[m.name,m]));state.known=normalizeKnown(pm);
   state.abilitiesByPokemon=abMap||{};state.abilitiesData=Array.isArray(abData)?abData:[];state.abilitiesByName=new Map(state.abilitiesData.map(a=>[a.name,a]));
   state.rankings=normalizeRankings(rankSingle);state.rankingByName=buildRankingMap(state.rankings);
-  const seasonKey=(sd.seasons&&sd.seasons[0])||'内定';state.season=new Set(sd[seasonKey]||[]);
+  state.season=new Set(sd[seasonKey]||[]);
+  if(window.pokeEdgeRankingSeason && typeof pokeEdgeRankingSeason.setStored === 'function' && seasonKey) pokeEdgeRankingSeason.setStored(seasonKey);
   state.items=(Array.isArray(bd)?bd:[]).filter(i=>i&&i.name);state.megaItems=state.items.filter(isMegaStoneItem);
   state.baseRoster=state.pokemon.filter(p=>state.season.has(p.name)&&!isDisplayHiddenFormName(p.name));
   if((state.season.has('ギルガルド盾')||state.season.has('ギルガルド剣'))&&!state.baseRoster.some(p=>p.name==='ギルガルド')){

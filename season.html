@@ -75,6 +75,15 @@ header{position:sticky;top:0;z-index:100;background:rgba(7,9,15,0.96);backdrop-f
 .search-clear-btn:hover{border-color:var(--accent);color:var(--accent);}
 .search-help{font-size:10px;color:var(--text2);line-height:1.6;flex-basis:100%;}
 .search-hit-note{color:var(--accent3);font-weight:700;}
+.search-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;flex:1 1 100%;}
+.search-field{display:flex;flex-direction:column;gap:4px;min-width:0;}
+.search-field-label{font-size:10px;color:var(--text2);letter-spacing:1px;}
+.search-suggest-wrap{position:relative;}
+.search-suggest-list{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:40;display:flex;flex-direction:column;gap:2px;background:var(--panel);border:1px solid var(--border);box-shadow:0 14px 28px rgba(0,0,0,.22);max-height:220px;overflow-y:auto;padding:6px;}
+.search-suggest-list[hidden]{display:none;}
+.search-suggest-item{background:transparent;border:none;color:var(--text);text-align:left;font:inherit;font-size:12px;padding:7px 8px;cursor:pointer;border-radius:8px;line-height:1.45;}
+.search-suggest-item:hover,.search-suggest-item.active{background:var(--bg2);color:var(--accent);}
+.search-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
 
 /* 統計バー */
 .stats-bar{display:flex;gap:16px;margin-bottom:10px;flex-wrap:wrap;align-items:center;}
@@ -170,6 +179,23 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 .rank-subtab{padding:6px 12px;border:1px solid var(--border);background:var(--panel);color:var(--text2);font-size:11px;cursor:pointer;}
 .rank-subtab.active,.rank-subtab:hover{border-color:var(--accent3);color:var(--accent3);background:rgba(255,200,0,0.08);}
 .rank-meta{font-size:11px;color:var(--text2);margin-bottom:10px;}
+.rank-toolbar{display:grid;grid-template-columns:minmax(160px,220px) minmax(0,1fr) auto;gap:10px;align-items:end;margin-bottom:12px;}
+.rank-toolbar .search-field{display:grid;gap:6px;}
+.rank-toolbar .search-field-label{font-size:10px;color:var(--text2);letter-spacing:1px;}
+.rank-toolbar select,.rank-toolbar input{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:9px 10px;font-family:'Noto Sans JP',sans-serif;font-size:12px;outline:none;}
+.rank-toolbar select:focus,.rank-toolbar input:focus{border-color:var(--accent);}
+.rank-clear-btn{padding:9px 14px;border:1px solid var(--border);background:transparent;color:var(--text2);font-family:'Noto Sans JP',sans-serif;font-size:12px;cursor:pointer;}
+.rank-clear-btn:hover{border-color:var(--accent);color:var(--accent);}
+.rank-view-subtabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+.rank-subpanel{display:none;}
+.rank-subpanel.show{display:block;}
+.detail-main-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+.detail-main-tab{padding:8px 12px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-family:'Noto Sans JP',sans-serif;font-size:12px;cursor:pointer;}
+.detail-main-tab.active,.detail-main-tab:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,200,240,0.08);}
+.detail-tab-panel{display:none;}
+.detail-tab-panel.show{display:block;}
+.detail-season-heading{font-size:12px;color:var(--accent3);margin:0 0 10px;letter-spacing:1px;}
+@media(max-width:900px){.rank-toolbar{grid-template-columns:1fr;}}
 .rank-wrap{overflow:auto;border:1px solid var(--border);}
 .rank-table{width:100%;border-collapse:collapse;font-size:12px;min-width:980px;}
 .rank-table th{position:sticky;top:0;background:var(--bg2);color:var(--text2);padding:8px;border-bottom:1px solid var(--border);text-align:left;font-size:10px;letter-spacing:1px;font-weight:400;}
@@ -258,7 +284,10 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
   .filter-bar{display:grid;grid-template-columns:1fr;gap:9px;padding:12px;}
   .season-btns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;}
   .season-btn{width:100%;padding:8px 6px;}
+  .search-grid{grid-template-columns:1fr;}
+  .search-field{width:100%;}
   .search-input,.search-mode-select{min-width:0;width:100%;}
+  .search-actions{display:grid;grid-template-columns:1fr;gap:8px;}
   .stats-bar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
   .stat-item{background:var(--panel);border:1px solid var(--border);padding:8px 10px;}
   .table-wrap,.rank-wrap,.detail-moves-wrap{overflow:visible;border:none;}
@@ -432,7 +461,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
     <a class="nav-btn" href="index.html">トップ</a>
     <a class="nav-btn" href="calc.html">ダメージ計算</a>
     <a class="nav-btn" href="endure.html">耐久調整</a>
-    <a class="nav-btn" href="move.html">技選択判定</a>
+    <a class="nav-btn" href="move.html">クイック技ダメージ</a>
     <a class="nav-btn" href="battle.html">バトル</a>
     <a class="nav-btn" href="party.html">パーティ管理</a>
     <a class="nav-btn" href="pokemon.html">ポケモン登録</a>
@@ -448,10 +477,10 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
   <button class="hamburger" id="hamburger" aria-label="メニュー"><span></span><span></span><span></span></button>
   <div class="nav-overlay" id="nav-overlay"></div>
 </header>
-<aside class="side-dock"><div class="side-card"><div class="side-title">ツール移動</div><div class="side-links"><a class="side-link" href="calc.html">ダメージ計算</a><a class="side-link" href="endure.html">耐久調整</a><a class="side-link" href="move.html">技選択判定</a><a class="side-link" href="battle.html">バトルシミュレーション</a><a class="side-link" href="party.html">パーティ管理</a><a class="side-link" href="pokemon.html">ポケモン登録</a><a class="side-link" href="items.html">アイテム</a><a class="side-link" href="scope.html">バトルアナライザー</a><a class="side-link active" href="season.html">使用可能ポケモン</a><a class="side-link" href="speed.html">素早さライン</a><a class="side-link" href="blog.html">記事一覧</a><a class="side-link" href="policy.html">サイト情報</a></div></div></aside>
+<aside class="side-dock"><div class="side-card"><div class="side-title">ツール移動</div><div class="side-links"><a class="side-link" href="calc.html">ダメージ計算</a><a class="side-link" href="endure.html">耐久調整</a><a class="side-link" href="move.html">クイック技ダメージ</a><a class="side-link" href="battle.html">バトルシミュレーション</a><a class="side-link" href="party.html">パーティ管理</a><a class="side-link" href="pokemon.html">ポケモン登録</a><a class="side-link" href="items.html">アイテム</a><a class="side-link" href="scope.html">バトルアナライザー</a><a class="side-link active" href="season.html">使用可能ポケモン</a><a class="side-link" href="speed.html">素早さライン</a><a class="side-link" href="blog.html">記事一覧</a><a class="side-link" href="policy.html">サイト情報</a></div></div></aside>
 <nav class="mobile-tool-nav" aria-label="スマホ用ページ移動">
   <div class="mobile-tool-nav-title">ツール移動</div>
-  <div class="mobile-tool-scroll"><a class="mobile-tool-link" href="index.html">TOP</a><a class="mobile-tool-link" href="calc.html">ダメ計</a><a class="mobile-tool-link" href="endure.html">耐久</a><a class="mobile-tool-link" href="move.html">技判定</a><a class="mobile-tool-link" href="battle.html">バトル</a><a class="mobile-tool-link" href="party.html">パーティ</a><a class="mobile-tool-link" href="pokemon.html">登録</a><a class="mobile-tool-link active" href="season.html" aria-current="page">使用可能</a><a class="mobile-tool-link" href="speed.html">素早さ</a><a class="mobile-tool-link" href="scope.html">アナライザー</a><a class="mobile-tool-link" href="items.html">アイテム</a><a class="mobile-tool-link" href="blog.html">記事</a><a class="mobile-tool-link" href="policy.html">情報</a></div>
+  <div class="mobile-tool-scroll"><a class="mobile-tool-link" href="index.html">TOP</a><a class="mobile-tool-link" href="calc.html">ダメ計</a><a class="mobile-tool-link" href="endure.html">耐久</a><a class="mobile-tool-link" href="move.html">クイック</a><a class="mobile-tool-link" href="battle.html">バトル</a><a class="mobile-tool-link" href="party.html">パーティ</a><a class="mobile-tool-link" href="pokemon.html">登録</a><a class="mobile-tool-link active" href="season.html" aria-current="page">使用可能</a><a class="mobile-tool-link" href="speed.html">素早さ</a><a class="mobile-tool-link" href="scope.html">アナライザー</a><a class="mobile-tool-link" href="items.html">アイテム</a><a class="mobile-tool-link" href="blog.html">記事</a><a class="mobile-tool-link" href="policy.html">情報</a></div>
 </nav>
 
 
@@ -470,7 +499,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
     </div>
     <div class="guide-links">
       <a class="guide-link primary" href="battle.html">バトルへ</a>
-      <a class="guide-link" href="move.html">技選択判定へ</a>
+      <a class="guide-link" href="move.html">クイック技ダメージへ</a>
       <a class="guide-link" href="calc.html">ダメージ計算へ</a>
       <a class="guide-link" href="blog.html">更新記事を見る</a>
     </div>
@@ -482,18 +511,50 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
     <div class="season-btns" id="season-btns">
       <button class="season-btn active" data-season="" onclick="setSeason(this,'')">すべて</button>
     </div>
-    <select class="search-mode-select" id="search-mode" onchange="render()" aria-label="検索対象">
-      <option value="all">全て</option>
-      <option value="name">名前</option>
-      <option value="move">技</option>
-      <option value="ability">特性</option>
-    </select>
     <select class="search-mode-select" id="type-filter" onchange="render()" aria-label="タイプ絞り込み">
       <option value="">全タイプ</option>
     </select>
-    <input class="search-input" id="name-search" type="text" placeholder="名前・技・特性で検索..." oninput="render()">
-    <button class="search-clear-btn" type="button" onclick="clearSeasonSearch()">クリア</button>
-    <div class="search-help">技・特性は検索欄、タイプは選択欄で絞り込めます。タイプを選んだまま名前や技名で追加検索できます。</div>
+    <div class="search-grid" aria-label="検索条件">
+      <div class="search-field">
+        <span class="search-field-label">名前</span>
+        <div class="search-suggest-wrap">
+          <input class="search-input" id="name-search" type="text" placeholder="ポケモン名で検索" autocomplete="off" data-suggest-kind="name">
+          <div class="search-suggest-list" id="name-search-suggest" hidden></div>
+        </div>
+      </div>
+      <div class="search-field">
+        <span class="search-field-label">技1</span>
+        <div class="search-suggest-wrap">
+          <input class="search-input" id="move-search-1" type="text" placeholder="技名を入力" autocomplete="off" data-suggest-kind="move">
+          <div class="search-suggest-list" id="move-search-1-suggest" hidden></div>
+        </div>
+      </div>
+      <div class="search-field">
+        <span class="search-field-label">技2</span>
+        <div class="search-suggest-wrap">
+          <input class="search-input" id="move-search-2" type="text" placeholder="技名を入力" autocomplete="off" data-suggest-kind="move">
+          <div class="search-suggest-list" id="move-search-2-suggest" hidden></div>
+        </div>
+      </div>
+      <div class="search-field">
+        <span class="search-field-label">技3</span>
+        <div class="search-suggest-wrap">
+          <input class="search-input" id="move-search-3" type="text" placeholder="技名を入力" autocomplete="off" data-suggest-kind="move">
+          <div class="search-suggest-list" id="move-search-3-suggest" hidden></div>
+        </div>
+      </div>
+      <div class="search-field">
+        <span class="search-field-label">特性</span>
+        <div class="search-suggest-wrap">
+          <input class="search-input" id="ability-search-1" type="text" placeholder="特性名を入力" autocomplete="off" data-suggest-kind="ability">
+          <div class="search-suggest-list" id="ability-search-1-suggest" hidden></div>
+        </div>
+      </div>
+      <div class="search-actions">
+        <button class="search-clear-btn" type="button" onclick="clearSeasonSearch()">クリア</button>
+      </div>
+    </div>
+    <div class="search-help">名前・技・特性をそれぞれ入力すると、文字に応じて候補が表示されます。技は3件まで、特性は1件で絞り込めます。技検索は技名のみを対象にします。</div>
   </div>
 
   <!-- 統計 -->
@@ -563,7 +624,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
           <div class="detail-card-title">技一覧</div>
           <div class="detail-tools">
             <div class="detail-meta-line" id="detail-move-meta"></div>
-            <input type="text" id="detail-move-search" placeholder="技名・タイプ・ヒット数・説明で絞り込み">
+            <input type="text" id="detail-move-search" placeholder="技名で絞り込み">
           </div>
           <div class="detail-moves-wrap">
             <table class="detail-moves-table">
@@ -581,6 +642,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
   <div class="footer-logo">PokeEdge</div>
   <div style="font-size:10px;"><a href="policy.html" style="color:var(--text2);text-decoration:none;">プライバシーポリシー / 利用規約</a></div>
 </footer>
+<script src="ranking-season-helper.js"></script>
 
 <script>
 var POKE_DATA = [];
@@ -590,6 +652,7 @@ var ABILITIES_BY_NAME = {};
 var ABILITY_EFFECTS_BY_NAME = {};
 var SEASON_DATA = {seasons:[]};
 var MEGA_DATA = {rows:[], baseToForms:{}, formToBase:{}};
+var SEASON_SEARCH_SUGGESTIONS = {name:[], move:[], ability:[]};
 
 
 function normalizeMegaRelations(raw){
@@ -622,7 +685,7 @@ function getMegaFormsFromRelations(baseName){
   return Array.isArray(MEGA_DATA?.baseToForms?.[base]) ? MEGA_DATA.baseToForms[base].slice() : [];
 }
 
-let currentSeason = '';
+let currentSeason = (window.pokeEdgeRankingSeason && typeof pokeEdgeRankingSeason.getStored === 'function') ? (pokeEdgeRankingSeason.getStored() || '') : '';
 let sortKey = 'no';
 let sortDir = 1;
 let currentDetailName = '';
@@ -715,12 +778,30 @@ function seasonsForName(name) {
   return SEASON_DATA.seasons.filter(s => seasonIncludesDisplayPokemon(SEASON_DATA[s]||[], name));
 }
 
-function getSeasonSearchMode() {
-  return document.getElementById('search-mode')?.value || 'all';
-}
-
 function getSeasonTypeFilter() {
   return document.getElementById('type-filter')?.value || '';
+}
+
+function getSearchInputValue(id) {
+  return String(document.getElementById(id)?.value || '').trim();
+}
+
+function getSearchValueList(ids) {
+  return (ids || []).map(id => getSearchInputValue(id)).filter(Boolean);
+}
+
+function getSeasonSearchCriteria() {
+  return {
+    type: getSeasonTypeFilter(),
+    name: getSearchInputValue('name-search'),
+    moves: getSearchValueList(['move-search-1','move-search-2','move-search-3']),
+    abilities: getSearchValueList(['ability-search-1'])
+  };
+}
+
+function hasSeasonSearchCriteria(criteria) {
+  const ctx = criteria || getSeasonSearchCriteria();
+  return !!(ctx.name || (ctx.moves || []).length || (ctx.abilities || []).length || ctx.type);
 }
 
 function matchesSeasonTypeFilter(p, type) {
@@ -737,19 +818,28 @@ function normalizeSeasonSearchText(value) {
   return String(value == null ? '' : value).toLowerCase().replace(/[\s　]+/g, '');
 }
 
+function uniqSeasonValues(values) {
+  return Array.from(new Set((values || []).map(v => String(v || '').trim()).filter(Boolean)));
+}
+
+function getPokemonNameTexts(p) {
+  if(!p) return [];
+  return uniqSeasonValues([p.name, p.no].concat(seasonSearchAliases(p.name)));
+}
+
 function getPokemonMoveTexts(name) {
   const names = seasonGroupedNames(name);
   const texts = [];
   names.forEach(siteName => {
     const detail = POKE_MOVES_BY_NAME[siteName] || { moves: [] };
     const moves = Array.isArray(detail.moves) ? detail.moves : [];
-    moves.forEach(m => texts.push(...[m.name, m.type, m.category, m.power, m.accuracy, m.pp, m.hits, m.description].filter(Boolean)));
+    moves.forEach(m => { if(m && m.name) texts.push(m.name); });
   });
-  return texts;
+  return uniqSeasonValues(texts);
 }
 
 function getPokemonAbilityTexts(name, includeEffects) {
-  const abilities = Array.from(new Set(seasonGroupedNames(name).flatMap(siteName => Array.isArray(ABILITIES_BY_NAME[siteName]) ? ABILITIES_BY_NAME[siteName] : [])));
+  const abilities = uniqSeasonValues(seasonGroupedNames(name).flatMap(siteName => Array.isArray(ABILITIES_BY_NAME[siteName]) ? ABILITIES_BY_NAME[siteName] : []));
   const out = abilities.slice();
   if(includeEffects) {
     abilities.forEach(ability => {
@@ -757,18 +847,7 @@ function getPokemonAbilityTexts(name, includeEffects) {
       if(effect) out.push(effect);
     });
   }
-  return out;
-}
-
-function getPokemonSearchFields(p, mode) {
-  if(!p) return [];
-  const nameFields = [p.name, p.no].concat(seasonSearchAliases(p.name));
-  const moveFields = getPokemonMoveTexts(p.name);
-  const abilityFields = getPokemonAbilityTexts(p.name, mode === 'all');
-  if(mode === 'name') return nameFields;
-  if(mode === 'move') return moveFields;
-  if(mode === 'ability') return abilityFields;
-  return nameFields.concat(moveFields, abilityFields);
+  return uniqSeasonValues(out);
 }
 
 function matchesSeasonSearchFields(fields, query) {
@@ -778,23 +857,46 @@ function matchesSeasonSearchFields(fields, query) {
   return tokens.every(token => hay.includes(token));
 }
 
-function matchesSeasonPokemonSearch(p, query, mode) {
-  return matchesSeasonSearchFields(getPokemonSearchFields(p, mode || getSeasonSearchMode()), query);
+function matchesSeasonPokemonCriteria(p, criteria) {
+  if(!p) return false;
+  const ctx = criteria || getSeasonSearchCriteria();
+  const nameFields = getPokemonNameTexts(p);
+  const moveFields = getPokemonMoveTexts(p.name);
+  const abilityFields = getPokemonAbilityTexts(p.name, false);
+  if(ctx.name && !matchesSeasonSearchFields(nameFields, ctx.name)) return false;
+  if((ctx.moves || []).some(query => !matchesSeasonSearchFields(moveFields, query))) return false;
+  if((ctx.abilities || []).some(query => !matchesSeasonSearchFields(abilityFields, query))) return false;
+  return true;
+}
+
+function seasonSearchSummaryHtml(criteria) {
+  const ctx = criteria || getSeasonSearchCriteria();
+  const parts = [];
+  if(ctx.type) parts.push(`<span class="search-hit-note">タイプ:</span> ${escapeHtml(ctx.type)}`);
+  if(ctx.name) parts.push(`<span class="search-hit-note">名前:</span> ${escapeHtml(ctx.name)}`);
+  if((ctx.moves || []).length) parts.push(`<span class="search-hit-note">技:</span> ${ctx.moves.map(v => escapeHtml(v)).join(' / ')}`);
+  if((ctx.abilities || []).length) parts.push(`<span class="search-hit-note">特性:</span> ${ctx.abilities.map(v => escapeHtml(v)).join(' / ')}`);
+  return parts.join(' / ');
 }
 
 function clearSeasonSearch() {
-  const input = document.getElementById('name-search');
+  ['name-search','move-search-1','move-search-2','move-search-3','ability-search-1'].forEach(id => {
+    const input = document.getElementById(id);
+    if(input) input.value = '';
+  });
   const typeFilter = document.getElementById('type-filter');
-  if(input) input.value = '';
   if(typeFilter) typeFilter.value = '';
+  hideAllSeasonSuggestLists();
   render();
 }
 
 function setSeason(btn, season) {
   currentSeason = season;
+  if(window.pokeEdgeRankingSeason && typeof pokeEdgeRankingSeason.setStored === 'function' && season) pokeEdgeRankingSeason.setStored(season);
   document.querySelectorAll('.season-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+  if(btn) btn.classList.add('active');
   render();
+  if(partyViewActive) renderPartyReferenceList();
 }
 
 function sortBy(key) {
@@ -820,13 +922,12 @@ function statCellHtml(p, key) {
 }
 
 function render() {
-  const q = (document.getElementById('name-search')?.value||'').trim();
-  const searchMode = getSeasonSearchMode();
-  const typeFilter = getSeasonTypeFilter();
+  const criteria = getSeasonSearchCriteria();
   let filtered = POKE_DATA.filter(p => {
     if(currentSeason && !inSeason(p.name, currentSeason)) return false;
-    if(!matchesSeasonTypeFilterForRecords(seasonFormRecordsForDisplayName(p.name).length ? seasonFormRecordsForDisplayName(p.name) : [p], typeFilter)) return false;
-    if(q && !matchesSeasonPokemonSearch(p, q, searchMode)) return false;
+    const records = seasonFormRecordsForDisplayName(p.name).length ? seasonFormRecordsForDisplayName(p.name) : [p];
+    if(!matchesSeasonTypeFilterForRecords(records, criteria.type)) return false;
+    if(!matchesSeasonPokemonCriteria(p, criteria)) return false;
     return true;
   });
 
@@ -842,9 +943,8 @@ function render() {
   document.getElementById('stat-nintei').textContent = totalNintei;
   const hint = document.querySelector('.detail-hint');
   if(hint) {
-    const modeLabel = ({all:'全て', name:'名前', move:'技', ability:'特性'})[searchMode] || '全て';
-    const typeNote = typeFilter ? ` / タイプ: ${escapeHtml(typeFilter)}` : '';
-    hint.innerHTML = q ? `<span class="search-hit-note">${escapeHtml(modeLabel)}検索中:</span> ${escapeHtml(q)}${typeNote} / 名前クリックで詳細表示` : `${typeFilter ? `<span class="search-hit-note">タイプ絞り込み:</span> ${escapeHtml(typeFilter)} / ` : ''}名前クリックで詳細表示`;
+    const summary = seasonSearchSummaryHtml(criteria);
+    hint.innerHTML = summary ? `${summary} / 名前クリックで詳細表示` : '名前クリックで詳細表示';
   }
 
   if(!filtered.length) {
@@ -877,10 +977,16 @@ function render() {
 
 function buildSeasonBtns() {
   const container = document.getElementById('season-btns');
-  SEASON_DATA.seasons.forEach(s => {
+  if(!container) return;
+  const labels = Array.isArray(SEASON_DATA?.seasons) ? SEASON_DATA.seasons.slice() : [];
+  const preferred = (window.pokeEdgeRankingSeason && typeof pokeEdgeRankingSeason.resolve === 'function')
+    ? pokeEdgeRankingSeason.resolve(labels, currentSeason)
+    : (currentSeason || labels[0] || '');
+  if(preferred) currentSeason = preferred;
+  labels.forEach(s => {
     const count = (SEASON_DATA[s]||[]).length;
     const btn = document.createElement('button');
-    btn.className = 'season-btn';
+    btn.className = 'season-btn' + (s === currentSeason ? ' active' : '');
     btn.dataset.season = s;
     btn.textContent = `${s}（${count}件）`;
     btn.onclick = () => setSeason(btn, s);
@@ -919,6 +1025,151 @@ function normalizeAbilityEffectsData(raw) {
     if(item && item.name) acc[item.name] = item;
     return acc;
   }, {});
+}
+
+function buildSeasonSearchSuggestionData() {
+  const nameSet = new Set();
+  Object.keys(POKE_BY_NAME || {}).forEach(name => {
+    if(!name) return;
+    nameSet.add(String(name).trim());
+    const base = seasonFormBaseName(name);
+    if(base) nameSet.add(base);
+  });
+  (POKE_DATA || []).forEach(p => { if(p && p.name) nameSet.add(String(p.name).trim()); });
+  const moveSet = new Set();
+  Object.values(POKE_MOVES_BY_NAME || {}).forEach(detail => {
+    const moves = Array.isArray(detail?.moves) ? detail.moves : [];
+    moves.forEach(m => { if(m && m.name) moveSet.add(String(m.name).trim()); });
+  });
+  const abilitySet = new Set();
+  Object.values(ABILITIES_BY_NAME || {}).forEach(list => {
+    (Array.isArray(list) ? list : []).forEach(name => { if(name) abilitySet.add(String(name).trim()); });
+  });
+  const sorter = (a,b) => String(a).localeCompare(String(b), 'ja');
+  SEASON_SEARCH_SUGGESTIONS.name = Array.from(nameSet).sort(sorter);
+  SEASON_SEARCH_SUGGESTIONS.move = Array.from(moveSet).sort(sorter);
+  SEASON_SEARCH_SUGGESTIONS.ability = Array.from(abilitySet).sort(sorter);
+}
+
+function getSeasonSuggestListEl(input) {
+  return document.getElementById(`${input.id}-suggest`);
+}
+
+function hideSeasonSuggestList(input) {
+  if(!input) return;
+  const list = getSeasonSuggestListEl(input);
+  if(list) {
+    list.hidden = true;
+    list.innerHTML = '';
+    delete list.dataset.activeIndex;
+  }
+}
+
+function hideAllSeasonSuggestLists() {
+  document.querySelectorAll('.search-suggest-list').forEach(list => {
+    list.hidden = true;
+    list.innerHTML = '';
+    delete list.dataset.activeIndex;
+  });
+}
+
+function getSeasonSuggestItems(input) {
+  const kind = input?.dataset?.suggestKind || 'name';
+  const source = Array.isArray(SEASON_SEARCH_SUGGESTIONS[kind]) ? SEASON_SEARCH_SUGGESTIONS[kind] : [];
+  const query = normalizeSeasonSearchText(input?.value || '');
+  if(!query) return [];
+  const starts = [];
+  const contains = [];
+  source.forEach(item => {
+    const norm = normalizeSeasonSearchText(item);
+    if(!norm.includes(query)) return;
+    if(norm.startsWith(query)) starts.push(item);
+    else contains.push(item);
+  });
+  return starts.concat(contains).slice(0, 12);
+}
+
+function renderSeasonSuggestList(input) {
+  if(!input) return;
+  const list = getSeasonSuggestListEl(input);
+  if(!list) return;
+  const items = getSeasonSuggestItems(input);
+  if(!items.length) {
+    hideSeasonSuggestList(input);
+    return;
+  }
+  const activeIndex = Math.max(-1, Math.min(Number(list.dataset.activeIndex || -1), items.length - 1));
+  list.dataset.activeIndex = String(activeIndex);
+  list.innerHTML = items.map((item, index) => `<button type="button" class="search-suggest-item ${index === activeIndex ? 'active' : ''}" data-value="${escapeHtml(item)}">${escapeHtml(item)}</button>`).join('');
+  list.hidden = false;
+}
+
+function moveSeasonSuggestSelection(input, direction) {
+  const list = getSeasonSuggestListEl(input);
+  if(!list || list.hidden) {
+    renderSeasonSuggestList(input);
+    return;
+  }
+  const items = getSeasonSuggestItems(input);
+  if(!items.length) return;
+  let next = Number(list.dataset.activeIndex || -1) + direction;
+  if(next < 0) next = items.length - 1;
+  if(next >= items.length) next = 0;
+  list.dataset.activeIndex = String(next);
+  renderSeasonSuggestList(input);
+}
+
+function applySeasonSuggestValue(input, value) {
+  if(!input) return;
+  input.value = value || '';
+  hideSeasonSuggestList(input);
+  render();
+}
+
+function initSeasonSuggestInputs() {
+  document.querySelectorAll('.search-input[data-suggest-kind]').forEach(input => {
+    if(input.dataset.suggestInit === '1') return;
+    input.dataset.suggestInit = '1';
+    input.addEventListener('input', function() {
+      renderSeasonSuggestList(input);
+      render();
+    });
+    input.addEventListener('focus', function() {
+      renderSeasonSuggestList(input);
+    });
+    input.addEventListener('keydown', function(e) {
+      if(e.key === 'ArrowDown') {
+        e.preventDefault();
+        moveSeasonSuggestSelection(input, 1);
+      } else if(e.key === 'ArrowUp') {
+        e.preventDefault();
+        moveSeasonSuggestSelection(input, -1);
+      } else if(e.key === 'Enter') {
+        const list = getSeasonSuggestListEl(input);
+        if(list && !list.hidden) {
+          const items = getSeasonSuggestItems(input);
+          const index = Number(list.dataset.activeIndex || -1);
+          if(items[index]) {
+            e.preventDefault();
+            applySeasonSuggestValue(input, items[index]);
+          }
+        }
+      } else if(e.key === 'Escape') {
+        hideSeasonSuggestList(input);
+      }
+    });
+  });
+  document.querySelectorAll('.search-suggest-list').forEach(list => {
+    if(list.dataset.suggestInit === '1') return;
+    list.dataset.suggestInit = '1';
+    list.addEventListener('mousedown', function(e) {
+      const btn = e.target.closest('.search-suggest-item');
+      if(!btn) return;
+      e.preventDefault();
+      const input = document.getElementById(list.id.replace(/-suggest$/, ''));
+      applySeasonSuggestValue(input, btn.dataset.value || '');
+    });
+  });
 }
 
 function openPokemonDetail(name) {
@@ -972,7 +1223,7 @@ function renderDetailMoves() {
   const detail = POKE_MOVES_BY_NAME[currentDetailName] || { moves: [] };
   const moves = Array.isArray(detail.moves) ? detail.moves : [];
   const filtered = !query ? moves : moves.filter(m => {
-    return matchesSeasonSearchFields([m.name, m.type, m.category, m.power, m.accuracy, m.pp, m.hits, m.description], query);
+    return matchesSeasonSearchFields([m.name], query);
   });
   if(!filtered.length) {
     body.innerHTML = `<tr><td colspan="8" class="detail-empty">${moves.length ? '条件に合う技がありません' : '技データがありません'}</td></tr>`;
@@ -1021,12 +1272,13 @@ async function ensureSeasonMovesLoaded(){
 window.onload = async () => {
   await initAuth();
   try {
-    const [pd, sd, ad, aed, megaData] = await Promise.all([
+    const [pd, sd, ad, aed, megaData, _movesReady] = await Promise.all([
       fetchDataJson('pokemon.json', []),
       fetchDataJson('season.json', {seasons:[]}),
       fetchDataJson('abilities.json', {}),
       fetchDataJson('abilities_data.json', []),
       fetchDataJson('mega.json', {rows:[], baseToForms:{}, formToBase:{}}),
+      ensureSeasonMovesLoaded()
     ]);
     const rawPokemonData = Array.isArray(pd) ? pd : [];
     POKE_BY_NAME = {};
@@ -1042,6 +1294,7 @@ window.onload = async () => {
       POKE_BY_NAME[p.name] = p;
     });
     SEASON_DATA = sd || {seasons:[]};
+    if(window.pokeEdgeRankingSeason && typeof pokeEdgeRankingSeason.resolve === 'function') currentSeason = pokeEdgeRankingSeason.resolve(SEASON_DATA.seasons || [], currentSeason);
     ABILITIES_BY_NAME = normalizeAbilitiesData(ad);
     ABILITY_EFFECTS_BY_NAME = normalizeAbilityEffectsData(aed);
     MEGA_DATA = normalizeMegaRelations(megaData);
@@ -1051,7 +1304,15 @@ window.onload = async () => {
   }
   buildSeasonBtns();
   buildTypeFilter();
+  buildSeasonSearchSuggestionData();
+  initSeasonSuggestInputs();
   render();
+  if(typeof loadRankingJson === 'function') {
+    if(typeof _seasonRankingLoaded !== 'undefined') _seasonRankingLoaded = false;
+    if(typeof _seasonRankingPromise !== 'undefined') _seasonRankingPromise = null;
+    if(typeof RANKING_AVAILABLE_SEASONS !== 'undefined') RANKING_AVAILABLE_SEASONS = [];
+    loadRankingJson();
+  }
 };
 
 document.addEventListener('click', function(e) {
@@ -1069,8 +1330,19 @@ document.addEventListener('DOMContentLoaded', function() {
   const moveSearch = document.getElementById('detail-move-search');
   if(closeBtn) closeBtn.addEventListener('click', closePokemonDetail);
   if(moveSearch) moveSearch.addEventListener('input', renderDetailMoves);
+  const typeFilter = document.getElementById('type-filter');
+  if(typeFilter && !typeFilter.dataset.searchInit) {
+    typeFilter.dataset.searchInit = '1';
+    typeFilter.addEventListener('change', render);
+  }
+  document.addEventListener('click', function(e) {
+    if(!e.target.closest('.search-suggest-wrap')) hideAllSeasonSuggestLists();
+  });
   document.addEventListener('keydown', function(ev) {
-    if(ev.key === 'Escape') closePokemonDetail();
+    if(ev.key === 'Escape') {
+      hideAllSeasonSuggestLists();
+      closePokemonDetail();
+    }
   });
 });
 </script>
@@ -1143,19 +1415,61 @@ document.addEventListener('DOMContentLoaded',function(){
     'イルカマン（マイティ）':['イルカマン']
   };
 
-  let SINGLE_RANKINGS = {rows:[], updatedAt:''};
-  let DOUBLE_RANKINGS = {rows:[], updatedAt:''};
-  let SINGLE_RANKING_HISTORY = {columns:[], rows:[], updatedAt:''};
-  let DOUBLE_RANKING_HISTORY = {columns:[], rows:[], updatedAt:''};
-  let currentViewMode = 'list';
+  let currentMainView = 'list';
+  let currentRankingView = 'ranking';
   let currentRankingBattle = 'single';
-  let currentHistoryBattle = 'single';
+  let currentRankingSeason = '';
+  let currentRankingNameQuery = '';
   let currentDetailMoves = [];
   let currentDetailMovesExpanded = false;
   let currentDetailTransferName = '';
+  let currentDetailTab = 'moves';
+
+  let RANKING_AVAILABLE_SEASONS = [];
+  let RANKING_STORE = {
+    single: {},
+    double: {},
+    historySingle: {},
+    historyDouble: {}
+  };
 
   function uniq(arr) {
     return Array.from(new Set((arr || []).filter(Boolean)));
+  }
+
+  function seasonNumericValue(label) {
+    const m = String(label || '').match(/(\d+)/);
+    return m ? parseInt(m[1], 10) : 0;
+  }
+
+  function sortSeasonLabels(arr, desc) {
+    return uniq(arr).sort((a,b) => {
+      const av = seasonNumericValue(a);
+      const bv = seasonNumericValue(b);
+      if(av !== bv) return desc ? bv - av : av - bv;
+      return desc ? String(b).localeCompare(String(a), 'ja') : String(a).localeCompare(String(b), 'ja');
+    });
+  }
+
+  function isBaseRankingSeason(season) {
+    return seasonNumericValue(season) === 1;
+  }
+
+  function seasonSuffixFromLabel(season) {
+    const raw = String(season || '').trim();
+    const num = seasonNumericValue(raw);
+    if(num) return `_s${num}`;
+    return '_' + raw.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+  }
+
+  function rankingFilePath(kind, battle, season) {
+    if(window.pokeEdgeRankingSeason && typeof pokeEdgeRankingSeason.file === 'function') {
+      const base = kind === 'ranking' ? `season_ranking_${battle}` : `season_ranking_history_${battle}`;
+      return pokeEdgeRankingSeason.file(base, season);
+    }
+    const suffix = isBaseRankingSeason(season) ? '' : seasonSuffixFromLabel(season);
+    if(kind === 'ranking') return `season_ranking_${battle}${suffix}.json`;
+    return `season_ranking_history_${battle}${suffix}.json`;
   }
 
   function formatRankingDate(value) {
@@ -1191,48 +1505,139 @@ document.addEventListener('DOMContentLoaded',function(){
     return uniq(names);
   }
 
+  function fetchMaybeJson(path) {
+    return fetch(path, {cache:'no-cache'}).then(async (r) => {
+      if(!r.ok) return {ok:false, data:null};
+      return {ok:true, data:await r.json()};
+    }).catch(() => ({ok:false, data:null}));
+  }
+
+  function normalizeRankingPayload(raw, battle, season) {
+    const base = raw && typeof raw === 'object' ? raw : {};
+    const rows = Array.isArray(base.rows) ? base.rows : [];
+    return {
+      battleType: battle,
+      season,
+      updatedAt: base.updatedAt || '',
+      rows: rows.map(row => Object.assign({}, row, { battleType: battle, season }))
+    };
+  }
+
+  function normalizeHistoryPayload(raw, battle, season) {
+    const base = raw && typeof raw === 'object' ? raw : {};
+    const rows = Array.isArray(base.rows) ? base.rows : [];
+    const columns = Array.isArray(base.columns) ? base.columns : [];
+    return {
+      battleType: battle,
+      season,
+      updatedAt: base.updatedAt || '',
+      columns,
+      rows: rows.map(row => Object.assign({}, row, { battleType: battle, season }))
+    };
+  }
+
+  async function loadRankingJson() {
+    const seasonCandidates = sortSeasonLabels((SEASON_DATA && Array.isArray(SEASON_DATA.seasons) ? SEASON_DATA.seasons : []).filter(Boolean), false);
+    if(!seasonCandidates.length) {
+      _seasonRankingLoaded = false;
+      _seasonRankingPromise = null;
+      RANKING_AVAILABLE_SEASONS = [];
+      return Promise.resolve(RANKING_STORE);
+    }
+    if(_seasonRankingLoaded) return RANKING_STORE;
+    if(_seasonRankingPromise) return _seasonRankingPromise;
+    _seasonRankingPromise = (async()=>{
+      const available = [];
+      for(const season of seasonCandidates) {
+        const [singleRes, doubleRes, singleHistoryRes, doubleHistoryRes] = await Promise.all([
+          fetchMaybeJson(rankingFilePath('ranking', 'single', season)),
+          fetchMaybeJson(rankingFilePath('ranking', 'double', season)),
+          fetchMaybeJson(rankingFilePath('history', 'single', season)),
+          fetchMaybeJson(rankingFilePath('history', 'double', season))
+        ]);
+        if(singleRes.ok) RANKING_STORE.single[season] = normalizeRankingPayload(singleRes.data, 'single', season);
+        if(doubleRes.ok) RANKING_STORE.double[season] = normalizeRankingPayload(doubleRes.data, 'double', season);
+        if(singleHistoryRes.ok) RANKING_STORE.historySingle[season] = normalizeHistoryPayload(singleHistoryRes.data, 'single', season);
+        if(doubleHistoryRes.ok) RANKING_STORE.historyDouble[season] = normalizeHistoryPayload(doubleHistoryRes.data, 'double', season);
+        if(singleRes.ok || doubleRes.ok || singleHistoryRes.ok || doubleHistoryRes.ok) available.push(season);
+      }
+      RANKING_AVAILABLE_SEASONS = sortSeasonLabels(available, true);
+      const preferred = (window.pokeEdgeRankingSeason && typeof pokeEdgeRankingSeason.resolve === 'function') ? pokeEdgeRankingSeason.resolve(RANKING_AVAILABLE_SEASONS.length ? RANKING_AVAILABLE_SEASONS : seasonCandidates, currentRankingSeason) : '';
+      if(preferred) currentRankingSeason = preferred;
+      if(!currentRankingSeason) currentRankingSeason = RANKING_AVAILABLE_SEASONS[0] || sortSeasonLabels(seasonCandidates, true)[0] || '';
+      if(window.pokeEdgeRankingSeason && typeof pokeEdgeRankingSeason.setStored === 'function' && currentRankingSeason) pokeEdgeRankingSeason.setStored(currentRankingSeason);
+      _seasonRankingLoaded = true;
+      renderRankingSeasonOptions();
+      renderActiveRankingPanel();
+      return RANKING_STORE;
+    })();
+    return _seasonRankingPromise;
+  }
+
+  function getRankingData(season, battle) {
+    return battle === 'double'
+      ? (RANKING_STORE.double[season] || {rows:[], updatedAt:'', season})
+      : (RANKING_STORE.single[season] || {rows:[], updatedAt:'', season});
+  }
+
+  function getHistoryData(season, battle) {
+    return battle === 'double'
+      ? (RANKING_STORE.historyDouble[season] || {columns:[], rows:[], updatedAt:'', season})
+      : (RANKING_STORE.historySingle[season] || {columns:[], rows:[], updatedAt:'', season});
+  }
+
+  function getCurrentRankingData() {
+    return getRankingData(currentRankingSeason, currentRankingBattle);
+  }
+
+  function getCurrentHistoryData() {
+    return getHistoryData(currentRankingSeason, currentRankingBattle);
+  }
+
+  function rankingSearchMatches(row, query) {
+    if(!query) return true;
+    const siteNames = resolveSiteNames(row.name || row.siteName || '');
+    const records = siteNames.map(n => POKE_BY_NAME[n]).filter(Boolean);
+    const fields = uniqSeasonValues([row.name, row.siteName].concat(siteNames).concat(records.flatMap(p => getPokemonNameTexts(p))));
+    return matchesSeasonSearchFields(fields, query);
+  }
+
   function buildSearchablePokemonFromName(name) {
     const siteNames = resolveSiteNames(name || '');
     return siteNames.map(n => POKE_BY_NAME[n]).filter(Boolean);
   }
 
-  function matchesSeasonRankingSearch(row, siteNames, query) {
-    const mode = getSeasonSearchMode();
-    const typeFilter = getSeasonTypeFilter();
-    const records = (siteNames && siteNames.length ? siteNames : resolveSiteNames(row.name || row.siteName || '')).map(n => POKE_BY_NAME[n]).filter(Boolean);
-    if(!matchesSeasonTypeFilterForRecords(records, typeFilter)) return false;
-    const nameFields = [row.name, row.siteName].concat(siteNames || []);
-    const abilityFields = (row.abilities || []).concat(records.flatMap(p => getPokemonAbilityTexts(p.name, mode === 'all')));
-    const moveFields = (row.moves || []).concat(records.flatMap(p => getPokemonMoveTexts(p.name)));
-    let fields = [];
-    if(mode === 'name') fields = nameFields;
-    else if(mode === 'ability') fields = abilityFields;
-    else if(mode === 'move') fields = moveFields;
-    else fields = nameFields.concat(abilityFields, moveFields);
-    return matchesSeasonSearchFields(fields, query);
-  }
-
   function resolveRankingRowsForName(name) {
     const lookup = resolveRankingLookupNames(name);
     const baseLookups = inferBaseRankingNames(name);
-    function collect(sourceRows) {
-      const seen = new Set();
+    function collect(store) {
       const out = [];
-      (sourceRows || []).forEach(row => {
-        const key = [row.battleType,row.rank,row.name].join('::');
-        const matchSelf = lookup.includes(row.name) || lookup.includes(row.siteName);
-        const matchBase = !matchSelf && (baseLookups.includes(row.name) || baseLookups.includes(row.siteName));
-        if((matchSelf || matchBase) && !seen.has(key)) {
-          seen.add(key);
-          out.push(Object.assign({}, row, {rankingSource: matchBase ? 'base' : 'self'}));
-        }
+      const seen = new Set();
+      sortSeasonLabels(RANKING_AVAILABLE_SEASONS, true).forEach(season => {
+        const data = store[season] || {rows:[]};
+        (data.rows || []).forEach(row => {
+          const key = [season, row.battleType, row.rank, row.name].join('::');
+          const matchSelf = lookup.includes(row.name) || lookup.includes(row.siteName);
+          const matchBase = !matchSelf && (baseLookups.includes(row.name) || baseLookups.includes(row.siteName));
+          if((matchSelf || matchBase) && !seen.has(key)) {
+            seen.add(key);
+            out.push(Object.assign({}, row, { rankingSource: matchBase ? 'base' : 'self', season }));
+          }
+        });
       });
       return out;
     }
     return {
-      single: collect(SINGLE_RANKINGS.rows),
-      double: collect(DOUBLE_RANKINGS.rows)
+      single: collect(RANKING_STORE.single),
+      double: collect(RANKING_STORE.double)
     };
+  }
+
+  function getHistoryRowsForName(name, battle, season) {
+    const data = getHistoryData(season, battle);
+    const rows = Array.isArray(data.rows) ? data.rows : [];
+    const lookup = resolveRankingLookupNames(name || '').concat(inferBaseRankingNames(name || ''));
+    return rows.filter(row => lookup.includes(row.name) || lookup.includes(row.siteName));
   }
 
   function collectDetailContext(name) {
@@ -1283,101 +1688,320 @@ document.addEventListener('DOMContentLoaded',function(){
     tabs.id = 'view-tabs';
     tabs.innerHTML = `
       <button class="view-tab active" type="button" data-view="list">使用可能ポケモン</button>
-      <button class="view-tab" type="button" data-view="ranking">順位確認</button>
-      <button class="view-tab" type="button" data-view="history">順位推移</button>
+      <button class="view-tab" type="button" data-view="ranking">ランキング関連</button>
+      <button class="view-tab" type="button" data-view="party">パーティー一覧</button>
     `;
-    filterBar.insertAdjacentElement('afterend', tabs);
+    main.insertBefore(tabs, filterBar);
 
     const listWrap = document.createElement('div');
     listWrap.id = 'season-list-view';
-    statsBar.parentNode.insertBefore(listWrap, statsBar);
+    main.insertBefore(listWrap, filterBar);
+    listWrap.appendChild(filterBar);
     listWrap.appendChild(statsBar);
     listWrap.appendChild(tableWrap);
 
-    const rankWrap = document.createElement('div');
-    rankWrap.id = 'season-ranking-view';
-    rankWrap.className = 'rank-panel';
-    rankWrap.innerHTML = `
+    const rankingRoot = document.createElement('div');
+    rankingRoot.id = 'season-ranking-root';
+    rankingRoot.className = 'rank-panel';
+    rankingRoot.innerHTML = `
+      <div class="rank-toolbar">
+        <label class="search-field">
+          <span class="search-field-label">シーズン</span>
+          <select id="rank-season-select" aria-label="ランキングシーズン選択"></select>
+        </label>
+        <label class="search-field">
+          <span class="search-field-label">ポケモン名</span>
+          <input type="text" id="rank-name-search" placeholder="ポケモン名で検索" autocomplete="off">
+        </label>
+        <button class="rank-clear-btn" type="button" id="rank-clear-btn">クリア</button>
+      </div>
+      <div class="rank-view-subtabs">
+        <button class="view-tab active" type="button" data-rank-view="ranking">ポケモンランキング</button>
+        <button class="view-tab" type="button" data-rank-view="history">順位推移</button>
+      </div>
       <div class="rank-subtabs">
         <button class="rank-subtab active" type="button" data-battle="single">シングル</button>
         <button class="rank-subtab" type="button" data-battle="double">ダブル</button>
       </div>
-      <div class="rank-meta" id="rank-meta">順位データを読み込み中...</div>
-      <div class="rank-wrap">
-        <table class="rank-table">
-          <thead>
-            <tr>
-              <th>順位</th>
-              <th>ポケモン</th>
-              <th>技</th>
-              <th>持ち物</th>
-              <th>特性</th>
-              <th>性格</th>
-              <th>努力値</th>
-              <th>更新日</th>
-            </tr>
-          </thead>
-          <tbody id="rank-tbody"></tbody>
-        </table>
+      <div class="rank-subpanel show" id="season-ranking-view">
+        <div class="rank-meta" id="rank-meta">順位データを読み込み中...</div>
+        <div class="rank-wrap">
+          <table class="rank-table">
+            <thead>
+              <tr>
+                <th>順位</th>
+                <th>ポケモン</th>
+                <th>技</th>
+                <th>持ち物</th>
+                <th>特性</th>
+                <th>性格</th>
+                <th>努力値</th>
+                <th>更新日</th>
+              </tr>
+            </thead>
+            <tbody id="rank-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="rank-subpanel" id="season-history-view">
+        <div class="rank-meta" id="rank-history-meta">順位推移データを読み込み中...</div>
+        <div class="rank-wrap">
+          <table class="rank-table" id="rank-history-table">
+            <thead id="rank-history-head"></thead>
+            <tbody id="rank-history-tbody"></tbody>
+          </table>
+        </div>
       </div>
     `;
-    listWrap.insertAdjacentElement('afterend', rankWrap);
-
-    const historyWrap = document.createElement('div');
-    historyWrap.id = 'season-history-view';
-    historyWrap.className = 'rank-panel';
-    historyWrap.innerHTML = `
-      <div class="rank-subtabs">
-        <button class="rank-subtab active" type="button" data-history-battle="single">シングル</button>
-        <button class="rank-subtab" type="button" data-history-battle="double">ダブル</button>
-      </div>
-      <div class="rank-meta" id="rank-history-meta">順位推移データを読み込み中...</div>
-      <div class="rank-wrap">
-        <table class="rank-table" id="rank-history-table">
-          <thead id="rank-history-head"></thead>
-          <tbody id="rank-history-tbody"></tbody>
-        </table>
-      </div>
-    `;
-    rankWrap.insertAdjacentElement('afterend', historyWrap);
+    main.insertBefore(rankingRoot, listWrap.nextSibling);
 
     tabs.addEventListener('click', function(e) {
       const btn = e.target.closest('.view-tab');
-      if(!btn) return;
-      setViewMode(btn.dataset.view || 'list');
+      if(!btn || btn.dataset.rankView) return;
+      if(btn.dataset.view === 'party') return;
+      setMainView(btn.dataset.view || 'list');
     });
-    rankWrap.addEventListener('click', function(e) {
-      const btn = e.target.closest('.rank-subtab');
-      if(!btn) return;
-      currentRankingBattle = btn.dataset.battle || 'single';
-      rankWrap.querySelectorAll('.rank-subtab').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderRankings();
+
+    rankingRoot.addEventListener('click', function(e) {
+      const battleBtn = e.target.closest('.rank-subtab');
+      if(battleBtn) {
+        currentRankingBattle = battleBtn.dataset.battle || 'single';
+        rankingRoot.querySelectorAll('.rank-subtab').forEach(btn => btn.classList.toggle('active', btn === battleBtn));
+        renderActiveRankingPanel();
+        return;
+      }
+      const viewBtn = e.target.closest('[data-rank-view]');
+      if(viewBtn) {
+        setRankingView(viewBtn.dataset.rankView || 'ranking');
+      }
     });
-    historyWrap.addEventListener('click', function(e) {
-      const btn = e.target.closest('.rank-subtab');
-      if(!btn) return;
-      currentHistoryBattle = btn.dataset.historyBattle || 'single';
-      historyWrap.querySelectorAll('.rank-subtab').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderRankingHistory();
+
+    const seasonSelect = rankingRoot.querySelector('#rank-season-select');
+    const nameInput = rankingRoot.querySelector('#rank-name-search');
+    const clearBtn = rankingRoot.querySelector('#rank-clear-btn');
+    if(seasonSelect) seasonSelect.addEventListener('change', function(){ currentRankingSeason = seasonSelect.value || ''; if(window.pokeEdgeRankingSeason && typeof pokeEdgeRankingSeason.setStored === 'function' && currentRankingSeason) pokeEdgeRankingSeason.setStored(currentRankingSeason); renderActiveRankingPanel(); });
+    if(nameInput) nameInput.addEventListener('input', function(){ currentRankingNameQuery = String(nameInput.value || '').trim(); renderActiveRankingPanel(); });
+    if(clearBtn) clearBtn.addEventListener('click', function(){
+      currentRankingNameQuery = '';
+      if(nameInput) nameInput.value = '';
+      renderActiveRankingPanel();
     });
+  }
+
+  function setMainView(mode) {
+    currentMainView = mode === 'ranking' ? 'ranking' : 'list';
+    const listView = document.getElementById('season-list-view');
+    const rankingRoot = document.getElementById('season-ranking-root');
+    document.querySelectorAll('.view-tab').forEach(btn => {
+      if(btn.dataset.rankView) return;
+      btn.classList.toggle('active', btn.dataset.view === currentMainView);
+    });
+    if(listView) listView.style.display = currentMainView === 'list' ? '' : 'none';
+    if(rankingRoot) rankingRoot.classList.toggle('show', currentMainView === 'ranking');
+    if(currentMainView === 'ranking') {
+      loadRankingJson();
+      renderActiveRankingPanel();
+    }
+  }
+
+  function setRankingView(mode) {
+    currentRankingView = mode === 'history' ? 'history' : 'ranking';
+    document.querySelectorAll('[data-rank-view]').forEach(btn => btn.classList.toggle('active', btn.dataset.rankView === currentRankingView));
+    const rankingView = document.getElementById('season-ranking-view');
+    const historyView = document.getElementById('season-history-view');
+    if(rankingView) rankingView.classList.toggle('show', currentRankingView === 'ranking');
+    if(historyView) historyView.classList.toggle('show', currentRankingView === 'history');
+    renderActiveRankingPanel();
+  }
+
+  function renderRankingSeasonOptions() {
+    const select = document.getElementById('rank-season-select');
+    if(!select) return;
+    const seasons = RANKING_AVAILABLE_SEASONS.length ? RANKING_AVAILABLE_SEASONS : sortSeasonLabels(SEASON_DATA?.seasons || [], true);
+    if(window.pokeEdgeRankingSeason && typeof pokeEdgeRankingSeason.resolve === 'function') currentRankingSeason = pokeEdgeRankingSeason.resolve(seasons, currentRankingSeason);
+    if(!currentRankingSeason) currentRankingSeason = seasons[0] || '';
+    select.innerHTML = seasons.length ? seasons.map(season => `<option value="${escapeHtml(season)}">${escapeHtml(season)}</option>`).join('') : '<option value="">未設定</option>';
+    select.value = currentRankingSeason;
+  }
+
+  function historyRankValues(row, columns) {
+    const values = [];
+    const latest = row ? Number(row.rank) : NaN;
+    if(Number.isFinite(latest) && latest > 0) values.push(latest);
+    (columns || []).forEach(col => {
+      const v = row && row.ranks ? Number(row.ranks[col.key]) : NaN;
+      if(Number.isFinite(v) && v > 0) values.push(v);
+    });
+    return values;
+  }
+
+  function sparklineHtml(row, columns, title) {
+    const values = historyRankValues(row, columns);
+    if(values.length < 2) return '';
+    const max = Math.max(...values);
+    const min = Math.min(...values);
+    const width = 220, height = 46, pad = 6;
+    const denom = Math.max(1, max - min);
+    const pts = values.map((v,i) => {
+      const x = pad + (i * ((width - pad*2) / Math.max(1, values.length - 1)));
+      const y = pad + ((v - min) / denom) * (height - pad*2);
+      return `${x},${y}`;
+    }).join(' ');
+    const latest = values[0];
+    const prev = values[1];
+    const trend = Number.isFinite(latest) && Number.isFinite(prev)
+      ? (latest < prev ? '上昇' : latest > prev ? '下降' : '維持')
+      : '推移';
+    const titleText = title ? `${title} / ` : '';
+    return `<div class="rank-spark"><div class="rank-spark-title">${escapeHtml(titleText)}最新 ${escapeHtml(latest)}位 / ${escapeHtml(trend)}</div><svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="2"></polyline></svg><div class="rank-spark-values">${values.map(v => `${v}位`).join(' → ')}</div></div>`;
+  }
+
+  function rankingRowsForCurrentView() {
+    const data = getCurrentRankingData();
+    const source = Array.isArray(data.rows) ? data.rows : [];
+    return source.filter(row => rankingSearchMatches(row, currentRankingNameQuery)).sort((a,b) => (a.rank || 0) - (b.rank || 0));
+  }
+
+  function formatHistoryRank(value) {
+    if(value == null || value === '') return '—';
+    return String(value);
+  }
+
+  function latestHistoryRank(row, columns) {
+    if(row && row.rank != null && row.rank !== '') return row.rank;
+    const firstCol = Array.isArray(columns) && columns.length ? columns[0] : null;
+    const key = firstCol && firstCol.key ? firstCol.key : null;
+    const value = key && row && row.ranks ? row.ranks[key] : null;
+    if(value != null && value !== '') return value;
+    return '';
+  }
+
+  function historyColumnLabel(col, index) {
+    const raw = String((col && (col.label || col.key)) || '');
+    if(/^prev\d+$/i.test(raw) || /^current$/i.test(raw)) return `${index + 1}回前`;
+    return raw || `${index + 1}回前`;
+  }
+
+  function rankHistoryRowsForCurrentView() {
+    const data = getCurrentHistoryData();
+    const source = Array.isArray(data.rows) ? data.rows : [];
+    const columns = Array.isArray(data.columns) && data.columns.length ? data.columns : [{key:'current', label:'最新'}];
+    return source.filter(row => rankingSearchMatches(row, currentRankingNameQuery)).sort((a,b) => {
+      const avRaw = latestHistoryRank(a, columns);
+      const bvRaw = latestHistoryRank(b, columns);
+      const av = Number.isFinite(Number(avRaw)) && Number(avRaw) > 0 ? Number(avRaw) : Number.MAX_SAFE_INTEGER;
+      const bv = Number.isFinite(Number(bvRaw)) && Number(bvRaw) > 0 ? Number(bvRaw) : Number.MAX_SAFE_INTEGER;
+      if(av !== bv) return av - bv;
+      return String(a && a.name || '').localeCompare(String(b && b.name || ''), 'ja');
+    });
+  }
+
+  function renderRankings() {
+    const tbody = document.getElementById('rank-tbody');
+    const meta = document.getElementById('rank-meta');
+    if(!tbody || !meta) return;
+    const data = getCurrentRankingData();
+    const rows = rankingRowsForCurrentView();
+    const updated = formatRankingDate(data.updatedAt) || '未取得';
+    meta.textContent = `${currentRankingSeason || 'シーズン未設定'} / ${currentRankingBattle === 'double' ? 'ダブル' : 'シングル'} / 更新日: ${updated} / ${rows.length}件`;
+    if(!rows.length) {
+      tbody.innerHTML = '<tr><td colspan="8" class="detail-empty">順位データがありません</td></tr>';
+      return;
+    }
+    tbody.innerHTML = rows.map(row => `
+      <tr>
+        <td><span class="rank-badge">${escapeHtml(row.rank || '—')}</span></td>
+        <td><button class="name-open-btn js-open-detail" type="button" data-name="${escapeHtml(row.name || '')}" data-detail-tab="ranking">${escapeHtml(row.name || '—')}</button></td>
+        <td><div class="rank-cell-block">${(row.moves || []).map(v => `<span>${escapeHtml(v)}</span>`).join('') || '<span>—</span>'}</div></td>
+        <td><div class="rank-cell-block">${(row.items || []).map(v => `<span>${escapeHtml(v)}</span>`).join('') || '<span>—</span>'}</div></td>
+        <td><div class="rank-cell-block">${(row.abilities || []).map(v => `<span>${escapeHtml(v)}</span>`).join('') || '<span>—</span>'}</div></td>
+        <td><div class="rank-cell-block">${(row.natures || []).map(v => `<span>${escapeHtml(v)}</span>`).join('') || '<span>—</span>'}</div></td>
+        <td><div class="rank-cell-block">${(row.spreads || []).map(v => `<span>${escapeHtml(v)}</span>`).join('') || '<span>—</span>'}</div></td>
+        <td>${escapeHtml(formatRankingDate(row.updatedAt) || '—')}</td>
+      </tr>
+    `).join('');
+  }
+
+  function renderRankingHistory() {
+    const head = document.getElementById('rank-history-head');
+    const body = document.getElementById('rank-history-tbody');
+    const meta = document.getElementById('rank-history-meta');
+    if(!head || !body || !meta) return;
+    const data = getCurrentHistoryData();
+    const columns = Array.isArray(data.columns) && data.columns.length ? data.columns : [{key:'current', label:'最新'}];
+    const rows = rankHistoryRowsForCurrentView();
+    const updated = formatRankingDate(data.updatedAt) || '未取得';
+    meta.textContent = `${currentRankingSeason || 'シーズン未設定'} / ${currentRankingBattle === 'double' ? 'ダブル' : 'シングル'} / 更新日: ${updated} / ${rows.length}件 / 左端を最新として表示`;
+    head.innerHTML = `<tr><th>最新順位</th><th>ポケモン</th><th>推移</th>${columns.map((col, index) => `<th>${escapeHtml(historyColumnLabel(col, index))}</th>`).join('')}</tr>`;
+    if(!rows.length) {
+      body.innerHTML = `<tr><td colspan="${columns.length + 3}" class="detail-empty">順位推移データがありません</td></tr>`;
+      return;
+    }
+    body.innerHTML = rows.map(row => `
+      <tr>
+        <td>${escapeHtml(formatHistoryRank(latestHistoryRank(row, columns)))}</td>
+        <td><button class="name-open-btn js-open-detail" type="button" data-name="${escapeHtml(row.name || '')}" data-detail-tab="ranking">${escapeHtml(row.name || '—')}</button></td>
+        <td class="rank-history-mini">${sparklineHtml(row, columns, '')}</td>
+        ${columns.map(col => `<td>${escapeHtml(formatHistoryRank(row.ranks ? row.ranks[col.key] : null))}</td>`).join('')}
+      </tr>
+    `).join('');
+  }
+
+  function renderActiveRankingPanel() {
+    renderRankingSeasonOptions();
+    if(currentRankingView === 'history') renderRankingHistory();
+    else renderRankings();
   }
 
   function ensureDetailRankingBox() {
     const detailMain = document.querySelector('.detail-main');
-    if(!detailMain || document.getElementById('detail-ranking-box')) return;
-    const card = document.createElement('div');
-    card.className = 'detail-card';
-    card.id = 'detail-ranking-box';
-    card.innerHTML = `
-      <div class="detail-card-title">順位情報</div>
-      <div id="detail-ranking-summary" class="detail-ranking-grid"><div class="detail-empty">順位データがありません</div></div>
+    if(!detailMain || document.getElementById('detail-main-tabs')) return;
+
+    const moveCard = detailMain.querySelector('.detail-card');
+    if(!moveCard) return;
+
+    const tabBar = document.createElement('div');
+    tabBar.className = 'detail-main-tabs';
+    tabBar.id = 'detail-main-tabs';
+    tabBar.innerHTML = `
+      <button class="detail-main-tab active" type="button" data-detail-tab="moves">技</button>
+      <button class="detail-main-tab" type="button" data-detail-tab="ranking">ランキング</button>
     `;
-    detailMain.insertBefore(card, detailMain.firstElementChild);
+
+    const movePanel = document.createElement('div');
+    movePanel.className = 'detail-tab-panel show';
+    movePanel.id = 'detail-tab-moves';
+    movePanel.appendChild(moveCard);
+
+    const rankingPanel = document.createElement('div');
+    rankingPanel.className = 'detail-tab-panel';
+    rankingPanel.id = 'detail-tab-ranking';
+    rankingPanel.innerHTML = `
+      <div class="detail-card" id="detail-ranking-box">
+        <div class="detail-card-title">ランキング</div>
+        <div id="detail-ranking-summary" class="detail-ranking-grid"><div class="detail-empty">順位データがありません</div></div>
+      </div>
+    `;
+
+    detailMain.appendChild(tabBar);
+    detailMain.appendChild(movePanel);
+    detailMain.appendChild(rankingPanel);
+
+    tabBar.addEventListener('click', function(e){
+      const btn = e.target.closest('[data-detail-tab]');
+      if(!btn) return;
+      setDetailTab(btn.dataset.detailTab || 'moves');
+    });
   }
 
-
+  function setDetailTab(mode) {
+    currentDetailTab = mode === 'ranking' ? 'ranking' : 'moves';
+    document.querySelectorAll('.detail-main-tab').forEach(btn => btn.classList.toggle('active', btn.dataset.detailTab === currentDetailTab));
+    const movePanel = document.getElementById('detail-tab-moves');
+    const rankPanel = document.getElementById('detail-tab-ranking');
+    if(movePanel) movePanel.classList.toggle('show', currentDetailTab === 'moves');
+    if(rankPanel) rankPanel.classList.toggle('show', currentDetailTab === 'ranking');
+  }
 
   function ensureDetailTransferBox() {
     const detailSide = document.querySelector('.detail-side');
@@ -1461,130 +2085,8 @@ document.addEventListener('DOMContentLoaded',function(){
     if(btn) btn.addEventListener('click', function(){ currentDetailMovesExpanded = !currentDetailMovesExpanded; renderDetailMovesPatched(); });
   }
 
-  function getHistoryRowsForName(name, battle) {
-    const data = battle === 'double' ? DOUBLE_RANKING_HISTORY : SINGLE_RANKING_HISTORY;
-    const rows = Array.isArray(data.rows) ? data.rows : [];
-    const lookup = resolveRankingLookupNames(name || '').concat(inferBaseRankingNames(name || ''));
-    return rows.filter(row => lookup.includes(row.name) || lookup.includes(row.siteName));
-  }
-
-  function historyRankValues(row, columns) {
-    const values = [];
-    const latest = row ? Number(row.rank) : NaN;
-    if(Number.isFinite(latest) && latest > 0) values.push(latest);
-    (columns || []).forEach(col => {
-      const v = row && row.ranks ? Number(row.ranks[col.key]) : NaN;
-      if(Number.isFinite(v) && v > 0) values.push(v);
-    });
-    return values;
-  }
-
-  function sparklineHtml(row, columns, title) {
-    const values = historyRankValues(row, columns);
-    if(values.length < 2) return '';
-    const max = Math.max(...values);
-    const min = Math.min(...values);
-    const width = 220, height = 46, pad = 6;
-    const denom = Math.max(1, max - min);
-    const pts = values.map((v,i) => {
-      const x = values.length === 1 ? width / 2 : pad + i * ((width - pad*2) / (values.length - 1));
-      const y = pad + ((v - min) / denom) * (height - pad*2);
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
-    }).join(' ');
-    const latest = values[0];
-    const oldest = values[values.length-1];
-    const diff = latest - oldest;
-    const trend = diff < 0 ? `上昇 ${Math.abs(diff)}` : diff > 0 ? `下降 ${diff}` : '横ばい';
-    const titleText = title ? `${title} / ` : '';
-    return `<div class="rank-spark"><div class="rank-spark-title">${escapeHtml(titleText)}最新 ${escapeHtml(latest)}位 / ${escapeHtml(trend)}</div><svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="2"></polyline></svg><div class="rank-spark-values">${values.map(v => `${v}位`).join(' → ')}</div></div>`;
-  }
-
-  function setViewMode(mode) {
-    currentViewMode = mode === 'ranking' ? 'ranking' : mode === 'history' ? 'history' : 'list';
-    const listView = document.getElementById('season-list-view');
-    const rankView = document.getElementById('season-ranking-view');
-    const historyView = document.getElementById('season-history-view');
-    document.querySelectorAll('.view-tab').forEach(btn => btn.classList.toggle('active', btn.dataset.view === currentViewMode));
-    if(listView) listView.style.display = currentViewMode === 'list' ? '' : 'none';
-    if(rankView) rankView.classList.toggle('show', currentViewMode === 'ranking');
-    if(historyView) historyView.classList.toggle('show', currentViewMode === 'history');
-    if(currentViewMode === 'ranking'){ loadRankingJson(); renderRankings(); }
-    if(currentViewMode === 'history'){ loadRankingJson(); renderRankingHistory(); }
-  }
-
-  function rankingRowsForCurrentView() {
-    const source = currentRankingBattle === 'double' ? (DOUBLE_RANKINGS.rows || []) : (SINGLE_RANKINGS.rows || []);
-    const q = (document.getElementById('name-search')?.value || '').trim();
-    return source.filter(row => {
-      const siteNames = resolveSiteNames(row.name);
-      if(currentSeason && !siteNames.some(n => inSeason(n, currentSeason))) return false;
-      if(q) {
-        if(!matchesSeasonRankingSearch(row, siteNames, q)) return false;
-      }
-      return true;
-    }).sort((a,b) => (a.rank || 0) - (b.rank || 0));
-  }
-
-  function renderRankings() {
-    const tbody = document.getElementById('rank-tbody');
-    const meta = document.getElementById('rank-meta');
-    if(!tbody || !meta) return;
-
-    const data = currentRankingBattle === 'double' ? DOUBLE_RANKINGS : SINGLE_RANKINGS;
-    const rows = rankingRowsForCurrentView();
-    const updated = formatRankingDate(data.updatedAt) || '未取得';
-    meta.textContent = `${currentRankingBattle === 'double' ? 'ダブル' : 'シングル'} / 更新日: ${updated} / ${rows.length}件`;
-
-    if(!rows.length) {
-      tbody.innerHTML = '<tr><td colspan="8" class="detail-empty">順位データがありません</td></tr>';
-      return;
-    }
-
-    tbody.innerHTML = rows.map(row => `
-      <tr>
-        <td><span class="rank-badge">${escapeHtml(row.rank || '—')}</span></td>
-        <td><button class="name-open-btn js-open-detail" type="button" data-name="${escapeHtml(row.name || '')}">${escapeHtml(row.name || '—')}</button></td>
-        <td><div class="rank-cell-block">${(row.moves || []).map(v => `<span>${escapeHtml(v)}</span>`).join('') || '<span>—</span>'}</div></td>
-        <td><div class="rank-cell-block">${(row.items || []).map(v => `<span>${escapeHtml(v)}</span>`).join('') || '<span>—</span>'}</div></td>
-        <td><div class="rank-cell-block">${(row.abilities || []).map(v => `<span>${escapeHtml(v)}</span>`).join('') || '<span>—</span>'}</div></td>
-        <td><div class="rank-cell-block">${(row.natures || []).map(v => `<span>${escapeHtml(v)}</span>`).join('') || '<span>—</span>'}</div></td>
-        <td><div class="rank-cell-block">${(row.spreads || []).map(v => `<span>${escapeHtml(v)}</span>`).join('') || '<span>—</span>'}</div></td>
-        <td>${escapeHtml(formatRankingDate(row.updatedAt) || '—')}</td>
-      </tr>
-    `).join('');
-  }
-
-  function renderDetailRanking(rankings) {
-    const box = document.getElementById('detail-ranking-summary');
-    if(!box) return;
-    const groups = [];
-    if(rankings.single.length) groups.push({title:'シングル順位', rows:rankings.single});
-    if(rankings.double.length) groups.push({title:'ダブル順位', rows:rankings.double});
-    if(!groups.length) {
-      box.innerHTML = '<div class="detail-empty">順位データがありません</div>';
-      return;
-    }
-    box.innerHTML = groups.map(group => `
-      <div class="detail-ranking-box">
-        <h5>${escapeHtml(group.title)}</h5>
-        ${group.rows.map(row => `
-          <div class="detail-ranking-line"><b>${escapeHtml(row.rank)}位</b>${escapeHtml(row.name || '')}${row.rankingSource === 'base' ? ' <span style="color:var(--accent3)">（元ポケモン順位）</span>' : ''}</div>
-          ${sparklineHtml((getHistoryRowsForName(row.name || '', group.title.includes('ダブル') ? 'double' : 'single') || [])[0], (group.title.includes('ダブル') ? DOUBLE_RANKING_HISTORY : SINGLE_RANKING_HISTORY).columns || [], group.title + 'の推移')}
-          <div class="detail-ranking-line">更新日: ${escapeHtml(formatRankingDate(row.updatedAt) || '—')}</div>
-          <div class="detail-ranking-line">技: ${escapeHtml((row.moves || []).join(' / ') || '—')}</div>
-          <div class="detail-ranking-line">持ち物: ${escapeHtml((row.items || []).join(' / ') || '—')}</div>
-          <div class="detail-ranking-line">特性: ${escapeHtml((row.abilities || []).join(' / ') || '—')}</div>
-          <div class="detail-ranking-line">性格: ${escapeHtml((row.natures || []).join(' / ') || '—')}</div>
-          <div class="detail-ranking-line">努力値: ${escapeHtml((row.spreads || []).join(' / ') || '—')}</div>
-        `).join('')}
-      </div>
-    `).join('');
-  }
-
   function renderDetailStats(records) {
-    if(!records.length) {
-      return '<div class="detail-empty">種族値データがありません</div>';
-    }
+    if(!records.length) return '<div class="detail-empty">種族値データがありません</div>';
     const stats = [['HP','hp'],['攻撃','atk'],['防御','def'],['特攻','spa'],['特防','spd'],['素早','spe']];
     if(records.length === 1) {
       const pokemon = records[0];
@@ -1595,19 +2097,17 @@ document.addEventListener('DOMContentLoaded',function(){
         return `<div class="detail-stat-row"><span>${label}</span><b>${val}</b><div class="detail-stat-bar"><span style="width:${pct}%;background:${color};"></span></div></div>`;
       }).join('');
     }
-    return `<div class="detail-form-grid">${
-      records.map(pokemon => `
-        <div class="detail-form-card">
-          <div class="detail-form-card-title">${escapeHtml(typeof seasonDisplayFormLabel === 'function' ? seasonDisplayFormLabel(pokemon.name) : pokemon.name)}</div>
-          ${stats.map(([label,key]) => {
-            const val = pokemon[key] || 0;
-            const pct = Math.min(100, Math.round(val / STAT_MAX[key] * 100));
-            const color = STAT_COLORS[key] || 'var(--accent)';
-            return `<div class="detail-stat-row"><span>${label}</span><b>${val}</b><div class="detail-stat-bar"><span style="width:${pct}%;background:${color};"></span></div></div>`;
-          }).join('')}
-        </div>
-      `).join('')
-    }</div>`;
+    return `<div class="detail-form-grid">${records.map(pokemon => `
+      <div class="detail-form-card">
+        <div class="detail-form-card-title">${escapeHtml(typeof seasonDisplayFormLabel === 'function' ? seasonDisplayFormLabel(pokemon.name) : pokemon.name)}</div>
+        ${stats.map(([label,key]) => {
+          const val = pokemon[key] || 0;
+          const pct = Math.min(100, Math.round(val / STAT_MAX[key] * 100));
+          const color = STAT_COLORS[key] || 'var(--accent)';
+          return `<div class="detail-stat-row"><span>${label}</span><b>${val}</b><div class="detail-stat-bar"><span style="width:${pct}%;background:${color};"></span></div></div>`;
+        }).join('')}
+      </div>
+    `).join('')}</div>`;
   }
 
   function renderAbilities(abilityNames) {
@@ -1618,14 +2118,50 @@ document.addEventListener('DOMContentLoaded',function(){
     }).join('');
   }
 
+  function renderDetailRanking(rankings) {
+    const box = document.getElementById('detail-ranking-summary');
+    if(!box) return;
+    const seasons = sortSeasonLabels(uniq((rankings.single || []).concat(rankings.double || []).map(row => row.season)), true);
+    if(!seasons.length) {
+      box.innerHTML = '<div class="detail-empty">順位データがありません</div>';
+      return;
+    }
+    box.innerHTML = seasons.map(season => {
+      const singleRows = (rankings.single || []).filter(row => row.season === season).sort((a,b) => (a.rank || 0) - (b.rank || 0));
+      const doubleRows = (rankings.double || []).filter(row => row.season === season).sort((a,b) => (a.rank || 0) - (b.rank || 0));
+      const groups = [];
+      if(singleRows.length) groups.push({title:'シングル順位', rows:singleRows, battle:'single'});
+      if(doubleRows.length) groups.push({title:'ダブル順位', rows:doubleRows, battle:'double'});
+      if(!groups.length) return '';
+      return `<div class="detail-ranking-box">
+        <h5 class="detail-season-heading">${escapeHtml(season)}</h5>
+        ${groups.map(group => `
+          <div class="detail-ranking-line"><b>${escapeHtml(group.title)}</b></div>
+          ${group.rows.map(row => {
+            const historyData = getHistoryData(season, group.battle);
+            const historyRow = (getHistoryRowsForName(row.name || '', group.battle, season) || [])[0];
+            return `
+              <div class="detail-ranking-line"><b>${escapeHtml(row.rank)}位</b>${escapeHtml(row.name || '')}${row.rankingSource === 'base' ? ' <span style="color:var(--accent3)">（元ポケモン順位）</span>' : ''}</div>
+              ${sparklineHtml(historyRow, historyData.columns || [], `${season} ${group.title}の推移`)}
+              <div class="detail-ranking-line">更新日: ${escapeHtml(formatRankingDate(row.updatedAt) || '—')}</div>
+              <div class="detail-ranking-line">技: ${escapeHtml((row.moves || []).join(' / ') || '—')}</div>
+              <div class="detail-ranking-line">持ち物: ${escapeHtml((row.items || []).join(' / ') || '—')}</div>
+              <div class="detail-ranking-line">特性: ${escapeHtml((row.abilities || []).join(' / ') || '—')}</div>
+              <div class="detail-ranking-line">性格: ${escapeHtml((row.natures || []).join(' / ') || '—')}</div>
+              <div class="detail-ranking-line">努力値: ${escapeHtml((row.spreads || []).join(' / ') || '—')}</div>
+            `;
+          }).join('')}
+        `).join('')}
+      </div>`;
+    }).join('') || '<div class="detail-empty">順位データがありません</div>';
+  }
+
   function renderDetailMovesPatched() {
     ensureDetailMoveToggleButton();
     const body = document.getElementById('detail-moves-body');
     const query = (document.getElementById('detail-move-search').value || '').trim();
     const moves = Array.isArray(currentDetailMoves) ? currentDetailMoves : [];
-    const filtered = !query ? moves : moves.filter(m => {
-      return [m.name, m.type, m.category, m.power, m.accuracy, m.pp, m.hits, m.description].filter(Boolean).join(' ').includes(query);
-    });
+    const filtered = !query ? moves : moves.filter(m => matchesSeasonSearchFields([m.name], query));
     const limit = 16;
     const visible = (!query && !currentDetailMovesExpanded) ? filtered.slice(0, limit) : filtered;
     const btn = document.getElementById('detail-move-toggle-btn');
@@ -1648,87 +2184,14 @@ document.addEventListener('DOMContentLoaded',function(){
     </tr>`).join('');
   }
 
-  function getHistoryData() {
-    return currentHistoryBattle === 'double' ? DOUBLE_RANKING_HISTORY : SINGLE_RANKING_HISTORY;
-  }
-
-  function rankHistoryRowsForCurrentView() {
-    const data = getHistoryData();
-    const source = Array.isArray(data.rows) ? data.rows : [];
-    const columns = Array.isArray(data.columns) && data.columns.length ? data.columns : [{key:'current', label:'最新'}];
-    const q = (document.getElementById('name-search')?.value || '').trim();
-    return source.filter(row => {
-      const siteNames = resolveSiteNames(row.name || row.siteName || '');
-      if(currentSeason && !siteNames.some(n => inSeason(n, currentSeason))) return false;
-      if(q) {
-        if(!matchesSeasonRankingSearch(row, siteNames, q)) return false;
-      }
-      return true;
-    }).sort((a,b) => {
-      const avRaw = latestHistoryRank(a, columns);
-      const bvRaw = latestHistoryRank(b, columns);
-      const av = Number.isFinite(Number(avRaw)) && Number(avRaw) > 0 ? Number(avRaw) : Number.MAX_SAFE_INTEGER;
-      const bv = Number.isFinite(Number(bvRaw)) && Number(bvRaw) > 0 ? Number(bvRaw) : Number.MAX_SAFE_INTEGER;
-      if(av !== bv) return av - bv;
-      return String(a && a.name || '').localeCompare(String(b && b.name || ''), 'ja');
-    });
-  }
-
-  function formatHistoryRank(value) {
-    if(value == null || value === '') return '—';
-    return String(value);
-  }
-
-  function latestHistoryRank(row, columns) {
-    if(row && row.rank != null && row.rank !== '') return row.rank;
-    const firstCol = Array.isArray(columns) && columns.length ? columns[0] : null;
-    const key = firstCol && firstCol.key ? firstCol.key : null;
-    const value = key && row && row.ranks ? row.ranks[key] : null;
-    if(value != null && value !== '') return value;
-    return '';
-  }
-
-  function historyColumnLabel(col, index) {
-    const raw = String((col && (col.label || col.key)) || '');
-    if(/^prev\d+$/i.test(raw) || /^current$/i.test(raw)) {
-      return `${index + 1}回前`;
-    }
-    return raw || `${index + 1}回前`;
-  }
-
-  function renderRankingHistory() {
-    const head = document.getElementById('rank-history-head');
-    const body = document.getElementById('rank-history-tbody');
-    const meta = document.getElementById('rank-history-meta');
-    if(!head || !body || !meta) return;
-    const data = getHistoryData();
-    const columns = Array.isArray(data.columns) && data.columns.length ? data.columns : [{key:'current', label:'最新'}];
-    const rows = rankHistoryRowsForCurrentView();
-    const updated = formatRankingDate(data.updatedAt) || '未取得';
-    meta.textContent = `${currentHistoryBattle === 'double' ? 'ダブル' : 'シングル'} / 更新日: ${updated} / ${rows.length}件 / 左端を最新として表示`;
-
-    head.innerHTML = `<tr><th>最新順位</th><th>ポケモン</th><th>推移</th>${columns.map((col, index) => `<th>${escapeHtml(historyColumnLabel(col, index))}</th>`).join('')}</tr>`;
-
-    if(!rows.length) {
-      body.innerHTML = `<tr><td colspan="${columns.length + 3}" class="detail-empty">順位推移データがありません</td></tr>`;
-      return;
-    }
-
-    body.innerHTML = rows.map(row => `
-      <tr>
-        <td>${escapeHtml(formatHistoryRank(latestHistoryRank(row, columns)))}</td>
-        <td><button class="name-open-btn js-open-detail" type="button" data-name="${escapeHtml(row.name || '')}">${escapeHtml(row.name || '—')}</button></td>
-        <td class="rank-history-mini">${sparklineHtml(row, columns, '')}</td>
-        ${columns.map(col => `<td>${escapeHtml(formatHistoryRank(row.ranks ? row.ranks[col.key] : null))}</td>`).join('')}
-      </tr>
-    `).join('');
-  }
-
   const originalOpenPokemonDetail = window.openPokemonDetail;
   window.renderDetailMoves = renderDetailMovesPatched;
-  window.openPokemonDetail = async function(name) {
+  window.openPokemonDetail = async function(name, preferredTab) {
     await Promise.all([ensureSeasonMovesLoaded(), loadRankingJson()]);
     ensureDetailRankingBox();
+    ensureDetailTransferBox();
+    ensureDetailMoveToggleButton();
+
     const ctx = collectDetailContext(name);
     if(!ctx.records.length) {
       if(typeof originalOpenPokemonDetail === 'function') return originalOpenPokemonDetail(name);
@@ -1738,8 +2201,6 @@ document.addEventListener('DOMContentLoaded',function(){
     currentDetailName = primary.name;
     currentDetailMoves = ctx.moves;
     currentDetailMovesExpanded = false;
-    ensureDetailTransferBox();
-    ensureDetailMoveToggleButton();
     setSeasonTransferName(ctx.displayName || primary.name);
 
     const rankingNameNote = ctx.siteNames.length > 1
@@ -1769,13 +2230,12 @@ document.addEventListener('DOMContentLoaded',function(){
 
     renderDetailRanking(ctx.rankings);
 
-    const rankingUpdates = uniq(
-      ctx.rankings.single.concat(ctx.rankings.double).map(row => row.updatedAt).filter(Boolean)
-    );
+    const rankingUpdates = uniq(ctx.rankings.single.concat(ctx.rankings.double).map(row => row.updatedAt).filter(Boolean));
     const updatedAt = formatRankingDate(rankingUpdates[0] || '');
     document.getElementById('detail-move-meta').textContent = ctx.moves.length ? `${ctx.moves.length}件の技${updatedAt ? ` / 更新日: ${updatedAt}` : ''}` : `技データ未登録${updatedAt ? ` / 更新日: ${updatedAt}` : ''}`;
     document.getElementById('detail-move-search').value = '';
     renderDetailMovesPatched();
+    setDetailTab(preferredTab === 'ranking' || currentMainView === 'ranking' ? 'ranking' : 'moves');
 
     document.getElementById('detail-overlay').classList.add('show');
     document.body.style.overflow = 'hidden';
@@ -1784,38 +2244,18 @@ document.addEventListener('DOMContentLoaded',function(){
   const originalRender = window.render;
   window.render = function() {
     if(typeof originalRender === 'function') originalRender();
-    renderRankings();
-    renderRankingHistory();
+    if(currentMainView === 'ranking') renderActiveRankingPanel();
   };
 
-  async function loadRankingJson() {
-    if(_seasonRankingLoaded) return {single:SINGLE_RANKINGS, double:DOUBLE_RANKINGS};
-    if(_seasonRankingPromise) return _seasonRankingPromise;
-    _seasonRankingPromise = (async()=>{
-      try {
-        const [singleRes, doubleRes, singleHistoryRes, doubleHistoryRes] = await Promise.all([
-          fetchDataJson('season_ranking_single.json', {rows:[], updatedAt:''}),
-          fetchDataJson('season_ranking_double.json', {rows:[], updatedAt:''}),
-          fetchDataJson('season_ranking_history_single.json', {columns:[], rows:[], updatedAt:''}),
-          fetchDataJson('season_ranking_history_double.json', {columns:[], rows:[], updatedAt:''})
-        ]);
-        SINGLE_RANKINGS = singleRes && Array.isArray(singleRes.rows) ? singleRes : {rows:[], updatedAt:''};
-        DOUBLE_RANKINGS = doubleRes && Array.isArray(doubleRes.rows) ? doubleRes : {rows:[], updatedAt:''};
-        SINGLE_RANKING_HISTORY = singleHistoryRes && Array.isArray(singleHistoryRes.rows) ? singleHistoryRes : {columns:[], rows:[], updatedAt:''};
-        DOUBLE_RANKING_HISTORY = doubleHistoryRes && Array.isArray(doubleHistoryRes.rows) ? doubleHistoryRes : {columns:[], rows:[], updatedAt:''};
-      } catch(e) {
-        SINGLE_RANKINGS = {rows:[], updatedAt:''};
-        DOUBLE_RANKINGS = {rows:[], updatedAt:''};
-        SINGLE_RANKING_HISTORY = {columns:[], rows:[], updatedAt:''};
-        DOUBLE_RANKING_HISTORY = {columns:[], rows:[], updatedAt:''};
-      }
-      _seasonRankingLoaded = true;
-      renderRankings();
-      renderRankingHistory();
-      return {single:SINGLE_RANKINGS, double:DOUBLE_RANKINGS};
-    })();
-    return _seasonRankingPromise;
-  }
+  document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.js-open-detail');
+    if(btn && btn.dataset.detailTab) {
+      e.preventDefault();
+      e.stopPropagation();
+      if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+      window.openPokemonDetail(btn.dataset.name || '', btn.dataset.detailTab || 'moves');
+    }
+  }, true);
 
   document.addEventListener('DOMContentLoaded', function() {
     ensureSeasonViews();
@@ -1828,8 +2268,11 @@ document.addEventListener('DOMContentLoaded',function(){
     ensureDetailRankingBox();
     ensureDetailTransferBox();
     ensureDetailMoveToggleButton();
+    loadRankingJson();
   });
 })();
+</script>
+
 </script>
 
 
@@ -1951,7 +2394,7 @@ document.addEventListener('DOMContentLoaded',function(){
       panel.id = 'season-party-view';
       panel.className = 'party-ref-view rank-panel';
       panel.innerHTML = '<div class="rank-meta" id="party-ref-meta">参考パーティーを読み込み中...</div><div id="party-ref-grid" class="party-ref-grid"></div>';
-      const insertAfter = document.getElementById('season-history-view') || document.getElementById('season-ranking-view') || document.getElementById('season-list-view');
+      const insertAfter = document.getElementById('season-ranking-root') || document.getElementById('season-list-view');
       if(insertAfter && insertAfter.parentNode) insertAfter.parentNode.insertBefore(panel, insertAfter.nextSibling);
     }
     if(!document.getElementById('party-ref-overlay')){
@@ -2015,14 +2458,36 @@ document.addEventListener('DOMContentLoaded',function(){
     });
     return fields;
   }
+  function partyRefMoveFields(party){
+    return uniqSeasonValues((party.members || []).flatMap(member => Array.isArray(member.moves) ? member.moves : []));
+  }
+  function partyRefAbilityFields(party){
+    return uniqSeasonValues((party.members || []).flatMap(member => getPokemonAbilityTexts(member.pokemon, false)));
+  }
+  function partyRefMatchesSearchCriteria(party, criteria){
+    const ctx = criteria || getSeasonSearchCriteria();
+    if(ctx.name && typeof matchesSeasonSearchFields === 'function' && !matchesSeasonSearchFields(partyRefFields(party), ctx.name)) return false;
+    if((ctx.moves || []).some(query => !matchesSeasonSearchFields(partyRefMoveFields(party), query))) return false;
+    if((ctx.abilities || []).some(query => !matchesSeasonSearchFields(partyRefAbilityFields(party), query))) return false;
+    return true;
+  }
+  function partyRefSeasonMatchesCurrent(partySeason, selectedSeason){
+    const partyValue = String(partySeason || '').trim();
+    const currentValue = String(selectedSeason || '').trim();
+    if(!currentValue) return true;
+    if(!partyValue) return false;
+    if(partyValue === currentValue) return true;
+    const partyNum = (window.pokeEdgeRankingSeason && typeof pokeEdgeRankingSeason.num === 'function') ? pokeEdgeRankingSeason.num(partyValue) : (parseInt((partyValue.match(/(\d+)/)||[])[1]||'',10) || 0);
+    const currentNum = (window.pokeEdgeRankingSeason && typeof pokeEdgeRankingSeason.num === 'function') ? pokeEdgeRankingSeason.num(currentValue) : (parseInt((currentValue.match(/(\d+)/)||[])[1]||'',10) || 0);
+    return !!partyNum && !!currentNum && partyNum === currentNum;
+  }
   function getFilteredPartyReferences(){
-    const q = (document.getElementById('name-search')?.value || '').trim();
+    const criteria = getSeasonSearchCriteria();
     const type = document.getElementById('type-filter')?.value || '';
     return (PARTY_REFERENCE_DATA.parties || []).filter(party => {
-      if(currentSeason && party.season && party.season !== currentSeason) return false;
-      if(currentSeason && !party.season) return false;
+      if(currentSeason && !partyRefSeasonMatchesCurrent(party.season, currentSeason)) return false;
       if(type && !partyRefMatchesTypeFilter(party, type)) return false;
-      if(q && typeof matchesSeasonSearchFields === 'function' && !matchesSeasonSearchFields(partyRefFields(party), q)) return false;
+      if(!partyRefMatchesSearchCriteria(party, criteria)) return false;
       return true;
     }).sort((a,b) => {
       const seasonCmp = String(a.season || '').localeCompare(String(b.season || ''), 'ja');
@@ -2036,23 +2501,19 @@ document.addEventListener('DOMContentLoaded',function(){
 
   function setPartyViewFilterState(active){
     partyViewActive = !!active;
-    const searchMode = document.getElementById('search-mode');
     const help = document.querySelector('.search-help');
     const input = document.getElementById('name-search');
-    if(searchMode) searchMode.style.display = active ? 'none' : '';
-    if(help) help.textContent = active ? 'シーズン・タイプ・検索欄で参考パーティーを絞り込めます。検索はNo・ポケモン名・持ち物・技名までまとめて対応します。' : '技・特性は検索欄、タイプは選択欄で絞り込めます。タイプを選んだまま名前や技名で追加検索できます。';
-    if(input) input.placeholder = active ? 'No・ポケモン名・持ち物・技名で検索...' : '名前・技・特性で検索...';
+    if(help) help.textContent = active ? 'シーズン・タイプ・名前・技・特性の入力欄で参考パーティーを絞り込めます。技は技名のみ、特性は1件のみで絞り込めます。名前欄はNo・ポケモン名・持ち物もまとめて探せます。' : '名前・技・特性をそれぞれ入力すると、文字に応じて候補が表示されます。技は3件まで、特性は1件で絞り込めます。技検索は技名のみを対象にします。';
+    if(input) input.placeholder = active ? 'No・ポケモン名・持ち物で検索' : 'ポケモン名で検索';
   }
 
   function showPartyReferenceView(){
     ensurePartyReferenceShell();
     const listView = document.getElementById('season-list-view');
-    const rankView = document.getElementById('season-ranking-view');
-    const historyView = document.getElementById('season-history-view');
+    const rankingRoot = document.getElementById('season-ranking-root');
     const partyView = document.getElementById('season-party-view');
     if(listView) listView.style.display = 'none';
-    if(rankView) rankView.classList.remove('show');
-    if(historyView) historyView.classList.remove('show');
+    if(rankingRoot) rankingRoot.classList.remove('show');
     if(partyView) { partyView.classList.add('show'); partyView.style.display = ''; }
     document.querySelectorAll('.view-tab').forEach(btn => btn.classList.toggle('active', btn.dataset.view === 'party'));
     setPartyViewFilterState(true);
@@ -2154,7 +2615,7 @@ document.addEventListener('DOMContentLoaded',function(){
     if(!season) return;
     const btn = document.querySelector(`.season-btn[data-season="${CSS.escape(season)}"]`);
     if(btn && typeof setSeason === 'function') setSeason(btn, season);
-    else { currentSeason = season; if(typeof render === 'function') render(); }
+    else { currentSeason = season; if(window.pokeEdgeRankingSeason && typeof pokeEdgeRankingSeason.setStored === 'function' && season) pokeEdgeRankingSeason.setStored(season); if(typeof render === 'function') render(); }
   }
 
   function openSeasonPokemonFromParty(name, season){
@@ -2238,11 +2699,13 @@ document.addEventListener('DOMContentLoaded',function(){
       });
     }
 
-    const input = document.getElementById('name-search');
-    if(input && !input.dataset.partyHooked){
-      input.dataset.partyHooked = '1';
-      input.addEventListener('input', function(){ if(partyViewActive) renderPartyReferenceList(); });
-    }
+    ['name-search','move-search-1','move-search-2','move-search-3','ability-search-1'].forEach(id => {
+      const input = document.getElementById(id);
+      if(input && !input.dataset.partyHooked){
+        input.dataset.partyHooked = '1';
+        input.addEventListener('input', function(){ if(partyViewActive) renderPartyReferenceList(); });
+      }
+    });
     const typeFilter = document.getElementById('type-filter');
     if(typeFilter && !typeFilter.dataset.partyHooked){
       typeFilter.dataset.partyHooked = '1';
