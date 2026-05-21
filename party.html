@@ -309,6 +309,19 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;margin:4p
 .party-workspace-tab-btn.active{border-color:var(--accent);background:rgba(0,200,240,0.12);color:var(--accent);}
 .party-workspace-panel{display:none;}
 .party-workspace-panel.active{display:block;}
+.party-mode-switch{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0 14px;padding:10px;background:rgba(15,20,35,.72);border:1px solid var(--border);border-radius:16px;}
+.party-mode-switch-label{font-size:10px;color:var(--text2);letter-spacing:2px;font-weight:800;margin-right:2px;}
+.party-mode-btn{border:1px solid var(--border2);background:var(--bg2);color:var(--text2);border-radius:999px;padding:9px 14px;font-size:11px;font-weight:800;font-family:'Noto Sans JP',sans-serif;letter-spacing:1px;cursor:pointer;transition:all .18s;}
+.party-mode-btn:hover{border-color:var(--accent);color:var(--accent);}
+.party-mode-btn.active{border-color:var(--accent);background:rgba(0,200,240,.12);color:var(--accent);}
+.party-mode-note{font-size:10px;color:var(--text2);line-height:1.7;margin-left:auto;}
+body.party-view-edit .party-analysis-only{display:none!important;}
+body.party-view-analyze .party-edit-only{display:none!important;}
+body.party-view-analyze .party-top-grid{grid-template-columns:1fr;}
+body.party-view-analyze .party-mid-grid{grid-template-columns:1fr;}
+body.party-view-analyze .party-workspace{min-height:0;}
+.party-light-status{border:1px dashed var(--border2);background:var(--bg2);border-radius:14px;padding:12px 14px;font-size:11px;color:var(--text2);line-height:1.8;}
+@media(max-width:760px){.party-mode-switch{position:sticky;top:94px;z-index:66;margin:8px 0 10px;}.party-mode-note{width:100%;margin-left:0;}.party-mode-btn{flex:1;min-width:120px;}}
 .party-workspace .cov-wrap,.party-workspace .add-section{margin-top:0;border-radius:16px;}
 .party-workspace .add-section{padding:0;border:none;background:transparent;}
 .party-workspace .add-section-title{margin-bottom:10px;}
@@ -343,7 +356,51 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;margin:4p
 .build-pill.bad{border-color:rgba(255,90,90,.35);color:var(--accent2);background:rgba(255,90,90,.07);}
 .build-pill.mid{border-color:rgba(255,200,0,.3);color:var(--accent3);background:rgba(255,200,0,.08);}
 .build-empty{font-size:11px;color:var(--text2);line-height:1.9;padding:12px;border:1px dashed var(--border2);border-radius:12px;background:var(--panel);}
-@media(max-width:760px){.build-carte-grid,.build-member-grid{grid-template-columns:1fr;}.build-carte-card{padding:11px 12px;}.build-mini-table{font-size:9px;}}
+.build-diagnosis-panel{background:linear-gradient(135deg,rgba(0,200,240,.07),rgba(255,200,0,.05));border:1px solid var(--border);border-radius:16px;padding:12px 14px;margin:0 0 12px;}
+.build-diagnosis-panel-title{font-size:12px;font-weight:800;color:var(--text);letter-spacing:1px;margin-bottom:4px;}
+.build-diagnosis-panel-note{font-size:10px;color:var(--text2);line-height:1.8;margin-bottom:10px;}
+.build-diagnosis-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.build-diagnosis-field.full{grid-column:1/-1;}
+.build-diagnosis-field label{display:block;font-size:9px;color:var(--text2);letter-spacing:1.5px;margin-bottom:5px;font-weight:700;}
+.build-diagnosis-input{width:100%;box-sizing:border-box;background:var(--panel);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:11px;line-height:1.7;padding:8px 10px;font-family:'Noto Sans JP',sans-serif;resize:vertical;min-height:38px;}
+.build-diagnosis-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,200,240,.09);}
+.build-diagnosis-check{display:flex;gap:8px;align-items:center;font-size:10px;color:var(--text2);line-height:1.7;margin-top:10px;}
+.build-diagnosis-check input{accent-color:#00c8f0;}
+.build-diagnosis-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.build-diagnosis-summary{font-size:11px;line-height:1.9;color:var(--text3);}
+.build-diagnosis-list{margin:0;padding-left:1.2em;color:var(--text3);line-height:1.9;font-size:11px;}
+.build-diagnosis-list li{margin:2px 0;}
+.build-diagnosis-subtitle{font-size:10px;font-weight:800;color:var(--text);letter-spacing:1px;margin:10px 0 6px;}
+.build-diagnosis-table-wrap{overflow-x:auto;}
+.build-diagnosis-table{width:100%;border-collapse:collapse;font-size:10px;min-width:720px;}
+.build-diagnosis-table th,.build-diagnosis-table td{border-bottom:1px solid var(--border);padding:7px 6px;text-align:left;vertical-align:top;line-height:1.65;}
+.build-diagnosis-table th{color:var(--text2);font-weight:800;letter-spacing:1px;white-space:nowrap;}
+.build-diagnosis-table td{color:var(--text3);}
+.build-diagnosis-tag{display:inline-flex;align-items:center;border:1px solid var(--border2);border-radius:999px;padding:3px 8px;margin:2px 4px 2px 0;font-size:9px;color:var(--text2);background:var(--panel);white-space:nowrap;}
+.build-diagnosis-tag.good{border-color:rgba(0,255,150,.35);color:var(--green);background:rgba(0,255,150,.07);}
+.build-diagnosis-tag.warn{border-color:rgba(255,200,0,.35);color:var(--accent3);background:rgba(255,200,0,.08);}
+.build-diagnosis-tag.bad{border-color:rgba(255,90,90,.35);color:var(--accent2);background:rgba(255,90,90,.07);}
+.build-diagnosis-panel-summary{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;list-style:none;}
+.build-diagnosis-panel-summary::-webkit-details-marker{display:none;}
+.build-diagnosis-panel-summary::after{content:'入力欄を開く';font-size:9px;color:var(--accent);border:1px solid var(--border2);border-radius:999px;padding:4px 8px;background:var(--panel);white-space:nowrap;}
+.build-diagnosis-panel[open] .build-diagnosis-panel-summary::after{content:'入力欄を閉じる';}
+.build-diagnosis-settings-body{margin-top:10px;}
+.build-diagnosis-compact-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:10px 0 4px;}
+.build-diagnosis-compact-card{background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:9px 10px;min-width:0;}
+.build-diagnosis-compact-label{font-size:9px;color:var(--text2);font-weight:800;letter-spacing:1.3px;margin-bottom:5px;}
+.build-diagnosis-compact-main{font-size:11px;color:var(--text);font-weight:800;line-height:1.55;word-break:break-word;}
+.build-diagnosis-compact-sub{font-size:9px;color:var(--text2);line-height:1.6;margin-top:4px;}
+.build-diagnosis-section-stack{display:grid;gap:8px;margin-top:10px;}
+.build-diagnosis-detail{background:var(--bg2);border:1px solid var(--border);border-radius:13px;overflow:hidden;}
+.build-diagnosis-detail>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;list-style:none;cursor:pointer;padding:10px 12px;font-size:11px;font-weight:800;color:var(--text);letter-spacing:1px;}
+.build-diagnosis-detail>summary::-webkit-details-marker{display:none;}
+.build-diagnosis-detail>summary::after{content:'開く';font-size:9px;color:var(--accent);border:1px solid var(--border2);border-radius:999px;padding:3px 8px;background:var(--panel);white-space:nowrap;}
+.build-diagnosis-detail[open]>summary{border-bottom:1px solid var(--border);color:var(--accent);}
+.build-diagnosis-detail[open]>summary::after{content:'閉じる';}
+.build-diagnosis-detail-body{padding:10px 12px 12px;}
+.build-diagnosis-top-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+@media(max-width:960px){.build-diagnosis-compact-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media(max-width:760px){.build-carte-grid,.build-member-grid,.build-diagnosis-grid{grid-template-columns:1fr;}.build-diagnosis-field.full{grid-column:auto;}.build-carte-card{padding:11px 12px;}.build-mini-table{font-size:9px;}.build-diagnosis-panel{padding:11px 12px;}.build-diagnosis-table{min-width:640px;font-size:9px;}.build-diagnosis-compact-grid{grid-template-columns:1fr;}.build-diagnosis-panel-summary::after,.build-diagnosis-detail>summary::after{font-size:8px;padding:3px 7px;}}
 .party-recommend-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
 .party-ranking-mode{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .party-ranking-mode-btn{border:1px solid var(--border);background:var(--bg2);color:var(--text2);padding:8px 12px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:1px;font-family:'Noto Sans JP',sans-serif;cursor:pointer;transition:all 0.18s;}
@@ -585,7 +642,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
   .layout{padding:12px 10px 94px;}
   .main-content{width:100%;}
   .mobile-party-tabs{
-    position:sticky;top:52px;z-index:80;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;
+    position:sticky;top:52px;z-index:80;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
     background:rgba(7,9,15,.96);backdrop-filter:blur(18px);border:1px solid var(--border);
     border-radius:16px;padding:8px;margin:0 0 10px;box-shadow:0 10px 28px rgba(0,0,0,.18);
   }
@@ -616,8 +673,9 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
   body.party-mobile-tab-edit .party-mid-grid > div:first-child{display:block;}
   body.party-mobile-tab-add .party-mid-grid{display:block;}
   body.party-mobile-tab-add .party-workspace{display:block;}
-  body.party-mobile-tab-add .party-workspace-panel[data-party-workspace-panel="add"]{display:block;}
-
+  body.party-mobile-tab-add .party-workspace-tabs{display:flex;}
+  body.party-mobile-tab-add .party-workspace-panel[data-party-workspace-panel="add"].active,
+  body.party-mobile-tab-add .party-workspace-panel[data-party-workspace-panel="recommend"].active{display:block;}
   body.party-mobile-tab-karte .party-workspace{display:block;}
   body.party-mobile-tab-karte .party-workspace-panel[data-party-workspace-panel="karte"]{display:block;}
   body.party-mobile-tab-coverage .party-mid-grid{display:block;}
@@ -735,6 +793,13 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
     </div>
     <div id="party-export-size-status" style="font-size:10px;color:var(--text2);margin:-4px 0 12px;line-height:1.6;">現在の保存比率: 16:9</div>
 
+    <div class="party-mode-switch" aria-label="作業モード切り替え">
+      <span class="party-mode-switch-label">作業モード</span>
+      <button type="button" class="party-mode-btn active" data-party-mode="edit" onclick="switchPartyMode('edit')">登録・編集</button>
+      <button type="button" class="party-mode-btn" data-party-mode="analyze" onclick="switchPartyMode('analyze')">診断・分析</button>
+      <span class="party-mode-note" id="party-mode-note">まずは6体の登録と保存だけに集中できます。</span>
+    </div>
+
     <div class="party-top-grid">
       <div class="party-section-box">
         <div class="sec">パーティ登録</div>
@@ -742,7 +807,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
         <div style="margin-top:8px;font-size:10px;color:var(--text2);">合計努力値: <span id="party-ev-summary" style="color:var(--text3);">—</span></div>
       </div>
 
-      <div class="saved-parties-section" id="saved-parties-section">
+      <div class="saved-parties-section party-edit-only" id="saved-parties-section">
         <div class="saved-parties-head">
           <div>
             <div class="saved-parties-title">保存場所関連</div>
@@ -755,7 +820,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
     </div>
 
     <div class="party-mid-grid">
-      <div>
+      <div class="party-edit-column party-edit-only">
         <div id="party-editor-empty" style="display:none;background:var(--bg2);border:1px dashed var(--border2);padding:20px;text-align:center;font-size:11px;color:var(--text2);">
           スロットを選択して技・努力値を編集
         </div>
@@ -873,15 +938,15 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 
       <div class="party-workspace">
         <div class="party-workspace-tabs" aria-label="PC用表示切替">
-          <button type="button" class="party-workspace-tab-btn active" data-party-workspace-tab="recommend" onclick="switchPartyWorkspace('recommend')">おすすめ</button>
-          <button type="button" class="party-workspace-tab-btn" data-party-workspace-tab="add" onclick="switchPartyWorkspace('add')">追加</button>
-          <button type="button" class="party-workspace-tab-btn" data-party-workspace-tab="coverage" onclick="switchPartyWorkspace('coverage')">相性</button>
-          <button type="button" class="party-workspace-tab-btn" data-party-workspace-tab="karte" onclick="switchPartyWorkspace('karte')">構築カルテ</button>
-          <button type="button" class="party-workspace-tab-btn" data-party-workspace-tab="compare" onclick="switchPartyWorkspace('compare')">比較</button>
+          <button type="button" class="party-workspace-tab-btn active party-edit-only" data-party-workspace-tab="add" onclick="switchPartyWorkspace('add')">追加</button>
+          <button type="button" class="party-workspace-tab-btn party-edit-only" data-party-workspace-tab="recommend" onclick="switchPartyWorkspace('recommend')">おすすめ</button>
+          <button type="button" class="party-workspace-tab-btn party-analysis-only" data-party-workspace-tab="coverage" onclick="switchPartyWorkspace('coverage')">相性</button>
+          <button type="button" class="party-workspace-tab-btn party-analysis-only" data-party-workspace-tab="karte" onclick="switchPartyWorkspace('karte')">構築カルテ</button>
+          <button type="button" class="party-workspace-tab-btn party-analysis-only" data-party-workspace-tab="compare" onclick="switchPartyWorkspace('compare')">比較</button>
         </div>
 
-        <div class="party-workspace-panel active" data-party-workspace-panel="recommend">
-          <div class="sec">おすすめ表示</div>
+        <div class="party-workspace-panel party-edit-only" data-party-workspace-panel="recommend">
+          <div class="sec">追加おすすめ</div>
           <div class="party-recommend-toolbar">
             <div class="party-ranking-mode">
               <span style="font-size:10px;color:var(--text2);letter-spacing:2px;">参照ランキング</span>
@@ -903,12 +968,12 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
               <div id="party-ranking-meta" class="party-ranking-meta"></div>
             </div>
           </div>
-          <div style="font-size:10px;color:var(--text2);margin-bottom:10px;line-height:1.8;">ランキング上位20匹の代表型を参照して、今の構築で重い相手と、殴り返しやすい候補を総合・対物理・対特殊で出します。</div>
+          <div style="font-size:10px;color:var(--text2);margin-bottom:10px;line-height:1.8;">追加候補として、ランキング上位20匹の代表型を参照し、今の構築で重い相手と殴り返しやすい候補を出します。</div>
           <div id="party-recommend-summary" class="recommend-summary-grid"></div>
           <div id="party-recommend-list" class="recommend-group-wrap"></div>
         </div>
 
-        <div class="party-workspace-panel" data-party-workspace-panel="add">
+        <div class="party-workspace-panel active party-edit-only" data-party-workspace-panel="add">
           <div class="add-section party-side-panel">
             <div class="add-section-title">登録済みから選ぶ</div>
             <div style="display:flex;gap:0;margin-bottom:10px;border-bottom:1px solid var(--border);">
@@ -946,7 +1011,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
           </div>
         </div>
 
-        <div class="party-workspace-panel" data-party-workspace-panel="coverage">
+        <div class="party-workspace-panel party-analysis-only" data-party-workspace-panel="coverage">
           <div class="party-coverage-grid">
             <div class="cov-wrap">
               <div class="sec">環境上位20への通り</div>
@@ -963,7 +1028,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
         </div>
 
 
-        <div class="party-workspace-panel" data-party-workspace-panel="karte">
+        <div class="party-workspace-panel party-analysis-only" data-party-workspace-panel="karte">
           <div class="build-carte-head">
             <div>
               <div class="build-carte-title">構築カルテ / 診断</div>
@@ -974,10 +1039,51 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
               <button type="button" class="build-carte-btn" onclick="copyPartyBuildCarteText()">メモ用にコピー</button>
             </div>
           </div>
+          <details class="build-diagnosis-panel">
+            <summary class="build-diagnosis-panel-summary">
+              <span>
+                <span class="build-diagnosis-panel-title">サイト内診断条件</span>
+                <span class="build-diagnosis-panel-note" style="display:block;margin:4px 0 0;">基本選出・勝ち筋・苦手相手を入れると診断に反映します。</span>
+              </span>
+            </summary>
+            <div class="build-diagnosis-settings-body">
+              <div class="build-diagnosis-grid">
+                <div class="build-diagnosis-field">
+                  <label for="party-diagnosis-rule">対象ルール / 想定環境</label>
+                  <textarea id="party-diagnosis-rule" class="build-diagnosis-input" rows="1" placeholder="例: Regulation M-A / シングル / 現在のランキング上位" oninput="savePartyDiagnosisSettings();markPartyBuildCarteDirty();"></textarea>
+                </div>
+                <div class="build-diagnosis-field">
+                  <label for="party-diagnosis-basic">基本選出</label>
+                  <textarea id="party-diagnosis-basic" class="build-diagnosis-input" rows="1" placeholder="例: カメックス、ホルード、ガブリアス" oninput="savePartyDiagnosisSettings();markPartyBuildCarteDirty();"></textarea>
+                </div>
+                <div class="build-diagnosis-field">
+                  <label for="party-diagnosis-second">第2選出</label>
+                  <textarea id="party-diagnosis-second" class="build-diagnosis-input" rows="1" placeholder="例: ミミロップ、ヤドキングG、ガブリアス" oninput="savePartyDiagnosisSettings();markPartyBuildCarteDirty();"></textarea>
+                </div>
+                <div class="build-diagnosis-field">
+                  <label for="party-diagnosis-pressure">相手に見せたい圧力</label>
+                  <textarea id="party-diagnosis-pressure" class="build-diagnosis-input" rows="1" placeholder="例: 先制技・高速打点・フェアリーへの毒打点" oninput="savePartyDiagnosisSettings();markPartyBuildCarteDirty();"></textarea>
+                </div>
+                <div class="build-diagnosis-field">
+                  <label for="party-diagnosis-win">実際に通したい勝ち筋</label>
+                  <textarea id="party-diagnosis-win" class="build-diagnosis-input" rows="1" placeholder="例: 対面処理から終盤にガブリアスを通す" oninput="savePartyDiagnosisSettings();markPartyBuildCarteDirty();"></textarea>
+                </div>
+                <div class="build-diagnosis-field full">
+                  <label for="party-diagnosis-hard">苦手な相手 / 意識している仮想敵</label>
+                  <textarea id="party-diagnosis-hard" class="build-diagnosis-input" rows="2" placeholder="例: フラエッテ、アシレーヌ、積み展開、受け寄り など" oninput="savePartyDiagnosisSettings();markPartyBuildCarteDirty();"></textarea>
+                </div>
+              </div>
+              <label class="build-diagnosis-check"><input id="party-diagnosis-keep-moves" type="checkbox" checked onchange="savePartyDiagnosisSettings();markPartyBuildCarteDirty();">技変更なしを優先して診断する</label>
+              <div class="build-diagnosis-actions">
+                <button type="button" class="build-carte-btn" onclick="savePartyDiagnosisSettings();renderPartyBuildCarte();">サイト内診断を更新</button>
+                <button type="button" class="build-carte-btn" onclick="copyPartyBuildDiagnosisText()">診断結果をコピー</button>
+              </div>
+            </div>
+          </details>
           <div id="party-build-carte-root"></div>
         </div>
 
-        <div class="party-workspace-panel" data-party-workspace-panel="compare">
+        <div class="party-workspace-panel party-analysis-only" data-party-workspace-panel="compare">
           <div class="sec">構築バージョン比較</div>
           <div class="party-compare-controls">
             <div class="party-compare-field">
@@ -1072,7 +1178,9 @@ const PARTY_DRAFT_KEY = 'pokeedge_party_draft_v1';
 let _partyCoverageTimer = null;
 let _partyDraftTimer = null;
 let PARTY_EDITOR_QUICK_MOVES = [];
-let PARTY_WORKSPACE_TAB = 'recommend';
+let PARTY_WORKSPACE_TAB = 'add';
+let PARTY_VIEW_MODE = localStorage.getItem('pokeedge_party_view_mode') === 'analyze' ? 'analyze' : 'edit';
+let _partyAnalysisDirty = true;
 let CURRENT_PARTY_SOURCE = null;
 let PARTY_COMPARE_SAVED = [];
 let _dataLoaded  = false;
@@ -1093,19 +1201,31 @@ async function ensurePokemonMovesLoaded(){
   return _pokemonMovesPromise;
 }
 
-function normalizeRankingPayload(payload, battleType){
+function normalizeRankingPayload(payload, battleType, seasonLabel){
   const rows = payload && Array.isArray(payload.rows) ? payload.rows : [];
   const updatedAt = payload && payload.updatedAt ? String(payload.updatedAt) : '';
-  return {battleType, updatedAt, rows};
+  return {battleType, seasonLabel:String(seasonLabel||''), updatedAt, rows};
 }
 function getPartyStoredSeasonLabel(){
   if(window.pokeEdgeRankingSeason && typeof pokeEdgeRankingSeason.getStored === 'function') return pokeEdgeRankingSeason.getStored() || '';
   return '';
 }
+function getLatestPartySeasonLabel(){
+  const labels = Array.isArray(SEASON_DATA?.seasons) ? SEASON_DATA.seasons : [];
+  if(window.pokeEdgeRankingSeason && typeof pokeEdgeRankingSeason.sortLabels === 'function'){
+    return (window.pokeEdgeRankingSeason.sortLabels(labels, true)[0] || '').trim();
+  }
+  return labels.slice().sort((a,b)=>{
+    const an = Number((String(a).match(/\d+/)||['0'])[0]);
+    const bn = Number((String(b).match(/\d+/)||['0'])[0]);
+    return bn - an || String(b).localeCompare(String(a),'ja');
+  })[0] || '';
+}
 function resolvePartySeasonLabel(preferred){
   const labels = Array.isArray(SEASON_DATA?.seasons) ? SEASON_DATA.seasons : [];
-  if(window.pokeEdgeRankingSeason && typeof pokeEdgeRankingSeason.resolve === 'function') return pokeEdgeRankingSeason.resolve(labels, preferred || ACTIVE_RANKING_SEASON || getPartyStoredSeasonLabel());
-  return String(preferred || ACTIVE_RANKING_SEASON || labels[0] || '').trim();
+  const want = String(preferred || '').trim();
+  if(want && labels.includes(want)) return want;
+  return getLatestPartySeasonLabel() || String(labels[0] || '').trim() || 'S1';
 }
 function getPartyRankingFilePath(mode, seasonLabel){
   const base = mode === 'double' ? 'season_ranking_double' : 'season_ranking_single';
@@ -1115,20 +1235,26 @@ function getPartyRankingFilePath(mode, seasonLabel){
   const num = m ? parseInt(m[1], 10) : 0;
   return num && num !== 1 ? `${base}_s${num}.json` : `${base}.json`;
 }
-async function reloadPartyRankingData(preferred){
+async function reloadPartyRankingData(preferred, mode){
   const seasonLabel = resolvePartySeasonLabel(preferred);
   ACTIVE_RANKING_SEASON = seasonLabel;
-  if(window.pokeEdgeRankingSeason && typeof pokeEdgeRankingSeason.setStored === 'function' && seasonLabel) pokeEdgeRankingSeason.setStored(seasonLabel);
-  const [rankingSingle, rankingDouble] = await Promise.all([
-    fetchDataJson(getPartyRankingFilePath('single', seasonLabel), {rows:[], updatedAt:''}),
-    fetchDataJson(getPartyRankingFilePath('double', seasonLabel), {rows:[], updatedAt:''})
-  ]);
-  PARTY_RANKING_DATA = {
-    single: normalizeRankingPayload(rankingSingle, 'single'),
-    double: normalizeRankingPayload(rankingDouble, 'double')
-  };
+  const safeMode = mode === 'double' ? 'double' : 'single';
+  const ranking = await fetchDataJson(getPartyRankingFilePath(safeMode, seasonLabel), {rows:[], updatedAt:''});
+  PARTY_RANKING_DATA = Object.assign({
+    single: PARTY_RANKING_DATA.single || {rows:[], updatedAt:''},
+    double: PARTY_RANKING_DATA.double || {rows:[], updatedAt:''}
+  }, {
+    [safeMode]: normalizeRankingPayload(ranking, safeMode, seasonLabel)
+  });
   if(selectedSlot>=0 && party[selectedSlot] && party[selectedSlot].poke) renderPeMoveQuick(party[selectedSlot].poke.name);
   updateCoverage();
+}
+async function ensurePartyRankingModeData(mode){
+  const safeMode = mode === 'double' ? 'double' : 'single';
+  const dataset = PARTY_RANKING_DATA[safeMode];
+  if(dataset && Array.isArray(dataset.rows) && dataset.rows.length && dataset.seasonLabel === ACTIVE_RANKING_SEASON) return dataset;
+  await reloadPartyRankingData(ACTIVE_RANKING_SEASON || getLatestPartySeasonLabel(), safeMode);
+  return PARTY_RANKING_DATA[safeMode] || {rows:[], updatedAt:''};
 }
 function normalizeMoveLookupName(name){
   return String(name||'').replace(/[\s　]+/g,'').trim();
@@ -1355,8 +1481,8 @@ async function loadGameData() {
     moveIndex    = MOVES_DATA.map((m,i)=>Object.assign({_i:i},m));
     MOVE_LOOKUP  = Object.fromEntries(moveIndex.map(m=>[normalizeMoveLookupName(m.name), m]));
     MEGA_DATA = normalizeMegaRelations(megaData);
-    ACTIVE_RANKING_SEASON = resolvePartySeasonLabel(getPartyStoredSeasonLabel());
-    await reloadPartyRankingData(ACTIVE_RANKING_SEASON);
+    ACTIVE_RANKING_SEASON = getLatestPartySeasonLabel();
+    await reloadPartyRankingData(ACTIVE_RANKING_SEASON, PARTY_RANKING_MODE);
     _dataLoaded  = true;
   } catch(e) {
     console.error('データ読み込みエラー:', e);
@@ -2063,11 +2189,19 @@ const TYPE_EFF = {
   'ノーマル':{'いわ':0.5,'はがね':0.5,'ゴースト':0},
 };
 
-function getTypeEff(movetype, defTypes, moveName='') {
+function partyAbilityLetsNormalFightingHitGhost(abilityName){
+  return ['きもったま','しんがん'].includes(String(abilityName||'').trim());
+}
+function partyIsNormalOrFightingType(moveType){
+  return ['ノーマル','かくとう','格闘'].includes(String(moveType||'').trim());
+}
+function getTypeEff(movetype, defTypes, moveName='', attackerAbility='') {
   let e = 1;
   const chart = TYPE_EFF[movetype] || {};
   const isFreezeDry = String(moveName||'').trim() === 'フリーズドライ';
+  const ignoreGhostImmunity = partyAbilityLetsNormalFightingHitGhost(attackerAbility) && partyIsNormalOrFightingType(movetype);
   defTypes.forEach(t => {
+    if(ignoreGhostImmunity && t === 'ゴースト') return;
     if(isFreezeDry && t === 'みず') {
       e *= 2;
       return;
@@ -2282,7 +2416,7 @@ function calcDamage() {
   // タイプ相性（防御側）
   const defPoke  = window._defBase;
   const defTypes = defPoke ? [defPoke.type1, defPoke.type2].filter(Boolean) : [];
-  const eff      = getTypeEff(mtype, defTypes);
+  const eff      = getTypeEff(mtype, defTypes, '', document.getElementById('atk-ability')?.value || '');
 
   // STAB（タイプ一致補正）: 技タイプ(漢字) → ポケモンタイプ(ひらがな/カタカナ) 変換して照合
   const MOVE_TYPE_TO_POKE = {
@@ -2449,12 +2583,12 @@ const MOVE_TYPE_TO_POKE2 = {
   'ドラゴン':'ドラゴン','フェアリー':'フェアリー'
 };
 
-function calcOneDamage(atkStats, atkBase, defStats, defBase, lv, mtype, mcat, mhits, mpower, itemKey) {
+function calcOneDamage(atkStats, atkBase, defStats, defBase, lv, mtype, mcat, mhits, mpower, itemKey, attackerAbility='') {
   const atkStat = mcat==='物理' ? atkStats.atk : atkStats.spa;
   const defStat = mcat==='物理' ? defStats.def  : defStats.spd;
   const hp      = defStats.hp;
   const defTypes = defBase ? [defBase.type1, defBase.type2].filter(Boolean) : [];
-  const eff      = getTypeEff(mtype, defTypes);
+  const eff      = getTypeEff(mtype, defTypes, '', attackerAbility);
   const atkTypes = atkBase ? [atkBase.type1, atkBase.type2].filter(Boolean) : [];
   const stab     = atkTypes.includes(MOVE_TYPE_TO_POKE2[mtype]||mtype) ? 1.5 : 1;
   let itemMult = 1;
@@ -2610,8 +2744,37 @@ let party = []; // 最大6匹（null不使用）
 let selectedSlot = -1;
 
 
+function isPartyAnalyzeMode(){
+  return PARTY_VIEW_MODE === 'analyze' || document.body.classList.contains('party-view-analyze');
+}
+function isPartyHeavyWorkspace(tab){
+  return ['recommend','coverage','karte','compare'].includes(tab || PARTY_WORKSPACE_TAB);
+}
+function shouldRunPartyHeavyAnalysis(){
+  if(PARTY_WORKSPACE_TAB === 'recommend') return true;
+  return isPartyAnalyzeMode() && ['coverage','karte','compare'].includes(PARTY_WORKSPACE_TAB);
+}
+function switchPartyMode(mode){
+  const safe = mode === 'analyze' ? 'analyze' : 'edit';
+  PARTY_VIEW_MODE = safe;
+  try{ localStorage.setItem('pokeedge_party_view_mode', safe); }catch(_){}
+  document.body.classList.toggle('party-view-edit', safe === 'edit');
+  document.body.classList.toggle('party-view-analyze', safe === 'analyze');
+  document.querySelectorAll('[data-party-mode]').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.partyMode === safe);
+  });
+  const note = document.getElementById('party-mode-note');
+  if(note) note.textContent = safe === 'edit' ? '追加とおすすめを同じ場所で確認できます。' : '相性・構築カルテ・比較をまとめて確認します。';
+  if(safe === 'edit'){
+    switchPartyWorkspace(['add','recommend'].includes(PARTY_WORKSPACE_TAB) ? PARTY_WORKSPACE_TAB : 'add');
+  } else {
+    switchPartyWorkspace(['coverage','karte','compare'].includes(PARTY_WORKSPACE_TAB) ? PARTY_WORKSPACE_TAB : 'coverage');
+  }
+}
 function switchPartyWorkspace(tab){
-  const safe = ['recommend','add','coverage','karte','compare'].includes(tab) ? tab : 'recommend';
+  let safe = ['recommend','add','coverage','karte','compare'].includes(tab) ? tab : (isPartyAnalyzeMode() ? 'coverage' : 'add');
+  if(!isPartyAnalyzeMode() && !['add','recommend'].includes(safe)) safe = 'add';
+  if(isPartyAnalyzeMode() && !['coverage','karte','compare'].includes(safe)) safe = 'coverage';
   PARTY_WORKSPACE_TAB = safe;
   document.querySelectorAll('[data-party-workspace-tab]').forEach(btn=>{
     btn.classList.toggle('active', btn.dataset.partyWorkspaceTab === safe);
@@ -2619,16 +2782,18 @@ function switchPartyWorkspace(tab){
   document.querySelectorAll('[data-party-workspace-panel]').forEach(panel=>{
     panel.classList.toggle('active', panel.dataset.partyWorkspacePanel === safe);
   });
+  if(shouldRunPartyHeavyAnalysis()) updateCoverage();
   if(safe === 'karte') renderPartyBuildCarte();
   if(safe === 'compare') renderPartyVersionCompare();
 }
-function setPartyRankingMode(mode){
+async function setPartyRankingMode(mode){
   const safe = mode === 'double' ? 'double' : 'single';
   PARTY_RANKING_MODE = safe;
   localStorage.setItem('pokeedge_party_ranking_mode', safe);
   document.querySelectorAll('[data-party-ranking-mode]').forEach(btn=>{
     btn.classList.toggle('active', btn.dataset.partyRankingMode === safe);
   });
+  await ensurePartyRankingModeData(safe);
   if(selectedSlot>=0 && party[selectedSlot] && party[selectedSlot].poke) renderPeMoveQuick(party[selectedSlot].poke.name);
   updateCoverage();
   markPartyBuildCarteDirty();
@@ -2638,12 +2803,14 @@ function setPartyRankingMode(mode){
 // ===== スマホ用: パーティ管理タブ切り替え =====
 function switchPartyMobileTab(tab){
   const safe = ['six','edit','add','coverage','karte','compare'].includes(tab) ? tab : 'six';
-  document.body.classList.remove('party-mobile-tab-six','party-mobile-tab-edit','party-mobile-tab-add','party-mobile-tab-coverage','party-mobile-tab-karte','party-mobile-tab-compare');
+  document.body.classList.remove('party-mobile-tab-six','party-mobile-tab-edit','party-mobile-tab-add','party-mobile-tab-recommend','party-mobile-tab-coverage','party-mobile-tab-karte','party-mobile-tab-compare');
   document.body.classList.add('party-mobile-tab-'+safe);
   document.querySelectorAll('[data-party-mobile-tab]').forEach(btn=>{
     btn.classList.toggle('active', btn.dataset.partyMobileTab === safe);
   });
-  if(safe === 'add') switchPartyWorkspace('add');
+  if(['six','edit','add'].includes(safe)) switchPartyMode('edit');
+  if(['coverage','karte','compare'].includes(safe)) switchPartyMode('analyze');
+  if(safe === 'add') switchPartyWorkspace(['add','recommend'].includes(PARTY_WORKSPACE_TAB) ? PARTY_WORKSPACE_TAB : 'add');
   if(safe === 'coverage') switchPartyWorkspace('coverage');
   if(safe === 'karte') switchPartyWorkspace('karte');
   if(safe === 'compare') switchPartyWorkspace('compare');
@@ -3424,7 +3591,7 @@ function getPartyBuildThreatRows(members){
     const ev = evaluateThreatAgainstCurrentParty(profile, members);
     const responders = members.map(member=>{
       const defenseValue = getWeightedDefenseValue(member, profile);
-      const attackEff = getWeightedAttackEff(getThreatCandidateAttackTypes(member), profile.threatTypes);
+      const attackEff = getWeightedAttackEff(getThreatCandidateAttackTypes(member), profile.threatTypes, member.ability || '');
       let score = 0;
       if(attackEff >= 4) score += 3;
       else if(attackEff >= 2) score += 2;
@@ -3557,6 +3724,379 @@ async function copyPartyBuildCarteText(){
     box.remove();
   }
 }
+
+const PARTY_DIAGNOSIS_SETTINGS_KEY = 'pokeedge_party_diagnosis_settings_v1';
+const PARTY_DIAGNOSIS_PRIORITY_MOVES = ['アクアジェット','しんそく','ふいうち','バレットパンチ','マッハパンチ','こおりのつぶて','かげうち','でんこうせっか','アクセルロック','ジェットパンチ','ねこだまし','しんくうは'];
+const PARTY_DIAGNOSIS_PIVOT_MOVES = ['とんぼがえり','ボルトチェンジ','クイックターン','すてゼリフ','バトンタッチ'];
+const PARTY_DIAGNOSIS_SETUP_MOVES = ['つるぎのまい','わるだくみ','りゅうのまい','めいそう','ビルドアップ','からをやぶる','ちょうのまい','てっぺき','ドわすれ','こうそくいどう','ロックカット','みがわり'];
+const PARTY_DIAGNOSIS_RECOVERY_MOVES = ['じこさいせい','なまける','はねやすめ','つきのひかり','こうごうせい','あさのひざし','ねむる','タマゴうみ','ミルクのみ'];
+const PARTY_DIAGNOSIS_STATUS_MOVES = ['でんじは','おにび','どくどく','あくび','ステルスロック','まきびし','どくびし','ちょうはつ','アンコール','トリック','すりかえ','ほえる','ふきとばし'];
+
+function getPartyDiagnosisSettings(){
+  const defaults = {rule:'', basic:'', second:'', pressure:'', win:'', hard:'', keepMoves:true};
+  let saved = {};
+  try{ saved = JSON.parse(localStorage.getItem(PARTY_DIAGNOSIS_SETTINGS_KEY) || '{}') || {}; }catch(_){ saved = {}; }
+  const ids = {
+    rule:'party-diagnosis-rule', basic:'party-diagnosis-basic', second:'party-diagnosis-second',
+    pressure:'party-diagnosis-pressure', win:'party-diagnosis-win', hard:'party-diagnosis-hard'
+  };
+  const result = Object.assign({}, defaults, saved);
+  Object.entries(ids).forEach(([key,id])=>{
+    const el = document.getElementById(id);
+    if(el) result[key] = String(el.value || '').trim();
+  });
+  const keepEl = document.getElementById('party-diagnosis-keep-moves');
+  if(keepEl) result.keepMoves = !!keepEl.checked;
+  return result;
+}
+function savePartyDiagnosisSettings(){
+  const settings = getPartyDiagnosisSettings();
+  try{ localStorage.setItem(PARTY_DIAGNOSIS_SETTINGS_KEY, JSON.stringify(settings)); }catch(_){ }
+}
+function loadPartyDiagnosisSettingsToForm(){
+  let settings = {keepMoves:true};
+  try{ settings = Object.assign(settings, JSON.parse(localStorage.getItem(PARTY_DIAGNOSIS_SETTINGS_KEY) || '{}') || {}); }catch(_){ }
+  const ids = {
+    rule:'party-diagnosis-rule', basic:'party-diagnosis-basic', second:'party-diagnosis-second',
+    pressure:'party-diagnosis-pressure', win:'party-diagnosis-win', hard:'party-diagnosis-hard'
+  };
+  Object.entries(ids).forEach(([key,id])=>{
+    const el = document.getElementById(id);
+    if(el && !el.value) el.value = settings[key] || '';
+  });
+  const keepEl = document.getElementById('party-diagnosis-keep-moves');
+  if(keepEl) keepEl.checked = settings.keepMoves !== false;
+}
+function splitPartyDiagnosisNames(text){
+  return String(text || '')
+    .split(/[、,\/／\n]+/)
+    .map(s=>s.trim())
+    .filter(Boolean);
+}
+function normalizePartyDiagnosisName(name){
+  return String(name || '')
+    .normalize('NFKC')
+    .replace(/[\s　・（）()]/g,'')
+    .replace(/ガラル/g,'G')
+    .replace(/リージョン/g,'')
+    .replace(/^メガ/,'');
+}
+function findPartyDiagnosisMemberByName(name, members){
+  const key = normalizePartyDiagnosisName(name);
+  if(!key) return null;
+  return (members || []).find(m=>{
+    const n = normalizePartyDiagnosisName(m && m.poke && m.poke.name || '');
+    return n === key || n.includes(key) || key.includes(n);
+  }) || null;
+}
+function getPartyDiagnosisMoveRecords(member){
+  return (member && member.moves || []).map(raw=>{
+    const meta = getMoveMetaByName(raw && (raw.name || raw) || '');
+    const known = getKnownMoveEntryForPokemon(member.poke && member.poke.name, raw && (raw.name || raw) || '');
+    return {
+      name:String(raw && (raw.name || raw) || '').trim(),
+      type:String(raw && raw.type || known?.type || meta?.type || '').trim(),
+      category:String(raw && raw.category || known?.category || meta?.category || '').trim(),
+      power:Number(raw && raw.power || known?.power || meta?.power || 0)
+    };
+  }).filter(mv=>mv.name);
+}
+function classifyPartyDiagnosisMove(move){
+  const name = String(move && move.name || '');
+  if(PARTY_DIAGNOSIS_PRIORITY_MOVES.includes(name)) return '先制技';
+  if(PARTY_DIAGNOSIS_PIVOT_MOVES.includes(name)) return '対面操作';
+  if(PARTY_DIAGNOSIS_SETUP_MOVES.includes(name)) return '展開技';
+  if(PARTY_DIAGNOSIS_RECOVERY_MOVES.includes(name)) return '回復技';
+  if(PARTY_DIAGNOSIS_STATUS_MOVES.includes(name)) return '妨害/展開補助';
+  if(String(move.category || '') === '変化') return '補助技';
+  if(Number(move.power || 0) > 0) return `${move.type || ''}${move.category || ''}打点`.trim();
+  return '役割技';
+}
+function inferPartyDiagnosisRole(member){
+  const p = member && member.poke || {};
+  const stats = calcPartyBuildStats(member);
+  const moves = getPartyDiagnosisMoveRecords(member);
+  const names = moves.map(m=>m.name);
+  const hasPriority = names.some(n=>PARTY_DIAGNOSIS_PRIORITY_MOVES.includes(n));
+  const hasPivot = names.some(n=>PARTY_DIAGNOSIS_PIVOT_MOVES.includes(n));
+  const hasSetup = names.some(n=>PARTY_DIAGNOSIS_SETUP_MOVES.includes(n));
+  const hasRecovery = names.some(n=>PARTY_DIAGNOSIS_RECOVERY_MOVES.includes(n));
+  const hasStatus = names.some(n=>PARTY_DIAGNOSIS_STATUS_MOVES.includes(n)) || moves.some(m=>m.category==='変化');
+  const atkMoves = moves.filter(m=>Number(m.power||0)>0);
+  const phys = atkMoves.filter(m=>m.category==='物理').length;
+  const spec = atkMoves.filter(m=>m.category==='特殊').length;
+  const bulk = (stats.hp + stats.def + stats.spd) / 3;
+  let role = '';
+  if(hasSetup && atkMoves.length) role = '展開エース';
+  else if(hasPriority && atkMoves.length >= 2) role = '対面処理・終盤縛り';
+  else if(hasPivot) role = '対面操作・着地補助';
+  else if(hasRecovery || (bulk >= 145 && hasStatus)) role = 'クッション・詰ませ補助';
+  else if(phys > spec) role = '物理打点';
+  else if(spec > phys) role = '特殊打点';
+  else if(atkMoves.length) role = '広範囲打点';
+  else role = '補助枠';
+  if(stats.spe >= 145 && !role.includes('高速')) role = `高速${role}`;
+  return role;
+}
+function getPartyDiagnosisMoveTargetTypes(move){
+  if(!move || !move.type || !Number(move.power || 0)) return [];
+  return PARTY_ALL_TYPES.filter(t=>getRegisteredMoveEffectAgainstTypes(move, [t]) >= 2).slice(0,6);
+}
+function getPartyDiagnosisMoveThreatTargets(member, move, limit=3){
+  if(!move || !move.type || !Number(move.power || 0)) return [];
+  const profiles = (getRankingDataset(PARTY_RANKING_MODE).rows || []).slice(0,20).map(buildThreatProfile).filter(p=>p && p.name);
+  return profiles.filter(profile=>{
+    const eff = getRegisteredMoveEffectAgainstTypes(move, profile.threatTypes || []);
+    return eff >= 2;
+  }).slice(0, limit).map(p=>p.name);
+}
+function buildPartyDiagnosisMemberRows(members){
+  return (members || []).map(member=>{
+    const p = member.poke || {};
+    const role = inferPartyDiagnosisRole(member);
+    const moves = getPartyDiagnosisMoveRecords(member);
+    const moveLabels = moves.map(mv=>`${mv.name}=${classifyPartyDiagnosisMove(mv)}`).join(' / ') || '技未設定';
+    const intentParts = [];
+    const atkTypes = moves.filter(m=>Number(m.power||0)>0).map(m=>m.type).filter(Boolean);
+    if(atkTypes.length) intentParts.push(`${Array.from(new Set(atkTypes)).join('・')}打点で処理範囲を確保`);
+    if(moves.some(m=>PARTY_DIAGNOSIS_PRIORITY_MOVES.includes(m.name))) intentParts.push('先制技で終盤の対面勝ち・削れた相手の回収を担当');
+    if(moves.some(m=>PARTY_DIAGNOSIS_PIVOT_MOVES.includes(m.name))) intentParts.push('対面操作で通したい駒を安全に着地させる');
+    if(moves.some(m=>PARTY_DIAGNOSIS_SETUP_MOVES.includes(m.name))) intentParts.push('有利対面から勝ち筋を作る');
+    if(member.item) intentParts.push(`${member.item}で役割対面を補強`);
+    const weak = PARTY_ALL_TYPES.filter(t=>getMemberBestDefEff(member, t) >= 2).slice(0,4);
+    const resist = PARTY_ALL_TYPES.filter(t=>getMemberBestDefEff(member, t) <= 0.5).slice(0,4);
+    let evalText = '採用技から役割は見えます。';
+    if(atkTypes.length >= 3) evalText = '打点範囲が広く、選出内の処理漏れを埋めやすいです。';
+    else if(moves.some(m=>PARTY_DIAGNOSIS_PRIORITY_MOVES.includes(m.name))) evalText = '先制技により、数値や素早さだけではない対面保証を作れます。';
+    else if(resist.length) evalText = `${resist.join('・')}に後投げ/着地しやすい枠です。`;
+    const concern = weak.length ? `${weak.join('・')}を押し付けられると役割遂行前に崩されやすいです。` : 'タイプ上の大きな弱点集中は目立ちません。';
+    const lost = moves.some(m=>PARTY_DIAGNOSIS_PRIORITY_MOVES.includes(m.name)) ? '先制技を外すと終盤の縛り・対面勝ち保証を失います。'
+      : moves.some(m=>PARTY_DIAGNOSIS_SETUP_MOVES.includes(m.name)) ? '展開技を外すと自力で勝ち筋を作る力が落ちます。'
+      : moves.some(m=>PARTY_DIAGNOSIS_PIVOT_MOVES.includes(m.name)) ? '対面操作を外すと着地補助とサイクルの切り返しが弱くなります。'
+      : atkTypes.length ? '打点を外すと対応できる仮想敵が減るため、代替処理ルートの確認が必要です。'
+      : '補助役割を外すと選出全体の再展開力が落ちます。';
+    return {member, name:p.name || '', role, intent:intentParts.join('。') || '採用意図は入力情報と合わせて確認が必要です。', evalText, concern, lost, moveLabels};
+  });
+}
+function buildPartyDiagnosisLegality(members){
+  const notes = [];
+  if((members || []).length !== 6) notes.push({cls:'warn', text:`6体未満/超過: 現在${(members || []).length}体。診断精度が落ちます。`});
+  else notes.push({cls:'good', text:'6体登録済み'});
+  const itemMap = {};
+  (members || []).forEach(m=>{ const item = String(m && m.item || '').trim(); if(item) itemMap[item] = (itemMap[item] || 0) + 1; });
+  const dupItems = Object.entries(itemMap).filter(([_,cnt])=>cnt>=2).map(([item,cnt])=>`${item}×${cnt}`);
+  if(dupItems.length) notes.push({cls:'bad', text:`同一持ち物あり: ${dupItems.join(' / ')}`});
+  else notes.push({cls:'good', text:'同一持ち物なし'});
+  const megaItems = Object.keys(itemMap).filter(item=>getPartyBuildMegaStoneBaseName(item));
+  if(megaItems.length >= 2) notes.push({cls:'warn', text:`メガ候補が複数: ${megaItems.join(' / ')}。選出時に1枠前提で確認。`});
+  else if(megaItems.length === 1) notes.push({cls:'good', text:`メガ候補: ${megaItems[0]}`});
+  const speciesMap = {};
+  (members || []).forEach(m=>{ const key = getPartyBuildMemberKey(m && m.poke && m.poke.name || ''); if(key) speciesMap[key] = (speciesMap[key] || 0) + 1; });
+  const dupSpecies = Object.entries(speciesMap).filter(([_,cnt])=>cnt>=2).map(([name,cnt])=>`${name}×${cnt}`);
+  if(dupSpecies.length) notes.push({cls:'warn', text:`同系統の重複候補: ${dupSpecies.join(' / ')}。ルール上の扱いは検算が必要。`});
+  else notes.push({cls:'good', text:'同名重複は目立ちません'});
+  return notes;
+}
+function describePartyDiagnosisSelection(label, names, members){
+  const picked = names.map(name=>findPartyDiagnosisMemberByName(name, members)).filter(Boolean);
+  if(!names.length) return `<div class="build-diagnosis-summary">${escapePartyHtml(label)}は未入力です。実際の3体を入力すると、この選出が何を処理する選出かまで表示します。</div>`;
+  const missing = names.filter(name=>!findPartyDiagnosisMemberByName(name, members));
+  const roles = picked.map(m=>`${m.poke.name}: ${inferPartyDiagnosisRole(m)}`);
+  const attackTypes = getPartyBuildAttackTypes(picked);
+  const covered = PARTY_ALL_TYPES.filter(t=>attackTypes[t] && attackTypes[t].length).length;
+  const weakRows = getPartyBuildDefenseRows(picked).filter(r=>r.weak.length>=2).sort((a,b)=>b.weak.length-a.weak.length).slice(0,3);
+  const threats = getPartyBuildThreatRows(picked).slice(0,3).map(r=>r.profile.name);
+  const missHtml = missing.length ? `<br><span class="build-diagnosis-tag warn">未登録名: ${escapePartyHtml(missing.join(' / '))}</span>` : '';
+  return `<div class="build-diagnosis-summary"><strong>${escapePartyHtml(label)}</strong>: ${escapePartyHtml(names.join(' / '))}${missHtml}<br>役割: ${escapePartyHtml(roles.join(' / ') || '未判定')}<br>処理範囲: ${covered}/18タイプに打点。${weakRows.length ? `弱点集中: ${escapePartyHtml(weakRows.map(r=>`${r.type}${r.weak.length}体`).join(' / '))}。` : '弱点集中は目立ちません。'}${threats.length ? `<br>この選出で重く出やすい上位相手: ${escapePartyHtml(threats.join(' / '))}` : ''}</div>`;
+}
+function buildPartyDiagnosisMoveIntentRows(members){
+  const rows = [];
+  (members || []).forEach(member=>{
+    getPartyDiagnosisMoveRecords(member).forEach(mv=>{
+      const kind = classifyPartyDiagnosisMove(mv);
+      const types = getPartyDiagnosisMoveTargetTypes(mv);
+      const threats = getPartyDiagnosisMoveThreatTargets(member, mv, 3);
+      let intent = '';
+      if(PARTY_DIAGNOSIS_PRIORITY_MOVES.includes(mv.name)) intent = '対面で残った相手を縛る・タスキ/低耐久の回収・終盤の詰め。';
+      else if(PARTY_DIAGNOSIS_PIVOT_MOVES.includes(mv.name)) intent = '不利対面を固定せず、通したい勝ち筋へ着地するための技。';
+      else if(PARTY_DIAGNOSIS_SETUP_MOVES.includes(mv.name)) intent = '有利対面や相手の交代に合わせて勝ち筋を作る技。';
+      else if(mv.category === '変化') intent = '数値勝負ではなく、相手の展開や受けを崩すための補助技。';
+      else intent = `${types.length ? types.join('・') : '等倍以上'}への処理ルート。`;
+      const target = threats.length ? threats.join(' / ') : (types.length ? `${types.join(' / ')}タイプ` : '具体的な仮想敵は要確認');
+      const lost = PARTY_DIAGNOSIS_PRIORITY_MOVES.includes(mv.name) ? '抜くと終盤の対面勝ち保証が落ちます。'
+        : PARTY_DIAGNOSIS_PIVOT_MOVES.includes(mv.name) ? '抜くと着地補助が減り、選出の再展開が弱くなります。'
+        : Number(mv.power || 0) > 0 ? '抜くとこのタイプ/相手への直接処理を別枠に渡す必要があります。'
+        : '抜くと展開阻止・補助の役割を別枠で補う必要があります。';
+      rows.push({pokemon:member.poke.name, move:mv.name, kind, target, intent, lost});
+    });
+  });
+  return rows;
+}
+function buildPartyDiagnosisThreatRouteRows(members, hardNames){
+  const profiles = (getRankingDataset(PARTY_RANKING_MODE).rows || []).slice(0,20).map(buildThreatProfile).filter(p=>p && p.name);
+  const hardKeys = hardNames.map(normalizePartyDiagnosisName).filter(Boolean);
+  let selected = [];
+  if(hardKeys.length){
+    selected = profiles.filter(p=>hardKeys.some(key=>normalizePartyDiagnosisName(p.name).includes(key) || key.includes(normalizePartyDiagnosisName(p.name))));
+  }
+  if(!selected.length) selected = getPartyBuildThreatRows(members).slice(0,6).map(r=>r.profile).filter(Boolean);
+  return selected.slice(0,6).map(profile=>{
+    const responders = (members || []).map(member=>{
+      const moves = getPartyDiagnosisMoveRecords(member).filter(mv=>Number(mv.power||0)>0).map(mv=>{
+        const eff = getRegisteredMoveEffectAgainstTypes(mv, profile.threatTypes || []);
+        return Object.assign({}, mv, {eff});
+      }).sort((a,b)=>b.eff-a.eff || (b.power||0)-(a.power||0));
+      const bestMove = moves[0];
+      const def = getWeightedDefenseValue(member, profile);
+      const attackEff = bestMove ? bestMove.eff : 0;
+      let score = 0;
+      if(attackEff >= 4) score += 3;
+      else if(attackEff >= 2) score += 2;
+      else if(attackEff > 1) score += 1;
+      if(def <= 0.55) score += 2;
+      else if(def <= 1) score += 1;
+      return {member, bestMove, def, attackEff, score};
+    }).sort((a,b)=>b.score-a.score || b.attackEff-a.attackEff || a.def-b.def).slice(0,3);
+    return {profile, responders};
+  });
+}
+function buildPartyDiagnosisHtml(members, settings, context){
+  const modeLabel = PARTY_RANKING_MODE === 'double' ? 'ダブル' : 'シングル';
+  const rule = settings.rule || `${modeLabel} / ランキング上位20参照`;
+  const memberRows = buildPartyDiagnosisMemberRows(members);
+  const legality = buildPartyDiagnosisLegality(members);
+  const basicNames = splitPartyDiagnosisNames(settings.basic);
+  const secondNames = splitPartyDiagnosisNames(settings.second);
+  const hardNames = splitPartyDiagnosisNames(settings.hard);
+  const moveRows = buildPartyDiagnosisMoveIntentRows(members);
+  const routeRows = buildPartyDiagnosisThreatRouteRows(members, hardNames);
+  const weakRows = (context.defenseRowsAll || []).filter(r=>r.weak.length>=2).sort((a,b)=>b.weak.length-a.weak.length).slice(0,4);
+  const topThreats = (context.threatRows || []).slice(0,4);
+  const priorityUsers = memberRows.filter(r=>getPartyDiagnosisMoveRecords(r.member).some(mv=>PARTY_DIAGNOSIS_PRIORITY_MOVES.includes(mv.name))).map(r=>r.name);
+  const setupUsers = memberRows.filter(r=>getPartyDiagnosisMoveRecords(r.member).some(mv=>PARTY_DIAGNOSIS_SETUP_MOVES.includes(mv.name))).map(r=>r.name);
+  const pivotUsers = memberRows.filter(r=>getPartyDiagnosisMoveRecords(r.member).some(mv=>PARTY_DIAGNOSIS_PIVOT_MOVES.includes(mv.name))).map(r=>r.name);
+  const mainWin = settings.win || (setupUsers.length ? `${setupUsers[0]}の展開を通す` : (priorityUsers.length ? `削りを入れて${priorityUsers.join(' / ')}の先制技圏内に入れる` : '上位相手への打点と耐性を合わせて対面処理する'));
+  const conclusion = [];
+  conclusion.push(`この構築は「${escapePartyHtml(mainWin)}」を軸に見るのが自然です。`);
+  if(priorityUsers.length) conclusion.push(`先制技枠（${escapePartyHtml(priorityUsers.join(' / '))}）は、汎用性ではなく終盤の対面勝ち保証として評価します。`);
+  if(settings.keepMoves) conclusion.push('技変更なし優先のため、改善はまず選出・着地・仮想敵の担当整理から行います。');
+  if(topThreats.length) conclusion.push(`現状の注意相手は ${escapePartyHtml(topThreats.map(r=>r.profile.name).join(' / '))} です。`);
+  const legalityHtml = legality.map(n=>`<span class="build-diagnosis-tag ${n.cls}">${escapePartyHtml(n.text)}</span>`).join('');
+  const roleTable = `<div class="build-diagnosis-table-wrap"><table class="build-diagnosis-table"><thead><tr><th>ポケモン</th><th>役割</th><th>採用意図</th><th>評価</th><th>気になる点</th><th>変更するなら失うもの</th></tr></thead><tbody>${memberRows.map(r=>`<tr><td>${escapePartyHtml(r.name)}</td><td>${escapePartyHtml(r.role)}</td><td>${escapePartyHtml(r.intent)}<br><span class="build-diagnosis-tag">${escapePartyHtml(r.moveLabels)}</span></td><td>${escapePartyHtml(r.evalText)}</td><td>${escapePartyHtml(r.concern)}</td><td>${escapePartyHtml(r.lost)}</td></tr>`).join('')}</tbody></table></div>`;
+  const moveTable = `<div class="build-diagnosis-table-wrap"><table class="build-diagnosis-table"><thead><tr><th>ポケモン</th><th>技</th><th>役割</th><th>誰に打つか</th><th>採用意図</th><th>抜くと重くなるもの</th></tr></thead><tbody>${moveRows.length ? moveRows.map(r=>`<tr><td>${escapePartyHtml(r.pokemon)}</td><td>${escapePartyHtml(r.move)}</td><td>${escapePartyHtml(r.kind)}</td><td>${escapePartyHtml(r.target)}</td><td>${escapePartyHtml(r.intent)}</td><td>${escapePartyHtml(r.lost)}</td></tr>`).join('') : '<tr><td colspan="6">技が未設定です。</td></tr>'}</tbody></table></div>`;
+  const routeTable = `<div class="build-diagnosis-table-wrap"><table class="build-diagnosis-table"><thead><tr><th>相手</th><th>処理ルート候補</th><th>注意点</th></tr></thead><tbody>${routeRows.length ? routeRows.map(row=>{
+    const routes = row.responders.map(res=>{
+      const mv = res.bestMove ? `${res.bestMove.name}${res.attackEff>=2 ? `（${res.attackEff}倍）` : ''}` : '有効打未設定';
+      const defLabel = res.def <= 0.75 ? '受け/着地しやすい' : (res.def <= 1.05 ? '一応着地可' : '受けは不安');
+      return `${escapePartyHtml(res.member.poke.name)}: ${escapePartyHtml(mv)} / ${escapePartyHtml(defLabel)}`;
+    }).join('<br>') || '薄め';
+    const caution = row.profile.topAttackTypes && row.profile.topAttackTypes.length ? `相手の主な打点: ${row.profile.topAttackTypes.map(x=>x.type).join(' / ')}。ダメージは検算が必要。` : '相手の技データが薄いため検算が必要。';
+    return `<tr><td>#${escapePartyHtml(row.profile.rank)} ${escapePartyHtml(row.profile.name)}</td><td>${routes}</td><td>${escapePartyHtml(caution)}</td></tr>`;
+  }).join('') : '<tr><td colspan="3">ランキング参照データがありません。</td></tr>'}</tbody></table></div>`;
+  const goodPoints = [];
+  if((context.attackCovered || 0) >= 12) goodPoints.push(`攻撃範囲が${context.attackCovered}/18タイプあり、選出内で打点を作りやすいです。`);
+  if(priorityUsers.length) goodPoints.push('先制技により、素早さ負けした相手にも終盤の処理ルートを残せます。');
+  if(pivotUsers.length) goodPoints.push('対面操作があるため、通したい駒への着地を作れます。');
+  if(setupUsers.length) goodPoints.push('展開技があるため、受け崩しではなく自力で勝ち筋を作るルートがあります。');
+  if(!goodPoints.length) goodPoints.push('6体の役割を入力条件に合わせて整理できており、まずは選出ルートの固定が改善点になります。');
+  const concerns = [];
+  if(weakRows.length) concerns.push(`防御面では ${weakRows.map(r=>`${r.type}弱点${r.weak.length}体`).join(' / ')} が重なります。誰にその技を受けさせるかを選出前に決める必要があります。`);
+  if(topThreats.length) concerns.push(`ランキング上位では ${topThreats.map(r=>r.profile.name).join(' / ')} への処理手順が曖昧だと、勝ち筋が消えやすいです。`);
+  if(!settings.basic) concerns.push('基本選出が未入力なので、診断上は6体全体の相性評価に寄っています。');
+  const losePatterns = [];
+  if(weakRows.length) losePatterns.push(`${weakRows[0].type}打点を一貫させる相手に、受け先を失って主勝ち筋が着地できなくなる。`);
+  if(topThreats[0]) losePatterns.push(`${topThreats[0].profile.name}に対して初手の処理担当を間違え、削りが足りないまま終盤の縛り圏外で残される。`);
+  losePatterns.push('基本選出と第2選出の役割が混ざり、誰で何を処理するかが曖昧なまま3体を選ぶ。');
+  const improveA = [];
+  improveA.push('選出前に「初手で削る相手」「中盤で着地させる駒」「終盤に残す技」を固定します。');
+  if(settings.basic) improveA.push(`基本選出（${settings.basic}）は、相手の上位打点を誰で受けるかまでセットで使います。`);
+  if(settings.hard) improveA.push(`苦手相手（${settings.hard}）には、上の処理ルート表にある担当以外を雑に投げない運用にします。`);
+  const improveB = [];
+  improveB.push('ダメージ計算と素早さラインを検算し、乱数/確定数がズレる対面だけ努力値を微調整します。');
+  improveB.push('持ち物で保証している対面が被っている場合は、同一持ち物やメガ枠の整理だけを検討します。');
+  const improveC = [];
+  if(context.attackCovered < 10) improveC.push('打点範囲が不足する場合のみ、同じ役割を持てる別ポケモンへの入れ替えを検討します。');
+  if(weakRows.length >= 3) improveC.push('弱点が3タイプ以上で重なる場合のみ、耐性枠の再設計を検討します。');
+  if(!improveC.length) improveC.push('現時点では構造変更より、選出ルートと仮想敵処理の固定を優先した方がよいです。');
+  const firstConcern = concerns[0] || '大きな重なりは少なめです。詳細は下の項目で確認できます。';
+  const firstGood = goodPoints[0] || '選出ルートの固定が最優先です。';
+  const detail = (title, body, open=false)=>`<details class="build-diagnosis-detail" ${open ? 'open' : ''}><summary>${title}</summary><div class="build-diagnosis-detail-body">${body}</div></details>`;
+  return `
+    <div class="build-carte-section">
+      <div class="build-carte-section-title">サイト内診断：要点</div>
+      <div class="build-diagnosis-summary">対象: ${escapePartyHtml(rule)}<br>${conclusion[0] || ''}</div>
+      <div class="build-diagnosis-compact-grid">
+        <div class="build-diagnosis-compact-card"><div class="build-diagnosis-compact-label">勝ち筋</div><div class="build-diagnosis-compact-main">${escapePartyHtml(mainWin)}</div><div class="build-diagnosis-compact-sub">まずここから逆算</div></div>
+        <div class="build-diagnosis-compact-card"><div class="build-diagnosis-compact-label">注意相手</div><div class="build-diagnosis-compact-main">${escapePartyHtml(topThreats.length ? topThreats.map(r=>r.profile.name).join(' / ') : '未検出')}</div><div class="build-diagnosis-compact-sub">処理担当を固定</div></div>
+        <div class="build-diagnosis-compact-card"><div class="build-diagnosis-compact-label">技方針</div><div class="build-diagnosis-compact-main">${settings.keepMoves ? '変更なし優先' : '変更も確認'}</div><div class="build-diagnosis-compact-sub">採用意図を先に読む</div></div>
+        <div class="build-diagnosis-compact-card"><div class="build-diagnosis-compact-label">最初に見る点</div><div class="build-diagnosis-compact-main">${escapePartyHtml(firstConcern)}</div><div class="build-diagnosis-compact-sub">詳しくは下を開く</div></div>
+      </div>
+      <div class="build-pill-row" style="margin-top:10px;">${legalityHtml}</div>
+    </div>
+    <div class="build-carte-section">
+      <div class="build-carte-section-title">主勝ち筋 / 選出評価</div>
+      <div class="build-diagnosis-compact-grid">
+        <div class="build-diagnosis-compact-card"><div class="build-diagnosis-compact-label">基本選出</div><div class="build-diagnosis-compact-main">${escapePartyHtml(basicNames.length ? basicNames.join(' / ') : '未入力')}</div><div class="build-diagnosis-compact-sub">${escapePartyHtml(settings.basic ? 'この3体の処理範囲を優先' : '入力すると診断精度UP')}</div></div>
+        <div class="build-diagnosis-compact-card"><div class="build-diagnosis-compact-label">第2選出</div><div class="build-diagnosis-compact-main">${escapePartyHtml(secondNames.length ? secondNames.join(' / ') : '未入力')}</div><div class="build-diagnosis-compact-sub">${escapePartyHtml(settings.second ? '基本選出が通らない時用' : '入力すると分岐を整理')}</div></div>
+        <div class="build-diagnosis-compact-card"><div class="build-diagnosis-compact-label">見せたい圧力</div><div class="build-diagnosis-compact-main">${escapePartyHtml(settings.pressure || (priorityUsers.length ? `先制技: ${priorityUsers.join(' / ')}` : firstGood))}</div><div class="build-diagnosis-compact-sub">相手の選出を歪ませる枠</div></div>
+        <div class="build-diagnosis-compact-card"><div class="build-diagnosis-compact-label">苦手・仮想敵</div><div class="build-diagnosis-compact-main">${escapePartyHtml(settings.hard || '未入力')}</div><div class="build-diagnosis-compact-sub">入力すると処理表に反映</div></div>
+      </div>
+    </div>
+    <div class="build-diagnosis-section-stack">
+      ${detail('選出ごとの処理範囲', `${describePartyDiagnosisSelection('基本選出', basicNames, members)}<div style="height:8px;"></div>${describePartyDiagnosisSelection('第2選出', secondNames, members)}${settings.pressure ? `<div class="build-diagnosis-subtitle">相手に見せたい圧力</div><div class="build-diagnosis-summary">${escapePartyHtml(settings.pressure)}</div>` : ''}`)}
+      ${detail('6体の役割表', roleTable)}
+      ${detail('技構成の採用意図推定', moveTable)}
+      ${detail('仮想敵処理ルート', routeTable)}
+      ${detail('良い点', `<ul class="build-diagnosis-list">${goodPoints.map(x=>`<li>${escapePartyHtml(x)}</li>`).join('')}</ul>`)}
+      ${detail('気になる点 / 負け筋', `<div class="build-diagnosis-subtitle">気になる点</div><ul class="build-diagnosis-list">${concerns.map(x=>`<li>${escapePartyHtml(x)}</li>`).join('')}</ul><div class="build-diagnosis-subtitle">選出ミスで起きる負け筋</div><ul class="build-diagnosis-list">${losePatterns.map(x=>`<li>${escapePartyHtml(x)}</li>`).join('')}</ul>`)}
+      ${detail('改善案', `<div class="build-diagnosis-subtitle">A. 変更なし運用案</div><ul class="build-diagnosis-list">${improveA.map(x=>`<li>${escapePartyHtml(x)}</li>`).join('')}</ul><div class="build-diagnosis-subtitle">B. 最小変更案</div><ul class="build-diagnosis-list">${improveB.map(x=>`<li>${escapePartyHtml(x)}</li>`).join('')}</ul><div class="build-diagnosis-subtitle">C. 構造変更案</div><ul class="build-diagnosis-list">${improveC.map(x=>`<li>${escapePartyHtml(x)}</li>`).join('')}</ul>`)}
+      ${detail('最終結論', '<div class="build-diagnosis-summary">この診断では、技を一般論で入れ替えるより、現在の技で誰を処理するかを先に固定します。特にダメージ・素早さ・乱数はサイト内のダメージ計算で検算が必要です。</div>')}
+    </div>
+  `;
+}
+function buildPartyDiagnosisText(){
+  const members = getPartyBuildMembers();
+  const settings = getPartyDiagnosisSettings();
+  if(!members.length) return 'パーティが未登録です。';
+  const memberRows = buildPartyDiagnosisMemberRows(members);
+  const threatRows = getPartyBuildThreatRows(members).slice(0,5);
+  const lines = [];
+  lines.push('【サイト内構築診断】');
+  lines.push(`対象: ${settings.rule || (PARTY_RANKING_MODE === 'double' ? 'ダブル' : 'シングル')}`);
+  lines.push(`基本選出: ${settings.basic || '未入力'}`);
+  lines.push(`第2選出: ${settings.second || '未入力'}`);
+  lines.push(`勝ち筋: ${settings.win || 'サイト内推定'}`);
+  lines.push('');
+  lines.push('■ 結論');
+  lines.push(settings.keepMoves ? '技変更なしを優先し、選出・着地・仮想敵処理ルートから改善する構築です。' : '技変更も含めて見ますが、まず採用意図を崩さない範囲で確認します。');
+  if(threatRows.length) lines.push(`注意相手: ${threatRows.map(r=>r.profile.name).join(' / ')}`);
+  lines.push('');
+  lines.push('■ 6体役割');
+  memberRows.forEach(r=>lines.push(`・${r.name}: ${r.role} / ${r.intent} / 失うもの: ${r.lost}`));
+  lines.push('');
+  lines.push('■ 仮想敵処理');
+  threatRows.forEach(r=>lines.push(`・${r.profile.name}: ${r.responders.slice(0,2).map(x=>x.name).join(' / ') || '薄め'}`));
+  lines.push('');
+  lines.push('■ 改善方針');
+  lines.push('A. 変更なし: 基本選出ごとに初手・中盤・終盤の担当を固定する。');
+  lines.push('B. 最小変更: ダメージ計算と素早さラインを検算して努力値・持ち物だけ微調整する。');
+  lines.push('C. 構造変更: A/Bで明確な負け筋が残る場合だけ検討する。');
+  return lines.join('\n');
+}
+async function copyPartyBuildDiagnosisText(){
+  const text = buildPartyDiagnosisText();
+  try{
+    await navigator.clipboard.writeText(text);
+    alert('診断結果をコピーしました。');
+  }catch(e){
+    const box = document.createElement('textarea');
+    box.value = text;
+    document.body.appendChild(box);
+    box.select();
+    try{ document.execCommand('copy'); alert('診断結果をコピーしました。'); }catch(_){ alert('コピーできませんでした。'); }
+    box.remove();
+  }
+}
 let PARTY_BUILD_CARTE_DIRTY = true;
 let PARTY_BUILD_CARTE_LAST_SIG = '';
 let PARTY_BUILD_CARTE_TIMER = null;
@@ -3577,7 +4117,9 @@ function getPartyBuildCarteSignature(members){
     const parsed = JSON.parse(raw);
     calcLen = Array.isArray(parsed) ? parsed.length : 0;
   }catch(_){ calcLen = 0; }
-  return [PARTY_RANKING_MODE, calcLen, parts.join('||')].join('@@');
+  let diagnosisSig = '';
+  try{ diagnosisSig = JSON.stringify(getPartyDiagnosisSettings()); }catch(_){ diagnosisSig = ''; }
+  return [PARTY_RANKING_MODE, calcLen, diagnosisSig, parts.join('||')].join('@@');
 }
 function markPartyBuildCarteDirty(){
   PARTY_BUILD_CARTE_DIRTY = true;
@@ -3654,13 +4196,16 @@ function renderPartyBuildCarte(){
     const ko = r?.result?.ko || '';
     return `<tr><td>${escapePartyHtml(a)} → ${escapePartyHtml(d)}</td><td>${escapePartyHtml(mv)}</td><td>${escapePartyHtml(dmg)}<br>${escapePartyHtml(pct)}</td><td>${escapePartyHtml(ko)}</td></tr>`;
   }).join('') : '<tr><td colspan="4">このパーティに関係する保存済みダメージ計算はまだありません。</td></tr>';
+  const diagnosisSettings = getPartyDiagnosisSettings();
+  const diagnosisHtml = buildPartyDiagnosisHtml(members, diagnosisSettings, {attackCovered, defenseRowsAll, threatRows});
   root.innerHTML = `
     <div class="build-carte-grid">
       <div class="build-carte-card"><div class="build-carte-card-title">構築状態</div><div class="build-carte-card-main">${members.length}/6体 / メガ候補 ${megaCount}体</div><div class="build-carte-card-sub">現在の保存名: ${escapePartyHtml(document.getElementById('party-save-name')?.value || '新規パーティ')}</div></div>
-      <div class="build-carte-card"><div class="build-carte-card-title">参照環境</div><div class="build-carte-card-main">${escapePartyHtml(modeLabel)} 上位20</div><div class="build-carte-card-sub">ランキング表示の切替と連動します。</div></div>
+      <div class="build-carte-card"><div class="build-carte-card-title">参照環境</div><div class="build-carte-card-main">${escapePartyHtml(ACTIVE_RANKING_SEASON || '最新')} / ${escapePartyHtml(modeLabel)} 上位20</div><div class="build-carte-card-sub">保存値ではなく最新シーズンを初期参照します。</div></div>
       <div class="build-carte-card"><div class="build-carte-card-title">攻撃範囲</div><div class="build-carte-card-main">${attackCovered}/18タイプに打点</div><div class="build-carte-card-sub">登録技ベース。技未設定の枠は反映しません。</div></div>
       <div class="build-carte-card"><div class="build-carte-card-title">技カテゴリ</div><div class="build-carte-card-main">物理${physicalMoves} / 特殊${specialMoves}</div><div class="build-carte-card-sub">変化技はカウント外。偏り確認用です。</div></div>
     </div>
+    ${diagnosisHtml}
     <div class="build-carte-section"><div class="build-carte-section-title">6体カルテ</div><div class="build-member-grid">${memberHtml}</div></div>
     <div class="build-carte-section"><div class="build-carte-section-title">攻撃範囲</div><div class="build-pill-row">${attackPills}</div></div>
     <div class="build-carte-section"><div class="build-carte-section-title">防御で重なりやすいタイプ</div><table class="build-mini-table"><thead><tr><th>タイプ</th><th>弱点数</th><th>対象</th></tr></thead><tbody>${weakRowsHtml}</tbody></table><div class="build-pill-row" style="margin-top:10px;">${immuneHtml}</div></div>
@@ -3849,7 +4394,7 @@ function updateCoverageNow() {
         const responders = coverageMembers.map(member=>{
           if(!member || !member.poke) return null;
           const defenseValue = getWeightedDefenseValue(member, profile);
-          const attackEff = getWeightedAttackEff(getThreatCandidateAttackTypes(member), profile.threatTypes);
+          const attackEff = getWeightedAttackEff(getThreatCandidateAttackTypes(member), profile.threatTypes, member.ability || '');
           const speed = Number(member.poke && member.poke.spe || 0);
           const threatSpeed = Number(profile.threatPokemon && profile.threatPokemon.spe || 0);
           let score = attackEff >= 4 ? 3.6 : attackEff >= 2 ? 2.7 : attackEff > 1 ? 1.4 : attackEff === 1 ? 0.5 : 0;
@@ -3965,7 +4510,12 @@ function updateCoverageNow() {
 
 function updateCoverage() {
   clearTimeout(_partyCoverageTimer);
-  _partyCoverageTimer = setTimeout(updateCoverageNow, 40);
+  if(!shouldRunPartyHeavyAnalysis()){
+    _partyAnalysisDirty = true;
+    return;
+  }
+  _partyAnalysisDirty = false;
+  _partyCoverageTimer = setTimeout(updateCoverageNow, 80);
 }
 
 function getThreatCandidateAttackTypes(memberOrCandidate) {
@@ -4100,14 +4650,14 @@ function getWeightedDefenseValue(subject, threatProfile){
   const bulkFactor = Math.max(0, Math.min(0.42, (bulk - 80) / 140));
   return Math.max(0, bestEff - bulkFactor);
 }
-function getWeightedAttackEff(attackTypes, threatTypes){
+function getWeightedAttackEff(attackTypes, threatTypes, attackerAbility=''){
   if(!threatTypes || !threatTypes.length || !attackTypes || !attackTypes.length) return 1;
   let best = 0;
   attackTypes.forEach(entry=>{
     const rawType = typeof entry === 'string' ? entry : (entry && entry.type);
     const moveName = typeof entry === 'string' ? '' : String(entry && entry.name || '').trim();
     const moveType = POKE_TYPE_TO_MOVE_TYPE[rawType] || rawType;
-    const eff = getTypeEff(moveType, threatTypes, moveName);
+    const eff = getTypeEff(moveType, threatTypes, moveName, attackerAbility);
     if(eff > best) best = eff;
   });
   return best;
@@ -4121,7 +4671,7 @@ function evaluateThreatAgainstCurrentParty(threatProfile, members){
     if(!member || !member.poke) return;
     const defenseValue = getWeightedDefenseValue(member, threatProfile);
     if(defenseValue < bestDefenseValue) bestDefenseValue = defenseValue;
-    const attackEff = getWeightedAttackEff(getThreatCandidateAttackTypes(member), threatProfile.threatTypes);
+    const attackEff = getWeightedAttackEff(getThreatCandidateAttackTypes(member), threatProfile.threatTypes, member.ability || '');
     if(attackEff > bestOffenseEff) bestOffenseEff = attackEff;
   });
   const defenseConcern = bestDefenseValue >= 1.35 ? 1.8 : bestDefenseValue >= 1.05 ? 1.25 : bestDefenseValue >= 0.8 ? 0.8 : bestDefenseValue >= 0.55 ? 0.45 : 0.15;
@@ -4273,7 +4823,7 @@ function renderPartyRecommendations(atkMap, defWeakCount, defResCount, defImmCou
   const megaTarget = PARTY_MEGA_TARGET;
   const megaRemain = Math.max(0, megaTarget - currentMegaCount);
   if(metaEl){
-    metaEl.innerHTML = `上位20参照 / <span style="color:var(--accent3);">${modeLabel}</span>${dataset.updatedAt ? ` / 更新 ${escapePartyHtml(dataset.updatedAt)}` : ''} / メガ枠 ${currentMegaCount}/${megaTarget}`;
+    metaEl.innerHTML = `最新${escapePartyHtml(ACTIVE_RANKING_SEASON || '')} 上位20参照 / <span style="color:var(--accent3);">${modeLabel}</span>${dataset.updatedAt ? ` / 更新 ${escapePartyHtml(dataset.updatedAt)}` : ''} / メガ枠 ${currentMegaCount}/${megaTarget}`;
   }
 
   if(!members.length) {
@@ -4398,7 +4948,8 @@ window.onload = async () => {
   await initAuth();
   await loadGameData();
   initSeasonFilter();
-  switchPartyWorkspace('recommend');
+  switchPartyMode(PARTY_VIEW_MODE);
+  loadPartyDiagnosisSettingsToForm();
   markPartyBuildCarteDirty();
   document.querySelectorAll('[data-party-ranking-mode]').forEach(btn=>{
     btn.classList.toggle('active', btn.dataset.partyRankingMode === PARTY_RANKING_MODE);
@@ -4438,7 +4989,17 @@ setupIfExists('atk2-search','atk2-drop');
 if(el('pe-move-search')) setupPeMoveSearch();
 
 // パーティ管理
-if(el('party-slot-list')){ switchPartyMobileTab('six'); syncPartySaveControls(); renderPartySlotList(); renderRegPokeList(); renderSavedPartyListFast(); renderSavedPartyList(); if(!restorePartyDraft()) renderPartySlotList(); }
+if(el('party-slot-list')){
+  switchPartyMobileTab('six');
+  syncPartySaveControls();
+  renderPartySlotList();
+  renderRegPokeList();
+  renderSavedPartyListFast();
+  const loadSavedPartiesLater = ()=>renderSavedPartyList();
+  if(window.requestIdleCallback) requestIdleCallback(loadSavedPartiesLater, {timeout:2000});
+  else setTimeout(loadSavedPartiesLater, 600);
+  if(!restorePartyDraft()) renderPartySlotList();
+}
 
 // ダメージ計算スライダー（要素が存在するページのみ）
 ['atk-lv','def-lv'].forEach(id=>{
@@ -4795,7 +5356,7 @@ const TYPE_COLORS = {
 window.exportPartyImage = exportPartyImage;
 setupPartyExportSizeSwitch();
 
-window.addEventListener('pokeedge:season-change', function(ev){ const season = ev?.detail?.season || ''; const sel = document.getElementById('global-season-filter'); if(season && sel && Array.from(sel.options).some(opt=>opt.value===season)){ sel.value = season; reloadPartyRankingData(season); renderRegPokeList(document.getElementById('party-reg-search')?.value||''); } });
+window.addEventListener('pokeedge:season-change', function(ev){ const season = ev?.detail?.season || ''; const sel = document.getElementById('global-season-filter'); if(season && sel && Array.from(sel.options).some(opt=>opt.value===season)){ sel.value = season; reloadPartyRankingData(season, PARTY_RANKING_MODE); renderRegPokeList(document.getElementById('party-reg-search')?.value||''); } });
 
 document.addEventListener('DOMContentLoaded',()=>{ renderRegPokeList(); renderPartySlotList(); });
 };
@@ -4813,8 +5374,7 @@ function getSeasonFilteredPokes() {
 }
 function onSeasonFilterChange() {
   const season = document.getElementById('global-season-filter')?.value || '';
-  if(season && window.pokeEdgeRankingSeason && typeof pokeEdgeRankingSeason.setStored === 'function') pokeEdgeRankingSeason.setStored(season);
-  reloadPartyRankingData(season || getPartyStoredSeasonLabel());
+  reloadPartyRankingData(season || getLatestPartySeasonLabel(), PARTY_RANKING_MODE);
   document.querySelectorAll('input.search-input').forEach(inp => {
     inp.dispatchEvent(new Event('input'));
   });
@@ -4832,7 +5392,7 @@ function initSeasonFilter() {
       opt.textContent = s + '（' + (SEASON_DATA[s]||[]).length + '件）';
       sel.appendChild(opt);
     });
-    const preferred = resolvePartySeasonLabel(getPartyStoredSeasonLabel());
+    const preferred = getLatestPartySeasonLabel();
     if(preferred) sel.value = preferred;
   }
 }

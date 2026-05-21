@@ -388,6 +388,7 @@ footer{text-align:center;color:var(--text3);font-size:11px;padding:26px 12px 34p
   <div><a href="policy.html" style="color:var(--text2);text-decoration:none;">プライバシーポリシー / 利用規約</a></div>
 </footer>
 
+<script src="ranking-season-helper.js"></script>
 <script>
 let POKEMON_DATA = [];
 let MOVES_DATA = [];
@@ -400,6 +401,7 @@ let MEGA_DATA = {rows:[], baseToForms:{}, formToBase:{}};
 let RANKING_ROWS = [];
 let RANKING_BY_NAME = new Map();
 let RANKING_UPDATED_AT = '';
+let ACTIVE_RANKING_SEASON = '';
 let pokeIndex = [];
 let moveIndex = [];
 let moveByName = new Map();
@@ -529,9 +531,62 @@ function normalizePokemonMoves(raw){ if(raw && raw.pokemon && typeof raw.pokemon
 function normalizeBelongings(raw){ if(Array.isArray(raw)) return raw; if(raw && Array.isArray(raw.items)) return raw.items; return []; }
 function parseMaybeJson(txt){ try{return JSON.parse(txt);}catch(_e){} const t=String(txt||'').trim(); const s1=t.indexOf('['), e1=t.lastIndexOf(']'); if(s1>=0&&e1>s1){ try{return JSON.parse(t.slice(s1,e1+1));}catch(_e){} } const s2=t.indexOf('{'), e2=t.lastIndexOf('}'); if(s2>=0&&e2>s2){ try{return JSON.parse(t.slice(s2,e2+1));}catch(_e){} } throw new Error('invalid_json'); }
 async function fetchJsonFlexible(url, fallback){ try{ const r = await fetch(url, {cache:'no-cache'}); if(!r.ok) throw new Error('fetch_failed'); const txt = (await r.text()).replace(/^\uFEFF/, '').trim(); if(!txt) return fallback; return parseMaybeJson(txt); } catch(e){ return fallback; } }
+function quickSeasonLabels(){
+  const fromList = Array.isArray(SEASON_DATA?.seasons) ? SEASON_DATA.seasons : [];
+  const fromKeys = Object.keys(SEASON_DATA || {}).filter(k=>/^S\d+$/i.test(k));
+  const labels = Array.from(new Set([...fromList, ...fromKeys].map(v=>String(v||'').trim()).filter(Boolean)));
+  if(window.pokeEdgeRankingSeason && typeof pokeEdgeRankingSeason.sortLabels === 'function') return pokeEdgeRankingSeason.sortLabels(labels, true);
+  return labels.sort((a,b)=>{
+    const an = parseInt((String(a).match(/\d+/)||[])[0] || '0', 10);
+    const bn = parseInt((String(b).match(/\d+/)||[])[0] || '0', 10);
+    return bn - an;
+  });
+}
+function quickLatestSeasonLabel(){
+  const labels = quickSeasonLabels();
+  return labels[0] || '';
+}
+function quickRankingFilePath(baseName, seasonLabel){
+  if(window.pokeEdgeRankingSeason && typeof pokeEdgeRankingSeason.file === 'function') return pokeEdgeRankingSeason.file(baseName, seasonLabel);
+  const raw = String(seasonLabel || '').trim();
+  const m = raw.match(/(\d+)/);
+  const num = m ? parseInt(m[1], 10) : 0;
+  return num && num !== 1 ? `${baseName}_s${num}.json` : `${baseName}.json`;
+}
+function quickNormalizeRankingPayload(raw){
+  return raw && typeof raw === 'object' && Array.isArray(raw.rows) ? raw : {rows:[]};
+}
+async function quickLoadLatestRankingPayload(){
+  const labels = quickSeasonLabels();
+  const candidates = [];
+  const add = (baseName, label)=>{
+    const path = quickRankingFilePath(baseName, label);
+    if(!candidates.some(c=>c.path === path)) candidates.push({path, label, baseName});
+  };
+  labels.forEach(label=>add('season_ranking_single', label));
+  labels.forEach(label=>add('season_ranking_double', label));
+  add('season_ranking_single', 'S1');
+  add('season_ranking_double', 'S1');
+  for(const cand of candidates){
+    const data = quickNormalizeRankingPayload(await fetchJsonFlexible(cand.path, {rows:[]}));
+    if(data.rows.length){
+      return Object.assign({}, data, {__seasonLabel:cand.label, __rankingPath:cand.path});
+    }
+  }
+  return {rows:[], __seasonLabel:quickLatestSeasonLabel(), __rankingPath:''};
+}
+function quickSetRankingPayload(payload){
+  const ranking = quickNormalizeRankingPayload(payload);
+  RANKING_ROWS = ranking.rows;
+  RANKING_UPDATED_AT = ranking.updatedAt || '';
+  ACTIVE_RANKING_SEASON = ranking.__seasonLabel || quickLatestSeasonLabel();
+  if(ACTIVE_RANKING_SEASON && window.pokeEdgeRankingSeason && typeof pokeEdgeRankingSeason.setStored === 'function') pokeEdgeRankingSeason.setStored(ACTIVE_RANKING_SEASON);
+  RANKING_BY_NAME = new Map();
+  RANKING_ROWS.forEach(row=>{ const nm = String(row.name || row.siteName || '').trim(); if(nm && !RANKING_BY_NAME.has(nm)) RANKING_BY_NAME.set(nm, row); });
+}
 async function loadGameData(){
   if(_dataLoaded) return;
-  const [pd, md, ad, abd, pmd, bd, sd, mega, rs2, rs1, rd2, rd1] = await Promise.all([
+  const [pd, md, ad, abd, pmd, bd, sd, mega] = await Promise.all([
     fetchJsonFlexible('pokemon.json', []),
     fetchJsonFlexible('moves.json', []),
     fetchJsonFlexible('abilities.json', {}),
@@ -539,11 +594,7 @@ async function loadGameData(){
     fetchJsonFlexible('pokemon_moves.json', {}),
     fetchJsonFlexible('belongings.json', []),
     fetchJsonFlexible('season.json', {seasons:[]}),
-    fetchJsonFlexible('mega.json', {rows:[], baseToForms:{}, formToBase:{}}),
-    fetchJsonFlexible('season_ranking_single_s2.json', {rows:[]}),
-    fetchJsonFlexible('season_ranking_single.json', {rows:[]}),
-    fetchJsonFlexible('season_ranking_double_s2.json', {rows:[]}),
-    fetchJsonFlexible('season_ranking_double.json', {rows:[]})
+    fetchJsonFlexible('mega.json', {rows:[], baseToForms:{}, formToBase:{}})
   ]);
   POKEMON_DATA = Array.isArray(pd) ? pd : [];
   MOVES_DATA = Array.isArray(md) ? md : [];
@@ -553,11 +604,8 @@ async function loadGameData(){
   BELONGINGS = normalizeBelongings(bd);
   SEASON_DATA = sd && typeof sd === 'object' ? sd : {seasons:[]};
   MEGA_DATA = mega && typeof mega === 'object' ? mega : {rows:[], baseToForms:{}, formToBase:{}};
-  const rankingSources = [rs2, rs1, rd2, rd1].filter(x=>x && Array.isArray(x.rows) && x.rows.length);
-  RANKING_ROWS = rankingSources.length ? rankingSources[0].rows : [];
-  RANKING_UPDATED_AT = rankingSources.length ? (rankingSources[0].updatedAt || '') : '';
-  RANKING_BY_NAME = new Map();
-  RANKING_ROWS.forEach(row=>{ const nm = String(row.name || row.siteName || '').trim(); if(nm && !RANKING_BY_NAME.has(nm)) RANKING_BY_NAME.set(nm, row); });
+  const rankingPayload = await quickLoadLatestRankingPayload();
+  quickSetRankingPayload(rankingPayload);
   pokeIndex = POKEMON_DATA.map((p,i)=>Object.assign({_i:i}, p));
   moveIndex = MOVES_DATA.map((m,i)=>Object.assign({_i:i}, m));
   pokeByName = new Map(pokeIndex.map(p=>[String(p.name||'').trim(), p]));
@@ -947,11 +995,19 @@ function calcFullStats(slot){
     spe: calcStat(Number(p.spe||0), slot.iv, slot.ev.spe, slot.lv, nat.spe, champions)
   };
 }
-function getTypeEff(moveType, defTypes, moveName=''){
+function quickAbilityLetsNormalFightingHitGhost(abilityName){
+  return ['きもったま','しんがん'].includes(String(abilityName||'').trim());
+}
+function quickIsNormalOrFightingType(moveType){
+  return ['ノーマル','かくとう','格闘'].includes(String(moveType||'').trim());
+}
+function getTypeEff(moveType, defTypes, moveName='', attackerAbility=''){
   let eff = 1;
   const chart = TYPE_EFF_TABLE[moveType] || {};
   const isFreezeDry = String(moveName||'').trim() === 'フリーズドライ';
+  const ignoreGhostImmunity = quickAbilityLetsNormalFightingHitGhost(attackerAbility) && quickIsNormalOrFightingType(moveType);
   defTypes.forEach(type=>{
+    if(ignoreGhostImmunity && type === 'ゴースト') return;
     if(isFreezeDry && type === 'みず') {
       eff *= 2;
       return;
@@ -960,7 +1016,12 @@ function getTypeEff(moveType, defTypes, moveName=''){
   });
   return eff;
 }
-function typeEffWithAbility(moveType, defTypes, ability, moveName=''){ if(ability && IMMUNE_AB[ability] === moveType) return 0; const ad = ability ? getAbilityData(ability) : null; if(ad && ad.immuneType && ad.immuneType === moveType) return 0; return getTypeEff(moveType, defTypes, moveName); }
+function typeEffWithAbility(moveType, defTypes, ability, moveName='', attackerAbility=''){
+  if(ability && IMMUNE_AB[ability] === moveType) return 0;
+  const ad = ability ? getAbilityData(ability) : null;
+  if(ad && ad.immuneType && ad.immuneType === moveType) return 0;
+  return getTypeEff(moveType, defTypes, moveName, attackerAbility);
+}
 function getAuraModifier(moveType, atkAbility, defAbility){ const fairyAura = atkAbility==='フェアリーオーラ' || defAbility==='フェアリーオーラ'; const darkAura = atkAbility==='ダークオーラ' || defAbility==='ダークオーラ'; const auraBreak = atkAbility==='オーラブレイク' || defAbility==='オーラブレイク'; if(moveType==='フェアリー' && fairyAura) return auraBreak ? 3072/4096 : 5448/4096; if(moveType==='あく' && darkAura) return auraBreak ? 3072/4096 : 5448/4096; return 1; }
 function getDisplayedCategory(move, atkStats, defStats){ if(move.name==='シェルアームズ'){ const physicalScore = Math.max(1, atkStats.atk) / Math.max(1, defStats.def); const specialScore = Math.max(1, atkStats.spa) / Math.max(1, defStats.spd); return physicalScore > specialScore ? '物理' : '特殊'; } return move.category; }
 function resolveMoveType(move, atkAbility, weather){ let type = move.type; let skin = 1; let notes = []; if(SKIN_MAP[atkAbility] && type==='ノーマル' && move.name!=='わるあがき'){ type = SKIN_MAP[atkAbility]; skin = 1.2; notes.push(`${atkAbility}で${type}化`); } if(move.name==='ウェザーボール' && weather && WB_MAP[weather]){ type = WB_MAP[weather]; notes.push(`ウェザーボール→${type}`); } return {type, skin, notes}; }
@@ -1105,9 +1166,12 @@ function calcDamageResult(atkSlot, moveName, defSlot, weather){
   const isFoulPlay = move.name==='イカサマ';
   const offenseCategory = isBodyPress ? 'ぼうぎょ' : (isFoulPlay ? 'こうげき' : (SPECIAL_DEFENSE_MOVES.has(move.name) ? '特殊' : rawCategory));
   const defenseCategory = SPECIAL_DEFENSE_MOVES.has(move.name) || isBodyPress || rawCategory==='物理' ? '物理' : '特殊';
-  const eff = typeEffWithAbility(resolvedType.type, defTypes, defSlot.ability, move.name || '');
+  const eff = typeEffWithAbility(resolvedType.type, defTypes, defSlot.ability, move.name || '', atkSlot.ability);
   const abilityPowerInfo = getAttackAbilityPowerInfo(atkSlot, move, resolvedType.type, rawCategory, eff);
-  const baseNotes = [...(resolvedType.notes||[]), ...(powerInfo.notes||[]), ...(abilityPowerInfo.notes||[])];
+  const scrappyNote = quickAbilityLetsNormalFightingHitGhost(atkSlot.ability) && quickIsNormalOrFightingType(resolvedType.type) && defTypes.includes('ゴースト')
+    ? [`${atkSlot.ability}: ゴースト無効を通常相性化`]
+    : [];
+  const baseNotes = [...(resolvedType.notes||[]), ...(powerInfo.notes||[]), ...(abilityPowerInfo.notes||[]), ...scrappyNote];
   if(eff === 0){
     return {immune:true, min:0, max:0, pctMin:0, pctMax:0, ko:'無効', score:0, eff:0, moveType:resolvedType.type, category:rawCategory, attackStatName:offenseCategory, defenseStatName:defenseCategory, notes:baseNotes};
   }
@@ -1242,14 +1306,18 @@ function quickCloseNav(){
 function quickSafeJson(key, fallback){ try{ return JSON.parse(localStorage.getItem(key) || ''); }catch(_e){ return fallback; } }
 function quickLoadPartiesLocal(){ return quickSafeJson('pokeedge_parties', []); }
 
-function quickCleanUsageName(v){ return String(v || '').replace(/（[^）]*）/g,'').replace(/\([^)]*\)/g,'').trim(); }
+function quickNormalizeLookupText(value){
+  return String(value || '').replace(/[０-９]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0)).trim();
+}
+function quickCleanUsageName(v){
+  return quickNormalizeLookupText(String(v || '').replace(/（[^）]*）/g,'').replace(/\([^)]*\)/g,'').trim());
+}
 function quickRankingPercent(v){ const m = String(v || '').match(/\(([0-9.]+)%\)/); return m ? parseFloat(m[1]) : 0; }
 function quickRankingSortValue(name){ const row = quickRankRowForName ? quickRankRowForName(name) : RANKING_BY_NAME.get(name); return row ? (parseInt(row.rank,10)||9999) : 9999; }
 function quickMegaBaseName(name){ return String(MEGA_DATA?.formToBase?.[name] || '').trim(); }
 function quickBaseForMoveSource(name){ return quickMegaBaseName(name) || name; }
 function quickLatestSeasonList(){
-  const seasons = Array.isArray(SEASON_DATA?.seasons) ? SEASON_DATA.seasons : [];
-  const key = seasons.length ? seasons[seasons.length - 1] : (SEASON_DATA?.S2 ? 'S2' : '');
+  const key = quickLatestSeasonLabel() || (Array.isArray(SEASON_DATA?.seasons) && SEASON_DATA.seasons.length ? SEASON_DATA.seasons[SEASON_DATA.seasons.length - 1] : (SEASON_DATA?.S2 ? 'S2' : ''));
   const list = key && Array.isArray(SEASON_DATA[key]) ? SEASON_DATA[key] : (Array.isArray(SEASON_DATA?.['内定']) ? SEASON_DATA['内定'] : []);
   return list.map(n=>String(n||'').trim()).filter(Boolean);
 }
@@ -1343,7 +1411,7 @@ function quickApplyRankingToSlot(role){
         slot.ability = rankingAbility;
       }
       rankedMoves = quickRankingMoveNames(row, slot.poke.name);
-      slot.rankingLabel = `ランキング${row.rank ? ' ' + row.rank + '位' : ''}${RANKING_UPDATED_AT ? ' / ' + RANKING_UPDATED_AT : ''}`;
+      slot.rankingLabel = `ランキング${row.rank ? ' ' + row.rank + '位' : ''}${ACTIVE_RANKING_SEASON ? ' / ' + ACTIVE_RANKING_SEASON : ''}${RANKING_UPDATED_AT ? ' / ' + RANKING_UPDATED_AT : ''}`;
     } else {
       quickEnsureAbility(role);
       slot.rankingLabel = 'ランキング未掲載';
@@ -1384,7 +1452,7 @@ function quickShowSearchPanel(panelId, items){
   panel.classList.add('open');
 }
 function quickHideSearchPanel(panelId){ const p=document.getElementById(panelId); if(p){ p.classList.remove('open'); p.innerHTML=''; } }
-function quickFilterTextMatch(label, q){ const a=String(label||'').toLowerCase(); const b=String(q||'').trim().toLowerCase(); return !b || a.includes(b); }
+function quickFilterTextMatch(label, q){ const a=quickNormalizeLookupText(label).toLowerCase(); const b=quickNormalizeLookupText(q).toLowerCase(); return !b || a.includes(b); }
 function quickPokemonSuggestions(query, role){
   return quickRankedPokemonList().filter(p=>quickFilterTextMatch(p.name, query)).slice(0,18).map(p=>{
     const row = quickRankRowForName(p.name);
