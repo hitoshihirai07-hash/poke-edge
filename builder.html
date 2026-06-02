@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google-adsense-account" content="ca-pub-7687416670736373">
 <title>構築アシスト | PokeEdge</title>
 <meta name="description" content="ランクマッチで使えるポケモンから、選択済み全体との相性補完を見ながら6匹の構築候補を作成するPokeEdgeの構築アシスト機能です。">
 <meta name="robots" content="index, follow">
@@ -319,6 +320,21 @@ footer{border-top:1px solid var(--border);padding:18px 20px;display:flex;align-i
       <div id="candidate-list" class="candidates"></div>
     </section>
   </div>
+
+
+  <section class="page-guide adsense-priority-note" aria-label="構築アシストの補足説明">
+    <div>
+      <div class="guide-kicker">構築作成の考え方</div>
+      <h2 class="guide-title">構築アシストは、候補を断定するのではなく、採用理由を比較しやすくするためのページです。</h2>
+      <p class="guide-text">ポケモン対戦の構築は、タイプ相性だけでなく、技範囲、素早さ、物理・特殊の偏り、メガ枠、重くなりやすい相手への打点を合わせて考える必要があります。このページでは、選択済みの6匹全体を見ながら、次に欲しい要素を整理できるようにしています。</p>
+    </div>
+    <div class="guide-points">
+      <div class="guide-point"><strong>全体の穴を確認</strong><span>現在の構築に足りない攻撃範囲や受け先を確認し、次の候補を比較する材料にできます。</span></div>
+      <div class="guide-point"><strong>型変更も考慮</strong><span>技・持ち物・性格を変えると役割も変わるため、候補を固定せず調整しながら見直せます。</span></div>
+      <div class="guide-point"><strong>他ツールへ連携</strong><span>気になる候補はパーティ管理やクイック技ダメージに回して、実際の対面確認につなげられます。</span></div>
+    </div>
+  </section>
+
 </main>
 
 <div class="detail-modal" id="detail-modal" onclick="if(event.target===this)closeDetail()"><div class="detail-card" id="detail-card"></div></div>
