@@ -758,7 +758,18 @@ function getItemName(item){ return String(item?.name || item?.item || item?.disp
 function getAvailablePokemonList(){ const naitei = SEASON_DATA && Array.isArray(SEASON_DATA['内定']) ? SEASON_DATA['内定'] : null; if(!naitei || !naitei.length) return pokeIndex; const set = new Set(naitei); return pokeIndex.filter(p=>set.has(String(p.name||'').trim())); }
 function getAbilityData(name){ return ABILITIES_DATA.find(a=>a.name===name) || null; }
 function getAbilityOptions(pokeName){ return Array.isArray(ABILITY_MAP[pokeName]) ? ABILITY_MAP[pokeName] : []; }
-function knownMovesForPokemon(pokeName){ const row = POKEMON_MOVES[pokeName]; return row && Array.isArray(row.moves) ? row.moves : []; }
+function knownMovesForPokemon(pokeName){
+  const raw = String(pokeName || '').trim();
+  const names = [];
+  const add = (v)=>{ const n=String(v||'').trim(); if(n && !names.includes(n)) names.push(n); };
+  try{ add(quickBaseForMoveSource(raw)); }catch(_){ }
+  add(raw);
+  for(const name of names){
+    const row = POKEMON_MOVES[name];
+    if(row && Array.isArray(row.moves) && row.moves.length) return row.moves;
+  }
+  return [];
+}
 function escapeHtml(str){ return String(str ?? '').replace(/[&<>"']/g, s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s])); }
 function escapeAttr(str){ return escapeHtml(str).replace(/`/g,'&#96;'); }
 function getTypePills(poke){ if(!poke) return ''; return [poke.type1, poke.type2].filter(Boolean).map(t=>`<span class="type-pill tp-${escapeAttr(t)}">${escapeHtml(t)}</span>`).join(''); }
@@ -799,13 +810,13 @@ function normalizeMoves(moves, pokeName){
     moves.slice(0,4).forEach((m,i)=>{ out[i] = typeof m === 'string' ? m : String(m?.name || '').trim(); });
   }
   if(!out.some(Boolean) && pokeName){
-    const known = knownMovesForPokemon(pokeName).slice(0,4).map(m=>m.name);
+    const known = quickSmartFallbackMoveNames(pokeByName.get(pokeName) || {name:pokeName}, 4);
     known.forEach((name,i)=>{ out[i]=name; });
   }
   return out;
 }
 function ensureAbility(slot){ if(!slot.poke) return; const opts = getAbilityOptions(slot.poke.name); if(!slot.ability && opts.length) slot.ability = opts[0]; if(slot.ability && opts.length && !opts.includes(slot.ability)) slot.ability = opts[0] || slot.ability; }
-function ensureMoves(slot){ if(!slot.poke || !slot.moves) return; if(slot.moves.some(Boolean)) return; const known = knownMovesForPokemon(slot.poke.name).slice(0,4); known.forEach((m,i)=>{ slot.moves[i] = m.name; }); }
+function ensureMoves(slot){ if(!slot.poke || !slot.moves) return; if(slot.moves.some(Boolean)) return; const known = quickSmartFallbackMoveNames(slot.poke, 4); known.forEach((name,i)=>{ slot.moves[i] = name; }); }
 function applySavedParty(){
   const idx = parseInt(el('saved-party-select').value, 10);
   if(Number.isNaN(idx) || !savedParties[idx]) return;
@@ -1380,7 +1391,21 @@ function resolveMovePower(move, atkSlot, defSlot, weather, field=''){
   power = applyFieldMovePower(field, move.name, power, atkSlot, defSlot, notes);
   return {power, notes};
 }
-function getAttackItemMultiplier(item, moveType, category, eff){
+
+function quickMetronomeMultiplier(count){
+  const n = Math.max(1, Math.min(6, parseInt(count || 1, 10) || 1));
+  return n <= 1 ? 1 : Math.min(2, 1 + 0.2 * (n - 1));
+}
+function quickAttackItemPowerNotes(item, moveType, category, eff, atkSlot=null){
+  const text = normalizeItemText(item);
+  const notes = [];
+  if(!text) return notes;
+  if(text.includes('ものしりメガネ') && category === '特殊') notes.push('ものしりメガネ: 特殊技×1.1');
+  if(text.includes('ちからハチマキ') && category === '物理') notes.push('ちからハチマキ: 物理技×1.1');
+  if(text.includes('メトロノーム')) notes.push('メトロノーム: 連続使用' + quickGetCondition(atkSlot || {}).metronomeCount + '回目');
+  return notes;
+}
+function getAttackItemMultiplier(item, moveType, category, eff, atkSlot=null){
   const text = normalizeItemText(item);
   const effect = getItemEffectText(item);
   if(!text) return 1;
@@ -1388,6 +1413,9 @@ function getAttackItemMultiplier(item, moveType, category, eff){
   if(text.includes('こだわりメガネ') && category==='特殊') return 1.5;
   if(text.includes('いのちのたま')) return 1.3;
   if(text.includes('たつじんのおび') && eff > 1) return 1.2;
+  if(text.includes('ものしりメガネ') && category === '特殊') return 1.1;
+  if(text.includes('ちからハチマキ') && category === '物理') return 1.1;
+  if(text.includes('メトロノーム')) return quickMetronomeMultiplier(quickGetCondition(atkSlot || {}).metronomeCount);
   if(effect.includes(moveType + 'タイプの技の威力が1.2倍') && eff > 0) return 1.2;
   if(text.includes('タイプ強化') && eff > 0) return 1.2;
   return 1;
@@ -1428,6 +1456,17 @@ function getAttackAbilityPowerInfo(atkSlot, move, moveType, category, eff, weath
   if(TYPE_BOOST_ABILITIES[ability] && TYPE_BOOST_ABILITIES[ability][0] === moveType){
     mult *= TYPE_BOOST_ABILITIES[ability][1];
     notes.push(`${ability}: ${moveType}技強化`);
+  }
+  const abilityData = getAbilityData(ability);
+  if(abilityData && abilityData.atkPowerUp){
+    const up = abilityData.atkPowerUp;
+    const types = up.type ? (Array.isArray(up.type) ? up.type : [up.type]) : [];
+    const typeOk = !types.length || types.includes(moveType);
+    const powerOk = up.maxPower == null || (Number(move?.power || 0) || 0) <= Number(up.maxPower);
+    if(typeOk && powerOk){
+      mult *= Number(up.mult || 1) || 1;
+      notes.push(up.info || `${ability}: ${moveType}技強化`);
+    }
   }
   if(LOW_HP_TYPE_ABILITIES[ability] === moveType && condition.lowHp){
     mult *= 1.5;
@@ -1558,7 +1597,8 @@ function calcDamageResult(atkSlot, moveName, defSlot, weather, field){
   const powerMult = abilityPowerInfo.mult * resolvedType.skin * getAuraModifier(resolvedType.type, atkSlot.ability, defSlot.ability) * fieldDamageInfo.powerMult;
   const weatherMoveMult = getWeatherMoveMult(weather, resolvedType.type);
   const defDmgMult = getDefAbilityDmgMult(defSlot.ability, resolvedType.type, eff);
-  const itemMult = getAttackItemMultiplier(atkSlot.item, resolvedType.type, rawCategory, eff);
+  const itemMult = getAttackItemMultiplier(atkSlot.item, resolvedType.type, rawCategory, eff, atkSlot);
+  baseNotes.push(...quickAttackItemPowerNotes(atkSlot.item, resolvedType.type, rawCategory, eff, atkSlot));
   const defItemMult = getDefenseItemMultiplier(defSlot.item, resolvedType.type, eff);
   const effectiveAttack = Math.max(1, Math.floor(attackStat * statMult));
   const effectiveDefense = Math.max(1, Math.floor(defenseStat));
@@ -1751,6 +1791,66 @@ function quickRankingMoveNames(row, pokeName){
   const filtered = damaging.filter(name=>!knownSet.size || knownSet.has(name));
   return (filtered.length ? filtered : damaging).slice(0,4);
 }
+const QUICK_LOW_PRACTICAL_MOVE_NAMES = new Set([
+  'ギガインパクト','はかいこうせん','ブラストバーン','ハイドロカノン','ハードプラント','メテオビーム',
+  'ソーラービーム','ソーラーブレード','ロケットずつき','ゴッドバード','そらをとぶ','とびはねる','あなをほる','ダイビング','シャドーダイブ','ゴーストダイブ',
+  'じばく','だいばくはつ','ミストバースト','ビックリヘッド','てっていこうせん','ゲップ','ゆめくい','きあいパンチ','しぜんのめぐみ'
+]);
+const QUICK_PRIORITY_MOVE_NAMES = new Set(['しんそく','ふいうち','アクアジェット','こおりのつぶて','かげうち','バレットパンチ','マッハパンチ','でんこうせっか','フェイント','アクセルロック','ジェットパンチ','グラススライダー']);
+function quickInferAttackBias(poke){
+  const atk = Number(poke && poke.atk || 0);
+  const spa = Number(poke && poke.spa || 0);
+  if(atk >= spa + 15) return 'physical';
+  if(spa >= atk + 15) return 'special';
+  return 'mixed';
+}
+function quickPracticalMovePenalty(move){
+  const name = String(move && move.name || '').trim();
+  const text = String(move && (move.effect || move.notes || '') || '');
+  let penalty = 0;
+  if(QUICK_LOW_PRACTICAL_MOVE_NAMES.has(name)) penalty += 900;
+  if(text.includes('使った次のターン') || text.includes('反動状態')) penalty += 700;
+  if(text.includes('溜め状態') || text.includes('ため状態')) penalty += 450;
+  if(text.includes('自分はひんし') || text.includes('自分がひんし')) penalty += 900;
+  if(text.includes('自分のHPを半分') || text.includes('最大HPの1/2')) penalty += 250;
+  const acc = Number(move && move.accuracy || 0) || 100;
+  if(acc && acc < 80) penalty += 180;
+  return penalty;
+}
+function quickSmartFallbackMoveNames(pokeOrName, limit=4){
+  const poke = typeof pokeOrName === 'string' ? (pokeByName.get(pokeOrName) || {name:pokeOrName}) : (pokeOrName || null);
+  const rawName = String(poke && poke.name || pokeOrName || '').trim();
+  const sourceName = quickBaseForMoveSource(rawName);
+  const types = new Set([poke && poke.type1, poke && poke.type2].filter(Boolean));
+  const bias = quickInferAttackBias(pokeByName.get(rawName) || pokeByName.get(sourceName) || poke);
+  const seen = new Set();
+  const rows = knownMovesForPokemon(sourceName).map(entry=>{
+    const name = String(entry && entry.name || '').trim();
+    if(!name || seen.has(name)) return null;
+    seen.add(name);
+    const meta = moveByName.get(name) || entry;
+    const category = String((entry && entry.category) || (meta && meta.category) || '').trim();
+    const type = String((entry && entry.type) || (meta && meta.type) || '').trim();
+    const power = Number((entry && entry.power) || (meta && meta.power)) || 0;
+    if(!meta || !['物理','特殊'].includes(category) || power <= 0) return null;
+    const acc = Number((entry && entry.accuracy) || (meta && meta.accuracy)) || 100;
+    const isStab = types.has(type);
+    const classMatch = bias === 'mixed' ? true : category === (bias === 'physical' ? '物理' : '特殊');
+    let score = 0;
+    score += isStab ? 1200 : 0;
+    score += classMatch ? 850 : -350;
+    score += Math.min(power, 120) * 8;
+    score += acc >= 100 ? 120 : (acc >= 90 ? 80 : (acc >= 80 ? 20 : -120));
+    if(QUICK_PRIORITY_MOVE_NAMES.has(name)) score += 180;
+    const desc = String((entry && entry.description) || (meta && meta.effect) || '').trim();
+    if(desc.includes('急所に当たりやすい') || desc.includes('必ず急所')) score += 70;
+    if(desc.includes('先制')) score += 120;
+    score -= quickPracticalMovePenalty(Object.assign({}, meta, entry));
+    return {name, score};
+  }).filter(Boolean);
+  rows.sort((a,b)=>b.score-a.score || a.name.localeCompare(b.name,'ja'));
+  return rows.slice(0, limit).map(x=>x.name);
+}
 function quickTopRankingValue(list){ return quickCleanUsageName((list || [])[0] || ''); }
 function quickApplyCharizardX(slot){
   slot.item = 'リザードナイトX';
@@ -1794,7 +1894,7 @@ function quickApplyRankingToSlot(role){
     if(megaItem) slot.item = megaItem;
   }
   if(role === 'attacker'){
-    const fallback = rankedMoves.length ? rankedMoves : knownMovesForPokemon(quickBaseForMoveSource(slot.poke.name)).map(m=>m.name).filter(Boolean).filter(n=>{ const m=moveByName.get(n); return m && (m.category==='物理'||m.category==='特殊'); }).slice(0,4);
+    const fallback = rankedMoves.length ? rankedMoves : quickSmartFallbackMoveNames(slot.poke, 4);
     const moves = fallback.slice(0,4);
     while(moves.length < 4) moves.push('');
     quickState.moves = moves;
@@ -1844,8 +1944,10 @@ function quickMoveSuggestions(query, index){
   const q = String(query || '').trim();
   const base = quickState.attacker.poke ? quickBaseForMoveSource(quickState.attacker.poke.name) : '';
   const known = knownMovesForPokemon(base).map(m=>String(m.name||'').trim()).filter(Boolean);
-  const knownSet = new Set(known);
-  const pool = known.length ? known : moveIndex.map(m=>m.name);
+  const smart = quickState.attacker.poke ? quickSmartFallbackMoveNames(quickState.attacker.poke, 80) : [];
+  const smartSet = new Set(smart);
+  const restKnown = known.filter(n=>!smartSet.has(n));
+  const pool = known.length ? smart.concat(restKnown) : moveIndex.map(m=>m.name);
   const damaging = pool.filter(n=>{ const m=moveByName.get(n); return m && (m.category==='物理'||m.category==='特殊'); });
   return damaging.filter(n=>quickFilterTextMatch(n,q)).slice(0,18).map(n=>{ const m=moveByName.get(n); return {label:n, meta:m?`${m.type}/${m.category}`:'', onclick:`quickPickMove(${index},'${escapeAttr(n)}')`}; });
 }
@@ -1902,7 +2004,7 @@ function quickRenderFieldChips(){
 }
 function quickStageMult(stage){ const s = Math.max(-6, Math.min(6, parseInt(stage||0,10)||0)); return s >= 0 ? (2+s)/2 : 2/(2-s); }
 function quickApplyStage(value, stage){ return Math.max(1, Math.floor(value * quickStageMult(stage))); }
-function quickDefaultCondition(){ return {faintedAllies:0, lowHp:false, flashFire:false, hpPercent:100, proteanUsed:false, proteanType:'', targetPoisoned:false}; }
+function quickDefaultCondition(){ return {faintedAllies:0, lowHp:false, flashFire:false, hpPercent:100, proteanUsed:false, proteanType:'', targetPoisoned:false, metronomeCount:1}; }
 function quickNormalizeCondition(condition){
   const src = condition && typeof condition === 'object' ? condition : {};
   const proteanType = QUICK_TYPE_NAMES.includes(src.proteanType) ? src.proteanType : '';
@@ -1913,7 +2015,8 @@ function quickNormalizeCondition(condition){
     hpPercent: Math.max(1, Math.min(100, parseInt(src.hpPercent || 100, 10) || 100)),
     proteanUsed: !!src.proteanUsed,
     proteanType,
-    targetPoisoned: !!src.targetPoisoned
+    targetPoisoned: !!src.targetPoisoned,
+    metronomeCount: Math.max(1, Math.min(6, parseInt(src.metronomeCount || 1, 10) || 1))
   };
 }
 function quickGetCondition(slot){
@@ -1943,6 +2046,7 @@ function quickSetCondition(role, key, value){
   }
   if(key === 'proteanType') condition.proteanType = QUICK_TYPE_NAMES.includes(value) ? value : '';
   if(key === 'targetPoisoned') condition.targetPoisoned = value === true || value === 'true' || value === 1 || value === '1';
+  if(key === 'metronomeCount') condition.metronomeCount = Math.max(1, Math.min(6, parseInt(value || 1, 10) || 1));
   slot.condition = condition;
   quickRenderAll();
 }
@@ -2116,9 +2220,7 @@ function quickAutoMoves(render=true){
   }
   const row = quickRankRowForName(poke.name);
   const ranked = quickRankingMoveNames(row, poke.name);
-  const known = knownMovesForPokemon(quickBaseForMoveSource(poke.name)).map(m=>m.name).filter(Boolean);
-  const damaging = known.filter(name=>{ const m=moveByName.get(name); return m && (m.category==='物理'||m.category==='特殊'); });
-  const source = (ranked.length ? ranked : (damaging.length ? damaging : known)).slice(0,4);
+  const source = (ranked.length ? ranked : quickSmartFallbackMoveNames(poke, 4)).slice(0,4);
   while(source.length < 4) source.push('');
   quickState.moves = source.slice(0,4);
   quickState.attacker.moves = quickState.moves.slice(0,4);
@@ -2254,7 +2356,8 @@ function quickConditionControls(role, slot){
   const needsTargetHp = role === 'defender' && hasTargetHpPower;
   const needsProtean = quickHasProteanAbility(slot);
   const needsMerciless = role === 'attacker' && ability === 'ひとでなし';
-  if(!needsFainted && !needsLowHp && !needsFlashFire && !needsSelfHp && !needsTargetHp && !needsProtean && !needsMerciless) return '';
+  const needsMetronome = role === 'attacker' && normalizeItemText(slot.item || '').includes('メトロノーム');
+  if(!needsFainted && !needsLowHp && !needsFlashFire && !needsSelfHp && !needsTargetHp && !needsProtean && !needsMerciless && !needsMetronome) return '';
   const parts = [];
   if(needsFainted){
     parts.push(`<div class="rank-box"><div class="label">味方ひんし数</div><div class="segment-grid">${[0,1,2].map(n=>`<button type="button" class="segment-btn ${condition.faintedAllies===n?'active':''}" onclick="quickSetCondition('${role}','faintedAllies',${n})">${n}体</button>`).join('')}</div></div>`);
@@ -2277,6 +2380,9 @@ function quickConditionControls(role, slot){
   }
   if(needsMerciless){
     parts.push(`<div class="rank-box"><div class="label">ひとでなし条件</div><div class="segment-grid"><button type="button" class="segment-btn ${!condition.targetPoisoned?'active':''}" onclick="quickSetCondition('${role}','targetPoisoned',false)">相手どくなし</button><button type="button" class="segment-btn ${condition.targetPoisoned?'active':''}" onclick="quickSetCondition('${role}','targetPoisoned',true)">相手どく/猛毒</button></div></div>`);
+  }
+  if(needsMetronome){
+    parts.push(`<div class="rank-box" style="grid-column:1/-1"><div class="label">メトロノーム連続使用</div><div class="segment-grid">${[1,2,3,4,5,6].map(n=>`<button type="button" class="segment-btn ${condition.metronomeCount===n?'active':''}" onclick="quickSetCondition('${role}','metronomeCount',${n})">${n===1?'1回目':(n===6?'6回目以降':'{N}回目').replace('{N}', n)}${n===1?'':` ×${quickMetronomeMultiplier(n).toFixed(1)}`}</button>`).join('')}</div></div>`);
   }
   return `<div class="field" style="grid-column:1/-1"><div class="label">発動条件</div><div class="rank-grid">${parts.join('')}</div></div>`;
 }
